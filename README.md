@@ -45,6 +45,8 @@ Sem cadastro, sem servidor, sem instalação. Cada pessoa que abre o planner tem
 ### 💰 Gastos e ganhos
 - Registre gastos e ganhos com valor, categoria, data e **de qual conta ou cartão** saiu.
 - **Contas fixas** (aluguel, salário, assinaturas): cadastre uma vez e elas aparecem todo mês como previstas — dê o check quando pagar.
+  - Escolha quando cai: **mesmo dia todo mês**, **Nº dia útil** (ex.: 5º dia útil), **último dia útil** ou **último dia do mês** — os dias úteis descontam fins de semana e feriados nacionais (inclusive Carnaval, Sexta-feira Santa e Corpus Christi).
+  - **Confirmar sozinho no dia**: o valor entra ou sai do saldo automaticamente quando a data chega (ideal para salário e débito automático). Se atrasar, é só desmarcar naquele mês.
 - **Compras parceladas**: informe o valor da parcela ou o total; cada parcela cai no mês certo e você vê quanto falta e quando termina.
 - **Orçamento por categoria** com barra que fica vermelha quando passa do limite.
 - Resumo do mês (ganhos, gastos, saldo e previsão), gastos por categoria e por cartão/conta, comparação com o mês anterior.

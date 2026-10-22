@@ -622,7 +622,14 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
       <label class="field">Nº de parcelas<input id="enN" type="number" min="2" max="120" step="1" value="2"></label>
       <label class="field">O valor informado é<select id="enBasis"><option value="each">De cada parcela</option><option value="total">O total da compra</option></select></label>
     </div>
-    <label class="field" id="enUntilBox">Repetir até (opcional)<input id="enUntil" type="date"></label>
+    <div id="enRecurBox">
+      <div class="grid2">
+        <label class="field">Cai em<select id="enRule"><option value="day">Mesmo dia todo mês</option><option value="biz">Nº dia útil do mês</option><option value="lastBiz">Último dia útil do mês</option><option value="last">Último dia do mês</option></select></label>
+        <label class="field" id="enRuleNBox">Qual dia útil?<input id="enRuleN" type="number" min="1" max="23" step="1" value="5"></label>
+      </div>
+      <label class="check-line"><input type="checkbox" id="enAuto"> <span id="enAutoLabel">Confirmar sozinho no dia</span></label>
+      <label class="field">Repetir até (opcional)<input id="enUntil" type="date"></label>
+    </div>
     <p class="hint" id="enHint"></p>
     <label class="field">Observações<textarea id="enNotes" maxlength="500" rows="2" placeholder="Opcional"></textarea></label>
     <div class="dlg-actions">
@@ -1019,7 +1026,9 @@ function sanitize(raw) {
       date: e.date, notes: str(e.notes, 500), recur,
       until: recur && isYm(e.until) && e.until >= ym ? e.until : '',
       except: recur ? arr(e.except, 600).filter(isYm) : [],
-      paid: recur ? Object.fromEntries(Object.keys(e.paid || {}).filter(k => isYm(k) && e.paid[k] === true).slice(0, 600).map(k => [k, true])) : {},
+      // true = confirmado; false = desmarcado de propósito (importa quando "confirmar sozinho" está ligado)
+      paid: recur ? Object.fromEntries(Object.keys(e.paid || {}).filter(k => isYm(k) && typeof e.paid[k] === 'boolean').slice(0, 600).map(k => [k, e.paid[k]])) : {},
+      rule: recur && RECUR_RULES[e.rule] ? e.rule : 'day', ruleN: int(e.ruleN, 1, 23, 5), auto: recur && e.auto === true,
       n: !recur && e.type === 'expense' ? int(e.n, 1, 120, 1) : 1
     };
   }).filter(Boolean);
@@ -1470,6 +1479,38 @@ const accColor = a => bankOf(a)?.color || a.color;
 const isCard = a => a.type === 'card';
 const debtLeft = d => Math.max(0, d.amount - d.payments.reduce((s, p) => s + p.amount, 0));
 
+/* ----- dias úteis: sem sábado, domingo e feriados nacionais (inclusive os móveis) ----- */
+const holidayCache = new Map();
+function holidaysBR(y) {
+  if (holidayCache.has(y)) return holidayCache.get(y);
+  // Páscoa (algoritmo de Meeus/Jones/Butcher); os feriados móveis contam a partir dela
+  const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const easter = keyOf(new Date(y, Math.floor((h + l - 7 * m + 114) / 31) - 1, ((h + l - 7 * m + 114) % 31) + 1));
+  const set = new Set(['01-01', '04-21', '05-01', '09-07', '10-12', '11-02', '11-15', '11-20', '12-25'].map(md => `${y}-${md}`));
+  [-48, -47, -2, 60].forEach(n => set.add(addDays(easter, n)));   // Carnaval (seg/ter), Sexta-feira Santa, Corpus Christi
+  holidayCache.set(y, set);
+  return set;
+}
+const isBizDay = k => { const d = dow(k); return d > 0 && d < 6 && !holidaysBR(+k.slice(0, 4)).has(k); };
+const RECUR_RULES = { day: 'Mesmo dia todo mês', biz: 'Nº dia útil do mês', lastBiz: 'Último dia útil do mês', last: 'Último dia do mês' };
+// Data em que uma conta fixa cai num mês, conforme a regra escolhida
+function recurDate(e, ym) {
+  if (e.rule === 'last') return dateIn(ym, 31);
+  if (e.rule === 'lastBiz') { let k = dateIn(ym, 31); while (!isBizDay(k) && k > ym + '-01') k = addDays(k, -1); return k; }
+  if (e.rule === 'biz') {
+    let k = ym + '-01', count = 0;
+    for (;;) {
+      if (isBizDay(k) && ++count === e.ruleN) return k;
+      const next = addDays(k, 1);
+      if (ymOf(next) !== ym) return k;   // mês com menos dias úteis que o pedido: último dia do mês
+      k = next;
+    }
+  }
+  return dateIn(ym, +e.date.slice(8, 10));
+}
+const ruleLabel = e => e.rule === 'biz' ? `${e.ruleN}º dia útil` : e.rule === 'lastBiz' ? 'último dia útil' : e.rule === 'last' ? 'último dia do mês' : `dia ${+e.date.slice(8, 10)}`;
+
 // Todas as ocorrências de um mês: lançamentos únicos, transferências, parcelas e contas fixas (pagas ou previstas).
 const finCache = new Map();
 function finMonth(ym) {
@@ -1479,7 +1520,11 @@ function finMonth(ym) {
     const start = ymOf(e.date), day = +e.date.slice(8, 10);
     if (e.recur) {
       if (ym < start || (e.until && ym > e.until) || e.except.includes(ym)) return;
-      occ.push({ e, ym, date: dateIn(ym, day), amount: e.amount, kind: 'recur', paid: !!e.paid[ym] });
+      const date = recurDate(e, ym);
+      if (date < e.date) return;   // ex.: criado dia 22 com "5º dia útil": este mês já passou
+      // paid[ym] guarda a escolha da pessoa; sem escolha, "confirmar sozinho" conta a partir do dia
+      const paid = ym in e.paid ? e.paid[ym] : e.auto && date <= todayKey();
+      occ.push({ e, ym, date, amount: e.amount, kind: 'recur', paid });
     } else if (e.n > 1) {
       const k = ymDiff(start, ym);
       if (k >= 0 && k < e.n) occ.push({ e, ym, date: dateIn(ym, day), amount: e.amount, kind: 'inst', idx: k + 1, paid: true });
@@ -1615,7 +1660,8 @@ function viewFinance() {
   // contas fixas do mês
   const bills = occ.filter(o => o.kind === 'recur').sort((a, b) => a.date.localeCompare(b.date)).map(o => {
     const late = !o.paid && o.date < t, inc = o.e.type === 'income';
-    const status = o.paid ? (inc ? 'Recebido' : 'Pago') : late ? `<span class="neg">Atrasada · dia ${+o.date.slice(8)}</span>` : `${inc ? 'Previsto' : 'Vence'} ${relDate(o.date).toLowerCase()}`;
+    const status = (o.paid ? (inc ? 'Recebido' : 'Pago') + (o.e.auto && !(o.ym in o.e.paid) ? ' sozinho' : '')
+      : late ? `<span class="neg">Atrasada · ${fmtShort(o.date)}</span>` : `${inc ? 'Previsto' : 'Vence'} ${relDate(o.date).toLowerCase()}${o.e.auto ? ' · confirma sozinho' : ''}`) + ` · ${ruleLabel(o.e)}`;
     return `<div class="bill-row ${o.paid ? 'done' : ''}"><input type="checkbox" class="check" ${o.paid ? 'checked' : ''} data-act="toggle-bill" data-id="${o.e.id}" data-ym="${o.ym}" aria-label="Marcar ${esc(o.e.desc)} como ${inc ? 'recebido' : 'pago'}">
       <div class="grow" data-act="open-entry" data-id="${o.e.id}" data-ym="${o.ym}"><b>${esc(o.e.desc)}</b><small>${status} · ${esc(accName(accOf(o.e.account)))}</small></div><b class="${inc ? 'pos' : ''}">${inc ? '+' : '−'} ${money(o.amount)}</b></div>`;
   }).join('');
@@ -1684,6 +1730,9 @@ function openEntry(id, ym, preset = {}) {
   $('#enN').value = e && e.n > 1 ? e.n : 2;
   $('#enBasis').value = 'each';
   $('#enUntil').value = e && e.until ? dateIn(e.until, 31) : '';
+  $('#enRule').value = e?.recur ? e.rule : 'day';
+  $('#enRuleN').value = e?.recur ? e.ruleN : 5;
+  $('#enAuto').checked = !!e?.auto;
   $('#enNotes').value = e ? e.notes : '';
   $('#enDelete').hidden = !e;
   syncEnForm(e ? e.cat : (preset.cat || ''));
@@ -1699,13 +1748,20 @@ function syncEnForm(keepCat) {
   if (type === 'income' && $('#enMode').value === 'inst') $('#enMode').value = 'once';
   const mode = $('#enMode').value, v = parseMoney($('#enAmount').value), n = Math.round(+$('#enN').value), date = $('#enDate').value;
   $('#enInstBox').hidden = mode !== 'inst';
-  $('#enUntilBox').hidden = mode !== 'recur';
+  $('#enRecurBox').hidden = mode !== 'recur';
+  const rule = $('#enRule').value, auto = $('#enAuto').checked;
+  $('#enRuleNBox').hidden = rule !== 'biz';
+  $('#enAutoLabel').textContent = `Confirmar sozinho no dia (${type === 'income' ? 'soma no' : 'desconta do'} saldo automaticamente)`;
   let hint = '';
   if (mode === 'inst' && v && n >= 2 && n <= 120) {
     const each = $('#enBasis').value === 'total' ? Math.round(v / n) : v;
     hint = `${n}x de ${moneyAlways(each)} = ${moneyAlways(each * n)}` + (validDate(date) ? ` · de ${fmtYmShort(ymOf(date))} a ${fmtYmShort(ymAdd(ymOf(date), n - 1))}` : '');
-  } else if (mode === 'recur') {
-    hint = `Aparece todo mês${validDate(date) ? ` no dia ${+date.slice(8)}` : ''} como previsto, também no calendário. Dê o check quando ${type === 'income' ? 'receber' : 'pagar'}.`;
+  } else if (mode === 'recur' && validDate(date)) {
+    // mostra as próximas datas calculadas pela regra, para conferir
+    const probe = { date, rule, ruleN: Math.min(23, Math.max(1, Math.round(+$('#enRuleN').value) || 1)) }, next = [];
+    const from = date > todayKey() ? date : todayKey();
+    for (let ym = ymOf(from), i = 0; next.length < 3 && i < 24; ym = ymAdd(ym, 1), i++) { const k = recurDate(probe, ym); if (k >= from) next.push(fmtShort(k)); }
+    hint = `Próximas datas: ${next.join(', ')}. ` + (auto ? `No dia, ${type === 'income' ? 'entra no' : 'sai do'} saldo sozinho — se não acontecer, é só desmarcar.` : `Aparece como previsto; dê o check quando ${type === 'income' ? 'receber' : 'pagar'}.`);
     if (enCtx.id) hint += ' Alterações valem para todos os meses.';
   }
   $('#enHint').textContent = hint;
@@ -1727,7 +1783,8 @@ $('#enForm').addEventListener('submit', e => {
   }
   const u = $('#enUntil').value, until = mode === 'recur' && validDate(u) ? ymOf(u) : '';
   if (until && until < ymOf(date)) return notify('"Repetir até" precisa ser depois da data inicial.');
-  const data = { type, amount, desc, date, n, cat: $('#enCat').value, account: $('#enAcc').value, notes: $('#enNotes').value.trim(), recur: mode === 'recur', until };
+  const data = { type, amount, desc, date, n, cat: $('#enCat').value, account: $('#enAcc').value, notes: $('#enNotes').value.trim(), recur: mode === 'recur', until,
+    rule: mode === 'recur' ? $('#enRule').value : 'day', ruleN: Math.min(23, Math.max(1, Math.round(+$('#enRuleN').value) || 5)), auto: mode === 'recur' && $('#enAuto').checked };
   let en = db.finance.entries.find(x => x.id === enCtx.id);
   if (en) {
     if (!data.recur) { en.paid = {}; en.except = []; }
@@ -1742,7 +1799,8 @@ $('#enForm').addEventListener('submit', e => {
   }
   const isNew = !enCtx.id;
   $('#enDlg').close();
-  if (isNew && ui.view === 'finance') ui.fmonth = ymOf(date);
+  // mostra o mês do lançamento; conta fixa que começou antes continua no mês que está na tela
+  if (isNew && ui.view === 'finance' && !(data.recur && ymOf(date) < ui.fmonth)) ui.fmonth = ymOf(date);
   save();
   notify(isNew ? (n > 1 ? `Compra parcelada em ${n}x registrada.` : data.recur ? 'Conta fixa criada.' : 'Lançamento registrado.') : 'Lançamento atualizado.');
 });
@@ -2584,12 +2642,12 @@ function loadDemo() {
   db.finance.cats.find(c => c.id === 'f-alimentacao').budget = 80000;
   db.finance.cats.find(c => c.id === 'f-lazer').budget = 30000;
   const paidUpTo = day => { const p = {}; for (let i = 3; i >= 0; i--) if (dateIn(back(i), day) <= t) p[back(i)] = true; return p; };
-  const fe = (type, amount, desc, cat, account, date, extra = {}) => ({ id: newId(), type, amount, desc, cat, account, date, notes: '', recur: false, until: '', except: [], paid: {}, n: 1, ...extra });
+  const fe = (type, amount, desc, cat, account, date, extra = {}) => ({ id: newId(), type, amount, desc, cat, account, date, notes: '', recur: false, until: '', except: [], paid: {}, rule: 'day', ruleN: 5, auto: false, n: 1, ...extra });
   db.finance.entries.push(
-    fe('income', 350000, 'Salário', 'f-salario', 'a-itau', dateIn(back(3), 5), { recur: true, paid: paidUpTo(5) }),
+    fe('income', 350000, 'Salário', 'f-salario', 'a-itau', dateIn(back(3), 1), { recur: true, rule: 'biz', ruleN: 5, auto: true }),
     fe('expense', 120000, 'Aluguel', 'f-moradia', 'a-itau', dateIn(back(3), 10), { recur: true, paid: paidUpTo(10) }),
     fe('expense', 9990, 'Internet', 'f-contas', 'a-itau', dateIn(back(3), 15), { recur: true, paid: paidUpTo(15) }),
-    fe('expense', 5590, 'Netflix', 'f-contas', 'a-nubank', dateIn(back(3), 27), { recur: true, paid: paidUpTo(27) }),
+    fe('expense', 5590, 'Netflix', 'f-contas', 'a-nubank', dateIn(back(3), 27), { recur: true, auto: true }),
     fe('expense', 35000, 'Notebook', 'f-compras', 'a-nubank', dateIn(back(2), 12), { n: 10 }),
     fe('expense', 31245, 'Mercado do mês', 'f-alimentacao', 'a-itau', d(-3)),
     fe('expense', 2850, 'Uber', 'f-transporte', 'a-nubank', d(-1)),
@@ -2716,7 +2774,12 @@ document.addEventListener('click', async e => {
     case 'open-entry': hideResults(); openEntry(id, el.dataset.ym || null); break;
     case 'toggle-bill': {
       const en = db.finance.entries.find(x => x.id === id), ym = el.dataset.ym;
-      if (en) { if (en.paid[ym]) delete en.paid[ym]; else en.paid[ym] = true; save(); if (en.paid[ym]) notify(`${en.desc}: ${en.type === 'income' ? 'recebido' : 'pago'} ✓`); }
+      if (!en) break;
+      const now = !!finMonth(ym).find(o => o.e === en)?.paid;
+      if (now) { if (en.auto) en.paid[ym] = false; else delete en.paid[ym]; }   // desmarcar uma automática fica guardado
+      else en.paid[ym] = true;
+      save();
+      notify(now ? `${en.desc}: desmarcado neste mês.` : `${en.desc}: ${en.type === 'income' ? 'recebido' : 'pago'} ✓`);
       break;
     }
     case 'fin-filter': ui.finFilter = el.dataset.f; render(); break;
@@ -2810,7 +2873,7 @@ document.addEventListener('input', e => {
   } else if (t.id === 'search') renderResults();
   else if (t.id === 'evAllDay' || t.id === 'evRepeat') syncEvForm();
   else if (t.id === 'glType') syncGoalForm();
-  else if (t.name === 'enType' || ['enMode', 'enN', 'enBasis', 'enAmount', 'enDate'].includes(t.id)) syncEnForm();
+  else if (t.name === 'enType' || ['enMode', 'enN', 'enBasis', 'enAmount', 'enDate', 'enRule', 'enRuleN', 'enAuto'].includes(t.id)) syncEnForm();
   else if (t.id === 'wishSort') { ui.wishSort = t.value; render(); }
   else if (t.name === 'billCycle') $('#billAmount').value = moneyInput(billCtx.opts[+t.value].amount);
   else if (t.classList.contains('fs-type')) {
