@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Política de Privacidade · Meu Planner</title>
+<meta name="description" content="Como o Meu Planner trata os seus dados.">
+<style>
+:root{--bg:#f3f5fa;--surface:#fff;--ink:#1f2a44;--muted:#6b7690;--line:#e4e8f1;--accent:#5468eb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0e121c;--surface:#161b28;--ink:#e6e9f2;--muted:#959eb5;--line:#283043;--accent:#7b8cff;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:40px 16px 64px}
+article{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:28px}
+h1{font-size:26px;margin:0 0 4px;letter-spacing:-.4px}
+h2{font-size:17px;margin:28px 0 6px}
+p,li{color:var(--ink)}
+.muted{color:var(--muted)}
+a{color:var(--accent)}
+code{font-size:13px;background:var(--bg);padding:1px 6px;border-radius:6px}
+.back{display:inline-block;margin-bottom:16px}
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="./">← Voltar para o Meu Planner</a>
+  <article>
+    <h1>Política de Privacidade</h1>
+    <p class="muted">Meu Planner · atualizada em 22 de outubro de 2026</p>
+
+    <p>O Meu Planner é um planner pessoal gratuito que funciona inteiramente no seu navegador. Esta página explica quais dados ele usa, onde eles ficam e como você pode apagá-los.</p>
+
+    <h2>1. Onde seus dados ficam</h2>
+    <p>Tudo o que você cadastra — compromissos, tarefas, provas, anotações, finanças, dívidas e wishlist — é salvo no <b>armazenamento local do seu navegador</b> (<code>localStorage</code>). O Meu Planner <b>não tem servidor</b>: nenhum dado é enviado para o dono do site ou para terceiros.</p>
+
+    <h2>2. Sincronização opcional com o Google Drive</h2>
+    <p>Se você clicar em <b>Entrar com Google</b>, o planner pede permissão para:</p>
+    <ul>
+      <li><b>Pasta de dados do app no seu Google Drive</b> (<code>drive.appdata</code>): uma pasta oculta e exclusiva do Meu Planner, onde é guardado um único arquivo (<code>meu-planner.json</code>) com os seus dados, para que o mesmo planner apareça no seu celular e no seu computador. O planner <b>não consegue ver, abrir ou alterar nenhum outro arquivo</b> do seu Drive.</li>
+      <li><b>Seu e-mail e nome básicos</b> (<code>openid</code>, <code>email</code>, <code>profile</code>): usados apenas para mostrar com qual conta você está conectado.</li>
+    </ul>
+    <p>Esses dados ficam <b>na sua própria conta Google</b>. Eles são transferidos diretamente entre o seu navegador e o Google; o dono do Meu Planner não tem acesso a eles.</p>
+    <p>O uso e a transferência de informações recebidas das APIs do Google seguem a <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener">Política de Dados do Usuário dos Serviços de API do Google</a>, incluindo os requisitos de Uso Limitado. Os dados não são vendidos, não são usados para publicidade e não são compartilhados com ninguém.</p>
+
+    <h2>3. Serviços de terceiros</h2>
+    <p>Apenas ao entrar com Google, o seu navegador carrega a biblioteca de login do Google (<code>accounts.google.com</code>) e conversa com a API do Google Drive. O site é hospedado no GitHub Pages, que pode registrar dados técnicos de acesso (como endereço IP) conforme a <a href="https://docs.github.com/pt/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">política do GitHub</a>.</p>
+
+    <h2>4. Como apagar seus dados</h2>
+    <ul>
+      <li><b>Neste aparelho:</b> no planner, vá em <i>Configurações → Apagar todos os dados</i>, ou limpe os dados do site no seu navegador.</li>
+      <li><b>No Google Drive:</b> em <a href="https://drive.google.com/drive/settings" target="_blank" rel="noopener">Configurações do Google Drive → Gerenciar apps</a>, encontre o Meu Planner e escolha <i>Excluir dados ocultos do app</i>.</li>
+      <li><b>Retirar o acesso:</b> use <i>Sair da conta Google</i> no planner ou remova o Meu Planner em <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">myaccount.google.com/permissions</a>.</li>
+    </ul>
+
+    <h2>5. Contato</h2>
+    <p>Dúvidas ou pedidos sobre privacidade: abra uma mensagem em <a href="https://github.com/gustavoguimaraesmotta-source/meu-planner/issues" target="_blank" rel="noopener">github.com/gustavoguimaraesmotta-source/meu-planner/issues</a>.</p>
+  </article>
+</main>
+</body>
+</html>
