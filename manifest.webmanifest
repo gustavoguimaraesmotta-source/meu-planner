@@ -1,0 +1,23 @@
+{
+  "name": "Meu Planner",
+  "short_name": "Planner",
+  "description": "Compromissos, tarefas, estudos, finanças, dívidas e wishlist em um só lugar.",
+  "lang": "pt-BR",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f3f5fa",
+  "theme_color": "#5468eb",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Novo gasto", "short_name": "Gasto", "url": "./?acao=gasto", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Nova tarefa", "short_name": "Tarefa", "url": "./?acao=tarefa", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Novo compromisso", "short_name": "Compromisso", "url": "./?acao=compromisso", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

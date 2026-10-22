@@ -73,7 +73,8 @@ Sem cadastro, sem servidor, sem instalação. Cada pessoa que abre o planner tem
 - Horário de início e fim da linha do tempo.
 
 ### 💾 Seus dados
-- **Mesmo planner no celular e no PC**: entre com Google e os dados ficam sincronizados por uma pasta privada do seu Google Drive (opcional).
+- **Mesmo planner no celular e no PC**: entre com Google e os dados ficam sincronizados por uma pasta privada do seu Google Drive (opcional). Se você mexer nos dois aparelhos sem sincronizar, o planner **junta as alterações automaticamente**, item por item.
+- **Instale como app**: ícone próprio na tela inicial, tela cheia e **funciona sem internet**. No celular, use o botão "📲 Instalar como app" (ou o menu do navegador → "Adicionar à tela inicial").
 - Salvamento automático no navegador.
 - **Backup** (.json) para guardar ou levar para outro computador/celular.
 - **Exportar .ics** para importar no Google Agenda, Outlook ou Apple Calendário.
@@ -138,6 +139,8 @@ Sem ID, o planner funciona normalmente, só no navegador.
 ## Tecnologia
 
 HTML, CSS e JavaScript puros — nenhuma biblioteca, nenhum build. Para modificar, edite o `index.html`.
+
+O `sw.js` (service worker) deixa o app abrir sem internet. **A cada publicação, mude o valor de `VERSION` no `sw.js`**: assim quem estiver com o app aberto recebe o aviso "Nova versão disponível".
 
 ## Licença
 

@@ -2,10 +2,17 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Meu Planner</title>
 <meta name="description" content="Planner pessoal: compromissos, trabalho, estudos, tarefas, provas, finanças, dívidas e wishlist em um só lugar. Seus dados ficam só no seu navegador.">
 <meta name="theme-color" content="#5468eb">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Planner">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%235468eb'/%3E%3Crect x='14' y='18' width='36' height='32' rx='6' fill='none' stroke='white' stroke-width='4'/%3E%3Cpath d='M14 28h36M24 12v10M40 12v10' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
 <style>
 :root{
@@ -90,7 +97,7 @@ kbd{font:600 10.5px ui-monospace,monospace;border:1px solid var(--line);border-b
 
 /* topo */
 .main{min-width:0;display:flex;flex-direction:column}
-.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;padding:12px 24px;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;padding:max(12px,env(safe-area-inset-top)) 24px 12px;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .period{min-width:0;margin-right:auto}
 .period h1{font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .period span{font-size:12px;color:var(--muted)}
@@ -473,6 +480,7 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
     <div class="side-sec">
       <div class="side-h"><span>Seus dados</span></div>
       <div id="syncBox" hidden></div>
+      <button class="side-link" data-act="install" id="installBtn" hidden>📲 Instalar como app</button>
       <button class="side-link" data-act="export">⬇️ Salvar backup</button>
       <button class="side-link" data-act="import">⬆️ Restaurar backup</button>
       <button class="side-link" data-act="ics">📤 Exportar para Google Agenda (.ics)</button>
@@ -2174,14 +2182,16 @@ const closeDrawer = () => $('#sidebar').classList.remove('open');
 
 /* ---------- avisos e confirmações ---------- */
 let toastTimer;
-function notify(text, undo) {
+// action = função do botão do aviso (por padrão "Desfazer"); ms = quanto tempo o aviso fica na tela
+function notify(text, action, label = 'Desfazer', ms) {
   $('#toastText').textContent = text;
   const b = $('#toastUndo');
-  b.hidden = !undo;
-  b.onclick = () => { $('#toast').classList.remove('show'); undo && undo(); };
+  b.hidden = !action;
+  b.textContent = label;
+  b.onclick = () => { $('#toast').classList.remove('show'); action && action(); };
   $('#toast').classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => $('#toast').classList.remove('show'), undo ? 6000 : 3800);
+  toastTimer = setTimeout(() => $('#toast').classList.remove('show'), ms || (action ? 6000 : 3800));
 }
 // menu = true mostra as opções numa lista vertical (para escolher destino/tipo), com Cancelar no fim
 function ask(title, text, buttons, menu = false) {
@@ -2745,6 +2755,7 @@ document.addEventListener('click', async e => {
     case 'sync-btn': if (!syncState || !tokenValid()) connectGoogle(); else syncNow(); break;
     case 'sync-now': if (tokenValid()) syncNow(); else connectGoogle(); break;
     case 'sync-logout': disconnectGoogle(); break;
+    case 'install': installApp(); break;
     case 'transfer': openTransfer(null); break;
     case 'pay-bill': openBill(accOf(id)); break;
     case 'adj-acc': openAdjust(accOf(id)); break;
@@ -2939,6 +2950,7 @@ async function remoteUpload() {
   const f = await r.json();
   Object.assign(syncState, { fileId: f.id, baseRev: f.modifiedTime, dirty: false, lastSync: Date.now() });
   saveSyncState();
+  saveBase(db);
 }
 function applyRemote(data, f) {
   const clean = sanitize(data);
@@ -2947,10 +2959,61 @@ function applyRemote(data, f) {
   try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) { storageOk = false; }
   Object.assign(syncState, { fileId: f.id, baseRev: f.modifiedTime, dirty: false, lastSync: Date.now() });
   saveSyncState();
+  saveBase(db);
   if ($('#welcome').open) { $('#wName').value = db.settings.name; $('#welcome').close(); }
   ui.planning = null;
   render();
 }
+/* --- juntar alterações de dois aparelhos (merge de 3 vias) ---
+   "base" é a última versão que os dois aparelhos tinham em comum. Para cada item (pelo id) e
+   cada campo: quem mudou em relação à base vence; se os dois mudaram o mesmo campo, vence o
+   aparelho que alterou por último. Item apagado num lado só some se o outro lado não o editou. */
+const BASE_KEY = 'meu-planner-base';
+function saveBase(d) {
+  try { localStorage.setItem(BASE_KEY, JSON.stringify(d)); }
+  catch (e) { try { localStorage.removeItem(BASE_KEY); } catch (_) { /* sem base: conflitos voltam a perguntar */ } }
+}
+function loadBase() { try { const s = localStorage.getItem(BASE_KEY); return s ? sanitize(JSON.parse(s)) : null; } catch (e) { return null; } }
+const stable = v => JSON.stringify(v, (k, x) => x && typeof x === 'object' && !Array.isArray(x) ? Object.keys(x).sort().reduce((o, kk) => (o[kk] = x[kk], o), {}) : x);
+const isPlain = x => x && typeof x === 'object' && !Array.isArray(x);
+function mergeVal(b, l, r, preferLocal) {
+  const sb = stable(b), sl = stable(l), sr = stable(r);
+  if (sl === sr || sr === sb) return l;
+  if (sl === sb) return r;
+  if (isPlain(l) && isPlain(r)) {
+    const out = {};
+    new Set([...Object.keys(l), ...Object.keys(r)]).forEach(k => {
+      const v = mergeVal(isPlain(b) ? b[k] : undefined, l[k], r[k], preferLocal);
+      if (v !== undefined) out[k] = v;
+    });
+    return out;
+  }
+  return preferLocal ? l : r;
+}
+function mergeList(b, l, r, preferLocal) {
+  const bm = new Map(b.map(x => [x.id, x])), lm = new Map(l.map(x => [x.id, x])), rm = new Map(r.map(x => [x.id, x]));
+  const out = [], seen = new Set();
+  for (const { id } of [...r, ...l]) {
+    if (seen.has(id)) continue;
+    seen.add(id);
+    const bi = bm.get(id), li = lm.get(id), ri = rm.get(id);
+    const v = li && ri ? mergeVal(bi, li, ri, preferLocal)
+      : li ? (bi && stable(li) === stable(bi) ? null : li)    // apagado no outro aparelho
+      : (bi && stable(ri) === stable(bi) ? null : ri);        // apagado neste aparelho
+    if (v) out.push(v);
+  }
+  return out;
+}
+const MERGE_LISTS = [['categories'], ['events'], ['tasks'], ['goals'], ['debts'], ['wishes'], ['finance', 'banks'], ['finance', 'accounts'], ['finance', 'cats'], ['finance', 'entries']];
+function mergeDb(base, local, remote) {
+  const preferLocal = (local.updatedAt || 0) >= (remote.updatedAt || 0);
+  const at = (o, p) => p.reduce((x, k) => x?.[k], o) || [];
+  const out = mergeVal(base, local, remote, preferLocal);
+  MERGE_LISTS.forEach(p => { p.slice(0, -1).reduce((x, k) => x[k], out)[p.at(-1)] = mergeList(at(base, p), at(local, p), at(remote, p), preferLocal); });
+  out.updatedAt = Date.now();
+  return sanitize(out);
+}
+
 // mesmo conteúdo (ignorando a hora da última alteração)? Então não há o que perguntar.
 function sameData(a, b) {
   const canon = d => { try { const c = sanitize(JSON.parse(JSON.stringify(d))); c.updatedAt = 0; c.settings.onboarded = true; return JSON.stringify(c); } catch (e) { return Math.random(); } };
@@ -2971,9 +3034,18 @@ async function syncNow(first = false) {
     else if (f.modifiedTime === syncState.baseRev) { if (syncState.dirty) await remoteUpload(); }
     else {
       const remote = await remoteDownload(f.id);
-      if (sameData(remote, db)) { Object.assign(syncState, { fileId: f.id, baseRev: f.modifiedTime, dirty: false, lastSync: Date.now() }); saveSyncState(); }
+      const base = !first && loadBase();
+      if (sameData(remote, db)) { Object.assign(syncState, { fileId: f.id, baseRev: f.modifiedTime, dirty: false, lastSync: Date.now() }); saveSyncState(); saveBase(db); }
       else if (!syncState.dirty && !(first && hasData(db))) applyRemote(remote, f);
-      else {
+      else if (base) {
+        // os dois aparelhos mudaram: junta item por item a partir da última versão em comum
+        db = mergeDb(base, sanitize(JSON.parse(JSON.stringify(db))), sanitize(remote));
+        try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) { storageOk = false; }
+        syncState.fileId = f.id;
+        await remoteUpload();
+        render();
+        notify('As alterações deste aparelho e do outro foram juntadas. ☁️');
+      } else {
         const v = await ask(first ? 'Sua conta já tem um planner salvo' : 'Alterações nos dois aparelhos',
           first ? `Seu Google Drive já tem um planner (salvo em ${fmtWhen(remote?.data?.updatedAt)}) e este aparelho também tem dados (${fmtWhen(db.updatedAt)}). Qual você quer usar? O outro será substituído.`
             : `Este aparelho e outro aparelho alteraram o planner desde a última sincronização. Nuvem: ${fmtWhen(remote?.data?.updatedAt)} · Este aparelho: ${fmtWhen(db.updatedAt)}. Qual versão manter? A outra será substituída.`,
@@ -3020,6 +3092,7 @@ async function disconnectGoogle() {
   if (sync.token && window.google?.accounts?.oauth2) google.accounts.oauth2.revoke(sync.token, () => {});
   clearTimeout(sync.timer);
   sync.token = null; syncState = null; saveSyncState();
+  try { localStorage.removeItem(BASE_KEY); } catch (e) { /* nada a limpar */ }
   setSync('off');
   notify('Você saiu. O planner continua funcionando só neste navegador.');
 }
@@ -3032,11 +3105,67 @@ window.addEventListener('online', () => { if (syncState) { if (tokenValid()) syn
 window.addEventListener('offline', () => { if (syncState) setSync('offline'); });
 setInterval(pullIfIdle, 30000);
 
+/* =========================================================
+   Instalar como app (PWA): ícone na tela inicial, tela cheia e uso sem internet
+   ========================================================= */
+let installEvt = null;
+const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const isMobile = /android|iphone|ipad|ipod/i.test(navigator.userAgent) || isIOS;
+function renderInstall() { $('#installBtn').hidden = isStandalone() || !(installEvt || isMobile); }
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; renderInstall(); });
+window.addEventListener('appinstalled', () => { installEvt = null; renderInstall(); notify('App instalado! Procure o ícone "Planner" na tela inicial. 📲'); });
+async function installApp() {
+  closeDrawer();
+  if (installEvt) {
+    installEvt.prompt();
+    const { outcome } = await installEvt.userChoice;
+    if (outcome === 'accepted') installEvt = null;
+    return renderInstall();
+  }
+  // navegadores sem o botão automático: explica o caminho pelo menu
+  const how = isIOS ? 'No Safari, toque em Compartilhar (o quadrado com a seta para cima) e depois em "Adicionar à Tela de Início".'
+    : /firefox/i.test(navigator.userAgent) ? 'No Firefox, toque no menu (⋮) e depois em "Instalar" ou "Adicionar à tela inicial".'
+    : 'Abra o menu do navegador (⋮) e toque em "Instalar app" ou "Adicionar à tela inicial".';
+  ask('Instalar o Meu Planner', how + ' O planner ganha um ícone próprio, abre em tela cheia e funciona mesmo sem internet.', [{ label: 'Entendi', value: true }]);
+}
+function initApp() {
+  renderInstall();
+  if (!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol)) return;
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    // versão nova publicada enquanto o app estava aberto: avisa e deixa atualizar com um toque
+    reg.addEventListener('updatefound', () => {
+      const w = reg.installing;
+      w?.addEventListener('statechange', () => {
+        if (w.state === 'installed' && navigator.serviceWorker.controller)
+          notify('Nova versão do planner disponível.', () => w.postMessage('skipWaiting'), 'Atualizar', 20000);
+      });
+    });
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update().catch(() => {}); });
+  }).catch(() => { /* sem service worker: o planner funciona normalmente, só não abre offline */ });
+  // só recarrega quando uma versão nova substitui a antiga (não na primeira instalação)
+  let reloading = false;
+  const hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController && !reloading) { reloading = true; flushNote(); location.reload(); } });
+}
+// atalhos do ícone do app (segurar o ícone no Android): ?acao=gasto | tarefa | compromisso
+function runShortcut() {
+  const acao = new URLSearchParams(location.search).get('acao');
+  if (!acao) return;
+  history.replaceState(null, '', location.pathname);
+  if (!db.settings.onboarded) return;
+  if (acao === 'gasto') { ui.view = 'finance'; render(); openEntry(null, null, { type: 'expense' }); }
+  else if (acao === 'tarefa') openTask(null, { date: todayKey() });
+  else if (acao === 'compromisso') openEvent(null, todayKey());
+}
+
 /* ---------- início ---------- */
 load();
 render();
 if (syncEnabled()) { loadGis(); if (syncState) setSync('auth'); }
 if (!db.settings.onboarded) showWelcome();
+initApp();
+runShortcut();
 </script>
 </body>
 </html>
