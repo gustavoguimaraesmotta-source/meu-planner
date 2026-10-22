@@ -20,8 +20,7 @@ Sem cadastro, sem servidor, sem instalação. Cada pessoa que abre o planner tem
 - Horário de início/fim ou **dia inteiro**.
 - **Repetição**: todos os dias, dias úteis, toda semana (escolhendo os dias), todo mês — com data final opcional.
 - Excluir só um dia de um compromisso que se repete, ou a série inteira.
-- **Local com sugestões de endereço** enquanto você digita, **mapinha** do lugar e botões **Abrir no Google Maps** e **Como chegar**.
-- Observações.
+- Local e observações.
 - Marque cada compromisso como feito.
 
 ### ✅ Tarefas
@@ -74,7 +73,7 @@ Na primeira vez, você pode começar do zero ou carregar **exemplos** para ver c
 
 ## Privacidade
 
-Seu planejamento não é enviado para nenhum servidor: os dados ficam no `localStorage` do navegador de quem está usando. A única exceção é o campo **Local**: o texto digitado ali é enviado ao [Photon](https://photon.komoot.io) (busca de endereços do OpenStreetMap) para sugerir endereços, e o mapinha é carregado do [OpenStreetMap](https://www.openstreetmap.org). Por isso:
+Nada é enviado para nenhum servidor. Os dados ficam no `localStorage` do navegador de quem está usando. Por isso:
 
 - Duas pessoas usando o mesmo link **não veem os dados uma da outra**.
 - Limpar os dados do navegador apaga o planejamento — **faça backups** de vez em quando.
