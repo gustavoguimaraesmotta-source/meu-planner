@@ -1,0 +1,6 @@
+# Backups pessoais exportados pelo planner — não publique seus dados
+planner-backup-*.json
+*.ics
+.claude/
+.DS_Store
+Thumbs.db
