@@ -401,6 +401,11 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
 .sync-pill.offline,.sync-pill.error{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 45%,transparent)}
 .welcome-sync{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
 #syncBox .status{margin:0 6px 4px}
+.sync-banner{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:12px 24px 0;padding:10px 14px;border-radius:12px;background:var(--warn-soft);border:1px solid color-mix(in srgb,var(--warn) 35%,transparent);font-size:13px}
+.sync-row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line-2);font-size:13px}
+.sync-row span{color:var(--muted)}
+.sync-row b{text-align:right}.sync-row small{display:block;font-weight:400;color:var(--muted)}
+@media (max-width:900px){.sync-banner{margin:10px 16px 0}}
 
 .bottom-nav,.fab,.only-mobile,.scrim{display:none}
 
@@ -515,6 +520,7 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
       <button class="sync-pill" data-act="sync-btn" id="syncBtn" hidden></button>
       <button class="icon-btn" data-act="theme" id="themeBtn" aria-label="Alternar tema">◐</button>
     </header>
+    <div class="sync-banner" id="syncBanner" role="status" hidden></div>
     <main class="view" id="view"></main>
   </div>
 </div>
@@ -803,6 +809,19 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
   </form>
 </dialog>
 
+<!-- Detalhes da sincronização -->
+<dialog id="syncDlg" class="sm">
+  <h2>☁️ Sincronização</h2>
+  <div id="syncInfo"></div>
+  <p class="small">Cada vez que abrir o planner, toque uma vez em <b>Sincronizar</b>. Depois disso, tudo o que você muda é enviado em segundos, e o que mudou nos outros aparelhos chega sozinho a cada 30 segundos ou quando você volta para o app.</p>
+  <div class="dlg-actions">
+    <button type="button" class="btn ghost danger" data-act="sync-logout">Sair da conta</button>
+    <span class="grow"></span>
+    <button type="button" class="btn" data-close>Fechar</button>
+    <button type="button" class="btn primary" data-act="sync-now">🔄 Sincronizar agora</button>
+  </div>
+</dialog>
+
 <!-- Confirmações -->
 <dialog id="askDlg" class="sm">
   <h2 id="askT"></h2>
@@ -1064,7 +1083,7 @@ function persist() {
   db.updatedAt = Date.now();
   try { localStorage.setItem(KEY, JSON.stringify(db)); storageOk = true; }
   catch (e) { storageOk = false; notify('Não foi possível salvar no navegador. Use "Salvar backup".'); }
-  if (syncState) { syncState.dirty = true; saveSyncState(); scheduleUpload(); }
+  if (syncState) { syncState.dirty = true; syncState.pending = (syncState.pending || 0) + 1; saveSyncState(); scheduleUpload(); }
 }
 function save() { persist(); render(); }
 
@@ -2815,7 +2834,8 @@ document.addEventListener('click', async e => {
     }
     /* sincronização: requestToken precisa rodar dentro do clique, antes de qualquer await */
     case 'sync-login': closeDrawer(); connectGoogle(); break;
-    case 'sync-btn': if (!syncState || !tokenValid()) connectGoogle(); else syncNow(); break;
+    case 'sync-btn': if (!syncState || !tokenValid()) connectGoogle(); else openSyncInfo(); break;
+    case 'sync-info': closeDrawer(); if (syncState) openSyncInfo(); break;
     case 'sync-now': if (tokenValid()) syncNow(); else connectGoogle(); break;
     case 'sync-logout': disconnectGoogle(); break;
     case 'install': installApp(); break;
@@ -2928,22 +2948,50 @@ const SYNC_LABELS = {
   off: ['☁️ Entrar', 'Entre com Google para usar o mesmo planner no celular e no PC'],
   auth: ['🔄 Sincronizar', 'Toque para conectar ao Google Drive e sincronizar'],
   saving: ['⏳ Salvando', 'Sincronizando com o Google Drive…'],
-  ok: ['☁️ Sincronizado', 'Tudo salvo no seu Google Drive'],
+  ok: ['☁️ Sincronizado', 'Tudo salvo no seu Google Drive — toque para ver os detalhes'],
   offline: ['⚠️ Sem conexão', 'As alterações serão enviadas quando a internet voltar'],
   error: ['⚠️ Erro', 'Não foi possível sincronizar — toque para tentar de novo']
 };
+// Nome deste aparelho, enviado junto com os dados para o outro aparelho saber de onde veio a alteração
+function deviceName() {
+  const ua = navigator.userAgent;
+  const kind = /android/i.test(ua) ? 'Celular Android' : /iphone/i.test(ua) ? 'iPhone' : /ipad/i.test(ua) ? 'iPad' : /windows/i.test(ua) ? 'Computador Windows' : /macintosh/i.test(ua) ? 'Mac' : /linux/i.test(ua) ? 'Computador Linux' : 'Outro aparelho';
+  const browser = /samsungbrowser/i.test(ua) ? 'Samsung Internet' : /edg\//i.test(ua) ? 'Edge' : /firefox|fxios/i.test(ua) ? 'Firefox' : /chrome|crios/i.test(ua) ? 'Chrome' : /safari/i.test(ua) ? 'Safari' : '';
+  return browser ? `${kind} · ${browser}` : kind;
+}
+const pendingCount = () => syncState?.dirty ? Math.max(1, syncState.pending || 0) : 0;
+const pendingText = n => n === 1 ? '1 alteração só neste aparelho' : `${n} alterações só neste aparelho`;
 function setSync(status) { sync.status = status; renderSync(); }
 function renderSync() {
-  const btn = $('#syncBtn'), box = $('#syncBox');
+  const btn = $('#syncBtn'), box = $('#syncBox'), banner = $('#syncBanner');
   btn.hidden = box.hidden = !syncEnabled();
-  if (!syncEnabled()) return;
-  const s = syncState ? sync.status : 'off', [label, title] = SYNC_LABELS[s] || SYNC_LABELS.auth;
-  btn.textContent = label; btn.title = title; btn.className = 'sync-pill ' + s;
-  const when = syncState?.lastSync ? new Date(syncState.lastSync).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
+  if (!syncEnabled()) { banner.hidden = true; return; }
+  const s = syncState ? sync.status : 'off', [label, title] = SYNC_LABELS[s] || SYNC_LABELS.auth, n = pendingCount();
+  btn.textContent = label + (n && s !== 'saving' && s !== 'ok' ? ` · ${n}` : '');
+  btn.title = n ? `${title} (${pendingText(n)})` : title;
+  btn.className = 'sync-pill ' + s;
+  // aviso no topo: este aparelho ainda não conectou nesta visita, ou tem alterações que não foram para a nuvem
+  const needsTap = syncState && (s === 'auth' || s === 'error');
+  banner.hidden = !(needsTap || (syncState && s === 'offline' && n));
+  banner.innerHTML = s === 'offline'
+    ? `<span>⚠️ Sem internet: <b>${pendingText(n)}</b>. Elas vão para a nuvem quando a conexão voltar.</span>`
+    : `<span>${n ? `⚠️ <b>${pendingText(n)}</b> — os outros aparelhos ainda não receberam.` : '☁️ Este aparelho ainda não sincronizou nesta visita.'}</span><button class="btn sm primary" data-act="sync-btn">🔄 Sincronizar agora</button>`;
   box.innerHTML = syncState
-    ? `<p class="status">☁️ Conectado como <b>${esc(syncState.email)}</b>${when ? `<br>Última sincronização: ${when}` : ''}</p><button class="side-link" data-act="sync-now">🔄 Sincronizar agora</button><button class="side-link" data-act="sync-logout">↩️ Sair da conta Google</button>`
+    ? `<p class="status">☁️ <b>${esc(syncState.email)}</b><br>${n ? `<span class="neg">${pendingText(n)}</span>` : syncState.lastSync ? `Sincronizado ${fmtWhen(syncState.lastSync)}` : ''}</p><button class="side-link" data-act="sync-info">📊 Detalhes da sincronização</button><button class="side-link" data-act="sync-now">🔄 Sincronizar agora</button><button class="side-link" data-act="sync-logout">↩️ Sair da conta Google</button>`
     : '<button class="side-link" data-act="sync-login">☁️ Entrar com Google (usar no celular e no PC)</button>';
+  if ($('#syncDlg').open) fillSyncInfo();
 }
+// Painel com o estado da sincronização: o que falta enviar e de qual aparelho veio a última alteração
+function fillSyncInfo() {
+  const n = pendingCount(), c = syncState?.cloud, s = sync.status;
+  const state = !syncState ? 'Não conectado' : s === 'saving' ? '⏳ Sincronizando…' : n ? `⚠️ ${pendingText(n)}` : s === 'ok' ? '✅ Tudo enviado e recebido' : s === 'offline' ? '⚠️ Sem internet' : '🔄 Toque em "Sincronizar agora" para conferir';
+  const row = (k, v) => `<div class="sync-row"><span>${k}</span><b>${v}</b></div>`;
+  $('#syncInfo').innerHTML = row('Conta', esc(syncState?.email || '—')) + row('Este aparelho', esc(deviceName())) + row('Situação', state) +
+    row('Última alteração na nuvem', c ? `${esc(c.device || 'outro aparelho')}<small>${fmtWhen(c.at)}</small>` : '—') +
+    row('Este aparelho enviou', syncState?.lastSent ? fmtWhen(syncState.lastSent) : '—') +
+    row('Este aparelho conferiu a nuvem', syncState?.lastCheck ? fmtWhen(syncState.lastCheck) : 'ainda não nesta visita');
+}
+function openSyncInfo() { fillSyncInfo(); $('#syncDlg').showModal(); }
 
 /* --- login: o Google só abre a janela de login a partir de um clique --- */
 function loadGis() {
@@ -2999,7 +3047,8 @@ async function remoteInfo() {
 }
 const remoteDownload = async id => (await gapi(`${DRIVE}/files/${id}?alt=media`)).json();
 async function remoteUpload() {
-  const body = JSON.stringify({ app: 'meu-planner', version: 6, data: db });
+  const sent = { device: deviceName(), at: Date.now() };
+  const body = JSON.stringify({ app: 'meu-planner', version: 6, ...sent, data: db });
   let r;
   if (syncState.fileId) {
     r = await gapi(`${DRIVE_UP}/files/${syncState.fileId}?uploadType=media&fields=id,modifiedTime`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body });
@@ -3011,16 +3060,18 @@ async function remoteUpload() {
     });
   }
   const f = await r.json();
-  Object.assign(syncState, { fileId: f.id, baseRev: f.modifiedTime, dirty: false, lastSync: Date.now() });
+  Object.assign(syncState, { fileId: f.id, baseRev: f.modifiedTime, dirty: false, pending: 0, lastSync: Date.now(), lastSent: sent.at, cloud: sent });
   saveSyncState();
   saveBase(db);
 }
+// de qual aparelho veio a versão da nuvem (arquivos antigos não têm: usa a data da alteração)
+const cloudOf = remote => ({ device: typeof remote?.device === 'string' ? remote.device.slice(0, 60) : 'outro aparelho', at: Number.isFinite(remote?.at) ? remote.at : remote?.data?.updatedAt || 0 });
 function applyRemote(data, f) {
   const clean = sanitize(data);
   clean.settings.onboarded = true;
   db = clean;
   try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) { storageOk = false; }
-  Object.assign(syncState, { fileId: f.id, baseRev: f.modifiedTime, dirty: false, lastSync: Date.now() });
+  Object.assign(syncState, { fileId: f.id, baseRev: f.modifiedTime, dirty: false, pending: 0, lastSync: Date.now(), cloud: cloudOf(data) });
   saveSyncState();
   saveBase(db);
   if ($('#welcome').open) { $('#wName').value = db.settings.name; $('#welcome').close(); }
@@ -3098,8 +3149,11 @@ async function syncNow(first = false) {
     else {
       const remote = await remoteDownload(f.id);
       const base = !first && loadBase();
-      if (sameData(remote, db)) { Object.assign(syncState, { fileId: f.id, baseRev: f.modifiedTime, dirty: false, lastSync: Date.now() }); saveSyncState(); saveBase(db); }
-      else if (!syncState.dirty && !(first && hasData(db))) applyRemote(remote, f);
+      if (sameData(remote, db)) { Object.assign(syncState, { fileId: f.id, baseRev: f.modifiedTime, dirty: false, pending: 0, lastSync: Date.now(), cloud: cloudOf(remote) }); saveSyncState(); saveBase(db); }
+      else if (!syncState.dirty && !(first && hasData(db))) {
+        applyRemote(remote, f);
+        if (!first) notify(`Recebido: alterações de ${syncState.cloud.device} (${fmtWhen(syncState.cloud.at)}) ✓`);
+      }
       else if (base) {
         // os dois aparelhos mudaram: junta item por item a partir da última versão em comum
         db = mergeDb(base, sanitize(JSON.parse(JSON.stringify(db))), sanitize(remote));
@@ -3107,7 +3161,7 @@ async function syncNow(first = false) {
         syncState.fileId = f.id;
         await remoteUpload();
         render();
-        notify('As alterações deste aparelho e do outro foram juntadas. ☁️');
+        notify(`Juntei as alterações deste aparelho com as de ${cloudOf(remote).device}. ☁️`);
       } else {
         const v = await ask(first ? 'Sua conta já tem um planner salvo' : 'Alterações nos dois aparelhos',
           first ? `Seu Google Drive já tem um planner (salvo em ${fmtWhen(remote?.data?.updatedAt)}) e este aparelho também tem dados (${fmtWhen(db.updatedAt)}). Qual você quer usar? O outro será substituído.`
@@ -3118,6 +3172,8 @@ async function syncNow(first = false) {
         else { setSync('error'); return; }
       }
     }
+    syncState.lastCheck = Date.now();
+    saveSyncState();
     setSync('ok');
   } catch (e) {
     if (e.auth) setSync('auth');
@@ -3154,6 +3210,7 @@ async function disconnectGoogle() {
   if (!await ask('Sair da conta Google?', 'O planner para de sincronizar neste aparelho. Seus dados continuam aqui e também no seu Google Drive — é só entrar de novo para voltar a sincronizar.', [{ label: 'Sair', value: true, danger: true }])) return;
   if (sync.token && window.google?.accounts?.oauth2) google.accounts.oauth2.revoke(sync.token, () => {});
   clearTimeout(sync.timer);
+  if ($('#syncDlg').open) $('#syncDlg').close();
   sync.token = null; syncState = null; saveSyncState();
   try { localStorage.removeItem(BASE_KEY); } catch (e) { /* nada a limpar */ }
   setSync('off');
