@@ -34,6 +34,27 @@ Sem cadastro, sem servidor, sem instalação. Cada pessoa que abre o planner tem
 - Escolha os dias clicando no calendário **ou** use **✨ Distribuir automaticamente** (todos os dias ou só dias úteis).
 - Acompanhe o progresso com barra e anel de porcentagem, e a contagem regressiva até o prazo.
 
+### 💰 Gastos e ganhos
+- Registre gastos e ganhos com valor, categoria, data e **de qual cartão ou conta** saiu (ex.: Cartão Nubank, Conta Itaú, Dinheiro).
+- **Contas fixas** (aluguel, salário, assinaturas): cadastre uma vez e elas aparecem todo mês como previstas — dê o check quando pagar.
+- **Compras parceladas**: informe o valor da parcela ou o total; cada parcela cai no mês certo e você vê quanto falta e quando termina.
+- **Orçamento por categoria** com barra que fica vermelha quando passa do limite.
+- Resumo do mês (ganhos, gastos, saldo e previsão), gastos por categoria e por cartão/conta, comparação com o mês anterior.
+- Botão para **esconder os valores** quando alguém estiver olhando sua tela.
+
+### 🤝 Dívidas
+- **Eu devo** e **Me devem**, com pessoa, valor, descrição e vencimento.
+- Pagamento parcial ("paguei uma parte") com histórico, e check para quitar.
+- Ao quitar, opção de lançar o valor nas Finanças automaticamente.
+
+### 🎁 Wishlist
+- Lista do que você quer comprar, com preço, prioridade e link da loja.
+- Ao marcar como comprado, opção de lançar o gasto (inclusive parcelado).
+
+### 📅 Tudo conectado
+- Vencimentos de contas fixas e dívidas aparecem no calendário e no seu dia, com check direto de lá.
+- A busca encontra compromissos, tarefas, metas, lançamentos, dívidas e itens da wishlist.
+
 ### 📓 Como foi o dia
 - Anotações livres por dia (situações, ideias, lembretes) e registro de humor.
 
