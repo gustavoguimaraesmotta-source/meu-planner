@@ -73,6 +73,7 @@ Sem cadastro, sem servidor, sem instalação. Cada pessoa que abre o planner tem
 - Horário de início e fim da linha do tempo.
 
 ### 💾 Seus dados
+- **Mesmo planner no celular e no PC**: entre com Google e os dados ficam sincronizados por uma pasta privada do seu Google Drive (opcional).
 - Salvamento automático no navegador.
 - **Backup** (.json) para guardar ou levar para outro computador/celular.
 - **Exportar .ics** para importar no Google Agenda, Outlook ou Apple Calendário.
@@ -102,7 +103,7 @@ Na primeira vez, você pode começar do zero ou carregar **exemplos** para ver c
 
 ## Privacidade
 
-Nada é enviado para nenhum servidor. Os dados ficam no `localStorage` do navegador de quem está usando. Por isso:
+Os dados ficam no `localStorage` do navegador de quem está usando. **Opcionalmente**, a pessoa pode clicar em **Entrar com Google**: aí o planner também guarda os dados numa **pasta oculta e privada do Google Drive dela** (permissão `drive.appdata`), e o mesmo planner aparece no celular e no PC. O planner não enxerga nenhum outro arquivo do Drive, e o dono do site não tem acesso a nada. Sem login:
 
 - Duas pessoas usando o mesmo link **não veem os dados uma da outra**.
 - Limpar os dados do navegador apaga o planejamento — **faça backups** de vez em quando.
@@ -122,6 +123,17 @@ Nada é enviado para nenhum servidor. Os dados ficam no `localStorage` do navega
    ```
 3. No repositório, vá em **Settings → Pages**, em *Source* escolha **Deploy from a branch**, branch `main`, pasta `/ (root)` e salve.
 4. Em um ou dois minutos o planner estará em `https://SEU-USUARIO.github.io/meu-planner/`. É só mandar esse link para quem quiser usar.
+
+### Sincronização no seu próprio site
+
+Se você copiar este projeto para o seu GitHub, a sincronização com o Google Drive só funciona com um **ID do cliente OAuth seu**:
+
+1. Em [console.cloud.google.com](https://console.cloud.google.com), crie um projeto e ative a **Google Drive API**.
+2. Em **Google Auth Platform**, configure o app (público **Externo**), adicione os escopos `drive.appdata`, `openid`, `userinfo.email` e `userinfo.profile` e publique o app.
+3. Em **Clientes**, crie um cliente **Aplicativo da Web** com a origem JavaScript do seu site (ex.: `https://seu-usuario.github.io`).
+4. Cole o ID do cliente em `GOOGLE_CLIENT_ID`, no começo do `<script>` do `index.html`.
+
+Sem ID, o planner funciona normalmente, só no navegador.
 
 ## Tecnologia
 

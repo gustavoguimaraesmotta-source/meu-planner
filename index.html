@@ -386,6 +386,15 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
 @media (max-width:1180px){.fin-grid{grid-template-columns:1fr}.kpis.four{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:600px){.kpis{grid-template-columns:1fr 1fr}.kpis .kpi:last-child{grid-column:1/-1}.kpis.four .kpi:last-child{grid-column:auto}.fs-mini input{width:96px}.kpi b{font-size:19px}.fs-row .budget{width:92px}.fin-head .btn{flex:1}}
 
+/* sincronização */
+.sync-pill{border:1px solid var(--line);background:var(--surface);border-radius:20px;padding:6px 12px;font-weight:600;font-size:12.5px;white-space:nowrap;color:var(--muted)}
+.sync-pill:hover{background:var(--surface-2)}
+.sync-pill.off,.sync-pill.auth{background:var(--accent);border-color:var(--accent);color:#fff}
+.sync-pill.ok{color:var(--ok)}
+.sync-pill.offline,.sync-pill.error{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 45%,transparent)}
+.welcome-sync{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+#syncBox .status{margin:0 6px 4px}
+
 .bottom-nav,.fab,.only-mobile,.scrim{display:none}
 
 /* ---------- responsivo ---------- */
@@ -463,12 +472,14 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
     </div>
     <div class="side-sec">
       <div class="side-h"><span>Seus dados</span></div>
+      <div id="syncBox" hidden></div>
       <button class="side-link" data-act="export">⬇️ Salvar backup</button>
       <button class="side-link" data-act="import">⬆️ Restaurar backup</button>
       <button class="side-link" data-act="ics">📤 Exportar para Google Agenda (.ics)</button>
       <button class="side-link" data-act="print">🖨️ Imprimir visão atual</button>
       <button class="side-link" data-act="settings">⚙️ Configurações</button>
       <p class="status" id="status"></p>
+      <p class="status"><a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a></p>
       <p class="kbd-help">Atalhos: <kbd>N</kbd> compromisso · <kbd>T</kbd> tarefa · <kbd>H</kbd> hoje · <kbd>D</kbd>/<kbd>S</kbd>/<kbd>M</kbd> dia/semana/mês · <kbd>←</kbd><kbd>→</kbd> navegar · <kbd>/</kbd> buscar</p>
     </div>
     <input type="file" id="file" accept="application/json,.json" hidden>
@@ -493,6 +504,7 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
         <input id="search" type="search" placeholder="Buscar…" autocomplete="off" aria-label="Buscar compromissos, tarefas e metas">
         <div id="results" class="results" hidden></div>
       </div>
+      <button class="sync-pill" data-act="sync-btn" id="syncBtn" hidden></button>
       <button class="icon-btn" data-act="theme" id="themeBtn" aria-label="Alternar tema">◐</button>
     </header>
     <main class="view" id="view"></main>
@@ -763,11 +775,15 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
   <form id="welcomeForm">
     <div class="logo big">✦</div>
     <h2>Bem-vindo(a) ao seu planner</h2>
-    <p>Organize compromissos, trabalho, estudos, tarefas, provas, finanças, dívidas e sua wishlist em um só lugar. Tudo fica salvo <b>apenas neste navegador</b>: ninguém mais vê seus dados.</p>
+    <p>Organize compromissos, trabalho, estudos, tarefas, provas, finanças, dívidas e sua wishlist em um só lugar. Tudo fica salvo <b>neste navegador</b><span id="wSyncText" hidden> — e, se você entrar com Google, numa pasta privada do seu Google Drive, para usar no celular e no PC</span>: ninguém mais vê seus dados.</p>
     <label class="field">Como você quer ser chamado(a)?<input id="wName" maxlength="40" placeholder="Seu nome (opcional)"></label>
     <div class="dlg-actions">
       <button type="button" class="btn" id="wDemo">Ver com exemplos</button>
       <button class="btn primary" type="submit" id="wGo">Começar do zero</button>
+    </div>
+    <div class="welcome-sync" id="wSyncBox" hidden>
+      <span>Já usa o planner em outro aparelho?</span>
+      <button type="button" class="btn" data-act="sync-login">☁️ Entrar com Google</button>
     </div>
   </form>
 </dialog>
@@ -788,6 +804,9 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
    Os dados ficam no localStorage do navegador de cada pessoa.
    ========================================================= */
 const KEY = 'meu-planner-v6';
+// ID do cliente OAuth do Google (Google Cloud → Google Auth Platform → Clientes).
+// Vazio = sem sincronização: o planner funciona só no navegador e o botão "Entrar com Google" some.
+const GOOGLE_CLIENT_ID = '417765381016-scmm87l8erbffc71uu7v42ok67p4177r.apps.googleusercontent.com';
 const HOUR = 52;
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -871,7 +890,8 @@ function blank() {
     settings: { name: '', theme: 'auto', weekStart: 0, dayStart: 6, dayEnd: 23, onboarded: false },
     categories: DEFAULT_CATS.map(c => ({ ...c, hidden: false })),
     events: [], tasks: [], goals: [], notes: {},
-    finance: blankFinance(), debts: [], wishes: []
+    finance: blankFinance(), debts: [], wishes: [],
+    updatedAt: 0
   };
 }
 
@@ -1004,6 +1024,7 @@ function sanitize(raw) {
       done: d.done === true, doneDate: validDate(d.doneDate) ? d.doneDate : ''
     };
   }).filter(Boolean);
+  out.updatedAt = Number.isFinite(raw.updatedAt) ? raw.updatedAt : 0;
   out.wishes = arr(raw.wishes, 2000).map(w => !w || !str(w.name, 120) ? null : ({
     id: uid(w.id), name: str(w.name, 120), price: isMoney(w.price) ? w.price : 0, link: safeUrl(w.link),
     priority: PRIORITY[w.priority] ? w.priority : 'normal', notes: str(w.notes, 500), month: isYm(w.month) ? w.month : '',
@@ -1023,8 +1044,10 @@ function load() {
   } catch (e) { storageOk = false; }
 }
 function persist() {
+  db.updatedAt = Date.now();
   try { localStorage.setItem(KEY, JSON.stringify(db)); storageOk = true; }
   catch (e) { storageOk = false; notify('Não foi possível salvar no navegador. Use "Salvar backup".'); }
+  if (syncState) { syncState.dirty = true; saveSyncState(); scheduleUpload(); }
 }
 function save() { persist(); render(); }
 
@@ -1101,12 +1124,14 @@ function renderSidebar() {
   const lateDebts = db.debts.filter(d => !d.done && d.due && d.due < todayKey()).length;
   $('#debtBadge').hidden = !lateDebts; $('#debtBadge').textContent = lateDebts;
   $('#moreBtn').classList.toggle('on', MORE_VIEWS.some(([v]) => v === ui.view));
+  renderSync();
   $('#hello').textContent = db.settings.name ? `Olá, ${db.settings.name}` : 'Organize seu dia';
   renderMini();
   $('#cats').innerHTML = db.categories.map(c => `<button class="cat ${c.hidden ? 'off' : ''}" style="--c:${c.color}" data-act="cat-toggle" data-id="${esc(c.id)}" title="${c.hidden ? 'Mostrar' : 'Ocultar'} ${esc(c.name)}"><span class="sw"></span>${esc(c.name)}<span class="eye">${c.hidden ? 'oculta' : ''}</span></button>`).join('');
   const st = $('#status');
   st.className = 'status' + (storageOk ? '' : ' warn');
-  st.textContent = storageOk ? '💾 Salvo automaticamente neste navegador. Faça backups de vez em quando.' : '⚠️ Salvamento local indisponível. Use "Salvar backup" para não perder seus dados.';
+  st.textContent = !storageOk ? '⚠️ Salvamento local indisponível. Use "Salvar backup" para não perder seus dados.'
+    : syncState ? '💾 Salvo neste aparelho e no seu Google Drive.' : '💾 Salvo automaticamente neste navegador. Faça backups de vez em quando.';
 }
 function renderMini() {
   const m = parse(ui.mini), start = weekStartOf(ui.mini), t = todayKey();
@@ -2593,6 +2618,8 @@ function showWelcome() {
   $('#wName').value = db.settings.name;
   $('#wDemo').hidden = !!has;
   $('#wGo').textContent = has ? 'Continuar' : 'Começar do zero';
+  $('#wSyncBox').hidden = !syncEnabled() || !!syncState;
+  $('#wSyncText').hidden = !syncEnabled();
   $('#welcome').showModal();
 }
 $('#welcomeForm').addEventListener('submit', e => { e.preventDefault(); $('#welcome').close(); });
@@ -2668,7 +2695,9 @@ document.addEventListener('click', async e => {
     case 'add-cat': $('#catRows').insertAdjacentHTML('beforeend', catRow({ id: newId(), name: '', color: '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0') })); $('#catRows .cat-row:last-child input[type=text]').focus(); break;
     case 'del-cat': el.closest('.cat-row').remove(); break;
     case 'reset':
-      if (await ask('Apagar tudo?', 'Todos os compromissos, tarefas, metas e anotações deste navegador serão apagados. Essa ação não pode ser desfeita.', [{ label: 'Apagar tudo', value: true, danger: true }])) {
+      if (await ask('Apagar tudo?', syncState
+        ? `Você está conectado ao Google (${syncState.email}): isso apaga os dados deste aparelho E do seu Google Drive, em todos os aparelhos. Para apagar só deste aparelho, saia da conta Google antes. Essa ação não pode ser desfeita.`
+        : 'Todos os compromissos, tarefas, metas, finanças e anotações deste navegador serão apagados. Essa ação não pode ser desfeita.', [{ label: 'Apagar tudo', value: true, danger: true }])) {
         $('#setDlg').close(); db = blank(); ui.planning = null; migrated = false; persist(); render(); showWelcome();
       }
       break;
@@ -2711,6 +2740,11 @@ document.addEventListener('click', async e => {
       if (await ask('Excluir banco?', `"${name}" e as contas dentro dele saem da lista. Os lançamentos continuam registrados, mas ficam "sem conta". Só vale depois de clicar em Salvar.`, [{ label: 'Excluir', value: true, danger: true }])) b.remove();
       break;
     }
+    /* sincronização: requestToken precisa rodar dentro do clique, antes de qualquer await */
+    case 'sync-login': closeDrawer(); connectGoogle(); break;
+    case 'sync-btn': if (!syncState || !tokenValid()) connectGoogle(); else syncNow(); break;
+    case 'sync-now': if (tokenValid()) syncNow(); else connectGoogle(); break;
+    case 'sync-logout': disconnectGoogle(); break;
     case 'transfer': openTransfer(null); break;
     case 'pay-bill': openBill(accOf(id)); break;
     case 'adj-acc': openAdjust(accOf(id)); break;
@@ -2801,8 +2835,207 @@ setInterval(() => {
 }, 60000);
 
 /* ---------- início ---------- */
+/* =========================================================
+   Sincronização opcional com o Google Drive
+   Os dados vão para a pasta oculta do app (appDataFolder) no Drive
+   de cada pessoa: só ela tem acesso, e o planner não vê outros arquivos.
+   ========================================================= */
+const SYNC_KEY = 'meu-planner-sync', SYNC_FILE = 'meu-planner.json';
+const DRIVE = 'https://www.googleapis.com/drive/v3', DRIVE_UP = 'https://www.googleapis.com/upload/drive/v3';
+const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
+const sync = { token: null, exp: 0, busy: false, status: 'off', timer: null, client: null, pending: null };
+const syncEnabled = () => !!GOOGLE_CLIENT_ID;
+// estado local da sincronização (não vai para a nuvem): conta, arquivo e última versão vista
+let syncState = (() => { try { const s = JSON.parse(localStorage.getItem(SYNC_KEY)); return s && s.email ? s : null; } catch (e) { return null; } })();
+function saveSyncState() {
+  try { if (syncState) localStorage.setItem(SYNC_KEY, JSON.stringify(syncState)); else localStorage.removeItem(SYNC_KEY); } catch (e) { /* sem armazenamento: a sincronização vale só nesta visita */ }
+}
+const SYNC_LABELS = {
+  off: ['☁️ Entrar', 'Entre com Google para usar o mesmo planner no celular e no PC'],
+  auth: ['🔄 Sincronizar', 'Toque para conectar ao Google Drive e sincronizar'],
+  saving: ['⏳ Salvando', 'Sincronizando com o Google Drive…'],
+  ok: ['☁️ Sincronizado', 'Tudo salvo no seu Google Drive'],
+  offline: ['⚠️ Sem conexão', 'As alterações serão enviadas quando a internet voltar'],
+  error: ['⚠️ Erro', 'Não foi possível sincronizar — toque para tentar de novo']
+};
+function setSync(status) { sync.status = status; renderSync(); }
+function renderSync() {
+  const btn = $('#syncBtn'), box = $('#syncBox');
+  btn.hidden = box.hidden = !syncEnabled();
+  if (!syncEnabled()) return;
+  const s = syncState ? sync.status : 'off', [label, title] = SYNC_LABELS[s] || SYNC_LABELS.auth;
+  btn.textContent = label; btn.title = title; btn.className = 'sync-pill ' + s;
+  const when = syncState?.lastSync ? new Date(syncState.lastSync).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
+  box.innerHTML = syncState
+    ? `<p class="status">☁️ Conectado como <b>${esc(syncState.email)}</b>${when ? `<br>Última sincronização: ${when}` : ''}</p><button class="side-link" data-act="sync-now">🔄 Sincronizar agora</button><button class="side-link" data-act="sync-logout">↩️ Sair da conta Google</button>`
+    : '<button class="side-link" data-act="sync-login">☁️ Entrar com Google (usar no celular e no PC)</button>';
+}
+
+/* --- login: o Google só abre a janela de login a partir de um clique --- */
+function loadGis() {
+  if (!syncEnabled() || $('#gis')) return;
+  const s = document.createElement('script');
+  s.id = 'gis'; s.src = 'https://accounts.google.com/gsi/client'; s.async = true; s.onload = initTokenClient;
+  document.head.append(s);
+}
+function initTokenClient() {
+  if (sync.client) return true;
+  if (!window.google?.accounts?.oauth2) return false;
+  const settle = (fn, arg) => { const p = sync.pending; sync.pending = null; p?.[fn](arg); };
+  sync.client = google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: `${DRIVE_SCOPE} openid email profile`,
+    callback: r => {
+      if (r.error) return settle('reject', Error('O Google recusou o login: ' + (r.error_description || r.error)));
+      if (!google.accounts.oauth2.hasGrantedAllScopes(r, DRIVE_SCOPE)) return settle('reject', Error('Para sincronizar, marque a permissão de acesso à pasta do planner no Google Drive.'));
+      sync.token = r.access_token; sync.exp = Date.now() + (r.expires_in || 3600) * 1000;
+      settle('resolve');
+    },
+    error_callback: e => settle('reject', Error(e.type === 'popup_closed' ? 'Login cancelado.' : 'Não foi possível abrir a janela do Google. Verifique se o navegador está bloqueando pop-ups.'))
+  });
+  return true;
+}
+function requestToken(consent) {
+  return new Promise((resolve, reject) => {
+    if (!initTokenClient()) return reject(Error('O login do Google ainda está carregando. Tente de novo em alguns segundos.'));
+    sync.pending = { resolve, reject };
+    sync.client.requestAccessToken({ prompt: consent ? 'consent' : '', login_hint: syncState?.email || undefined });
+  });
+}
+const tokenValid = () => !!sync.token && Date.now() < sync.exp - 60000;
+
+/* --- Google Drive: um único arquivo JSON na pasta oculta do app --- */
+async function gapi(url, opts = {}) {
+  if (!navigator.onLine) throw Object.assign(Error('offline'), { offline: true });
+  let r;
+  try { r = await fetch(url, { ...opts, headers: { Authorization: 'Bearer ' + sync.token, ...(opts.headers || {}) } }); }
+  catch (e) { throw Object.assign(Error('offline'), { offline: true }); }
+  if (r.status === 401) { sync.token = null; throw Object.assign(Error('auth'), { auth: true }); }
+  if (!r.ok) throw Object.assign(Error(`o Google Drive respondeu ${r.status}`), { status: r.status });
+  return r;
+}
+async function remoteInfo() {
+  if (syncState.fileId) {
+    try { return await (await gapi(`${DRIVE}/files/${syncState.fileId}?fields=id,modifiedTime`)).json(); }
+    catch (e) { if (e.status !== 404) throw e; syncState.fileId = null; }
+  }
+  const q = encodeURIComponent(`name='${SYNC_FILE}'`);
+  const j = await (await gapi(`${DRIVE}/files?spaces=appDataFolder&q=${q}&orderBy=modifiedTime desc&fields=files(id,modifiedTime)`)).json();
+  return j.files?.[0] || null;
+}
+const remoteDownload = async id => (await gapi(`${DRIVE}/files/${id}?alt=media`)).json();
+async function remoteUpload() {
+  const body = JSON.stringify({ app: 'meu-planner', version: 6, data: db });
+  let r;
+  if (syncState.fileId) {
+    r = await gapi(`${DRIVE_UP}/files/${syncState.fileId}?uploadType=media&fields=id,modifiedTime`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body });
+  } else {
+    const b = 'planner' + Date.now(), meta = JSON.stringify({ name: SYNC_FILE, parents: ['appDataFolder'] });
+    r = await gapi(`${DRIVE_UP}/files?uploadType=multipart&fields=id,modifiedTime`, {
+      method: 'POST', headers: { 'Content-Type': `multipart/related; boundary=${b}` },
+      body: `--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${meta}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n${body}\r\n--${b}--`
+    });
+  }
+  const f = await r.json();
+  Object.assign(syncState, { fileId: f.id, baseRev: f.modifiedTime, dirty: false, lastSync: Date.now() });
+  saveSyncState();
+}
+function applyRemote(data, f) {
+  const clean = sanitize(data);
+  clean.settings.onboarded = true;
+  db = clean;
+  try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) { storageOk = false; }
+  Object.assign(syncState, { fileId: f.id, baseRev: f.modifiedTime, dirty: false, lastSync: Date.now() });
+  saveSyncState();
+  if ($('#welcome').open) { $('#wName').value = db.settings.name; $('#welcome').close(); }
+  ui.planning = null;
+  render();
+}
+// mesmo conteúdo (ignorando a hora da última alteração)? Então não há o que perguntar.
+function sameData(a, b) {
+  const canon = d => { try { const c = sanitize(JSON.parse(JSON.stringify(d))); c.updatedAt = 0; c.settings.onboarded = true; return JSON.stringify(c); } catch (e) { return Math.random(); } };
+  return canon(a) === canon(b);
+}
+const hasData = d => d.events.length || d.tasks.length || d.goals.length || d.finance.entries.length || d.debts.length || d.wishes.length || Object.keys(d.notes).length;
+const fmtWhen = t => t ? new Date(t).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'sem data';
+
+// Compara este aparelho com a nuvem: envia, baixa ou pergunta qual versão manter.
+async function syncNow(first = false) {
+  if (!syncState || sync.busy) return;
+  if (!tokenValid()) return setSync('auth');
+  sync.busy = true;
+  setSync('saving');
+  try {
+    const f = await remoteInfo();
+    if (!f) await remoteUpload();
+    else if (f.modifiedTime === syncState.baseRev) { if (syncState.dirty) await remoteUpload(); }
+    else {
+      const remote = await remoteDownload(f.id);
+      if (sameData(remote, db)) { Object.assign(syncState, { fileId: f.id, baseRev: f.modifiedTime, dirty: false, lastSync: Date.now() }); saveSyncState(); }
+      else if (!syncState.dirty && !(first && hasData(db))) applyRemote(remote, f);
+      else {
+        const v = await ask(first ? 'Sua conta já tem um planner salvo' : 'Alterações nos dois aparelhos',
+          first ? `Seu Google Drive já tem um planner (salvo em ${fmtWhen(remote?.data?.updatedAt)}) e este aparelho também tem dados (${fmtWhen(db.updatedAt)}). Qual você quer usar? O outro será substituído.`
+            : `Este aparelho e outro aparelho alteraram o planner desde a última sincronização. Nuvem: ${fmtWhen(remote?.data?.updatedAt)} · Este aparelho: ${fmtWhen(db.updatedAt)}. Qual versão manter? A outra será substituída.`,
+          [{ label: '📱 Manter a deste aparelho', value: 'local', secondary: true }, { label: '☁️ Usar a da nuvem', value: 'remote' }]);
+        if (v === 'remote') applyRemote(remote, f);
+        else if (v === 'local') { syncState.fileId = f.id; await remoteUpload(); }
+        else { setSync('error'); return; }
+      }
+    }
+    setSync('ok');
+  } catch (e) {
+    if (e.auth) setSync('auth');
+    else if (e.offline) setSync('offline');
+    else { setSync('error'); notify('Erro ao sincronizar: ' + e.message); }
+  } finally {
+    sync.busy = false;
+    if (syncState?.dirty && sync.status === 'ok') scheduleUpload();
+  }
+}
+function scheduleUpload() {
+  clearTimeout(sync.timer);
+  if (tokenValid() && !sync.busy) setSync('saving');
+  sync.timer = setTimeout(() => { if (tokenValid()) syncNow(); else setSync(navigator.onLine ? 'auth' : 'offline'); }, 2000);
+}
+async function connectGoogle() {
+  if (!syncEnabled()) return;
+  const firstTime = !syncState;
+  try {
+    await requestToken(firstTime);   // precisa ser a primeira coisa do clique
+    if (firstTime) {
+      const u = await (await gapi('https://www.googleapis.com/oauth2/v3/userinfo')).json();
+      syncState = { email: u.email || 'sua conta Google', fileId: null, baseRev: null, dirty: false, lastSync: 0 };
+      saveSyncState();
+    }
+    await syncNow(firstTime);
+    if (firstTime && sync.status === 'ok') notify('Pronto! Este planner agora fica salvo no seu Google Drive. ☁️');
+  } catch (e) {
+    setSync(syncState ? 'auth' : 'off');
+    notify(e.offline ? 'Sem conexão com a internet.' : e.message);
+  }
+}
+async function disconnectGoogle() {
+  if (!await ask('Sair da conta Google?', 'O planner para de sincronizar neste aparelho. Seus dados continuam aqui e também no seu Google Drive — é só entrar de novo para voltar a sincronizar.', [{ label: 'Sair', value: true, danger: true }])) return;
+  if (sync.token && window.google?.accounts?.oauth2) google.accounts.oauth2.revoke(sync.token, () => {});
+  clearTimeout(sync.timer);
+  sync.token = null; syncState = null; saveSyncState();
+  setSync('off');
+  notify('Você saiu. O planner continua funcionando só neste navegador.');
+}
+// Busca alterações feitas em outro aparelho: ao voltar para a aba, ao reconectar e a cada 30 s.
+function pullIfIdle() {
+  if (syncState && tokenValid() && !sync.busy && document.visibilityState === 'visible' && !document.querySelector('dialog[open]')) syncNow();
+}
+document.addEventListener('visibilitychange', pullIfIdle);
+window.addEventListener('online', () => { if (syncState) { if (tokenValid()) syncNow(); else setSync('auth'); } });
+window.addEventListener('offline', () => { if (syncState) setSync('offline'); });
+setInterval(pullIfIdle, 30000);
+
+/* ---------- início ---------- */
 load();
 render();
+if (syncEnabled()) { loadGis(); if (syncState) setSync('auth'); }
 if (!db.settings.onboarded) showWelcome();
 </script>
 </body>
