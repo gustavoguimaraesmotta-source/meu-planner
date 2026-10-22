@@ -356,9 +356,35 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
 .wish .goal-actions{margin-top:auto;padding-top:12px}
 .wish.bought h3{text-decoration:line-through;color:var(--muted)}
 .sort{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 10px}
+.kpis.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card-h.wrap{flex-wrap:wrap}
+.bank{margin-bottom:10px}.bank:last-child{margin-bottom:0}
+.bank-h{display:flex;align-items:center;gap:8px;padding:6px 8px;font-size:13.5px;border-bottom:1px solid var(--line-2);margin-bottom:2px}
+.bank-h b:last-child{font-variant-numeric:tabular-nums}
+.acc-row{cursor:pointer}
+.acc-v{text-align:right;white-space:nowrap}.acc-v b{font-variant-numeric:tabular-nums}
+.acc-row .link{font-size:11px;font-weight:600}
+.card-limit{padding-bottom:12px;border-bottom:1px solid var(--line-2)}.card-limit:last-child{border-bottom:0;padding-bottom:0;margin-bottom:0}
+.bill-line{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px;flex-wrap:wrap}
+.bill-line small{font-size:11.5px}
+.seg2.col{flex-direction:column}
+.seg2.col span{text-align:left;display:flex;justify-content:space-between;gap:8px;font-weight:600;font-size:13px}
+.seg2.col span b{white-space:nowrap}
+.fs-bank{border:1px solid var(--line);border-radius:12px;padding:10px;margin:10px 0}
+.fs-bank-h{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.fs-bank-h .fs-bname{flex:1;min-width:140px}
+.fs-bank-h input[type=color]{width:38px;height:36px;border:1px solid var(--line);border-radius:9px;padding:2px;background:var(--surface-2);cursor:pointer}
+.fs-acc{flex-wrap:wrap;align-items:flex-end;padding:6px 0;border-top:1px dashed var(--line-2)}
+.fs-acc .fs-type{width:auto;max-width:170px}
+.fs-acc .fs-name{flex:1 1 130px}
+.fs-mini{display:flex;flex-direction:column;font-size:10.5px;font-weight:600;color:var(--muted);gap:2px}
+.fs-mini input{width:110px}.fs-day input{width:70px}
+.wish-group{margin-bottom:22px}
+.wish-month{display:flex;align-items:center;gap:8px;margin:0 2px 10px;flex-wrap:wrap}
+.wish-month h3{font-size:16px}
 .chip.bill{background:transparent;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 55%,transparent)}
-@media (max-width:1180px){.fin-grid{grid-template-columns:1fr}}
-@media (max-width:600px){.kpis{grid-template-columns:1fr 1fr}.kpis .kpi:last-child{grid-column:1/-1}.kpi b{font-size:19px}.fs-row .budget{width:92px}.fin-head .btn{flex:1}}
+@media (max-width:1180px){.fin-grid{grid-template-columns:1fr}.kpis.four{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:600px){.kpis{grid-template-columns:1fr 1fr}.kpis .kpi:last-child{grid-column:1/-1}.kpis.four .kpi:last-child{grid-column:auto}.fs-mini input{width:96px}.kpi b{font-size:19px}.fs-row .budget{width:92px}.fin-head .btn{flex:1}}
 
 .bottom-nav,.fab,.only-mobile,.scrim{display:none}
 
@@ -591,8 +617,63 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
 <!-- Cartões, contas e categorias financeiras -->
 <dialog id="fsDlg">
   <form id="fsForm">
-    <h2>Cartões, contas e categorias</h2>
+    <h2>Bancos, contas e categorias</h2>
     <div id="fsBody"></div>
+    <div class="dlg-actions">
+      <button type="button" class="btn" data-close>Cancelar</button>
+      <button class="btn primary" type="submit">Salvar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Transferir entre contas -->
+<dialog id="trDlg">
+  <form id="trForm">
+    <h2 id="trTitle">Transferir</h2>
+    <p>Move dinheiro de uma conta para outra — por exemplo, guardar na caixinha ou resgatar um investimento. Não conta como gasto nem como ganho.</p>
+    <div class="grid2">
+      <label class="field">Valor (R$)<input id="trAmount" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off" required></label>
+      <label class="field">Data<input id="trDate" type="date" required></label>
+    </div>
+    <div class="grid2">
+      <label class="field">Sai de<select id="trFrom"></select></label>
+      <label class="field">Vai para<select id="trTo"></select></label>
+    </div>
+    <label class="field">Descrição (opcional)<input id="trDesc" type="text" maxlength="120" placeholder="Ex.: Guardar para a viagem"></label>
+    <div class="dlg-actions">
+      <button type="button" class="btn ghost danger" id="trDelete">Excluir</button>
+      <span class="grow"></span>
+      <button type="button" class="btn" data-close>Cancelar</button>
+      <button class="btn primary" type="submit">Transferir</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Pagar fatura do cartão -->
+<dialog id="billDlg">
+  <form id="billForm">
+    <h2>Pagar fatura</h2>
+    <p id="billInfo"></p>
+    <div class="seg2 col" id="billCycles"></div>
+    <div class="grid2">
+      <label class="field">Valor pago (R$)<input id="billAmount" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off" required></label>
+      <label class="field">Data<input id="billDate" type="date" required></label>
+    </div>
+    <label class="field">De onde saiu o dinheiro?<select id="billFrom"></select></label>
+    <p class="hint">O valor sai do saldo dessa conta. Os gastos do cartão já foram contados nas categorias, então a fatura não conta de novo.</p>
+    <div class="dlg-actions">
+      <button type="button" class="btn" data-close>Cancelar</button>
+      <button class="btn primary" type="submit">Pagar fatura</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Ajustar saldo -->
+<dialog id="adjDlg" class="sm">
+  <form id="adjForm">
+    <h2>Ajustar saldo</h2>
+    <p id="adjInfo"></p>
+    <label class="field">Saldo real hoje (R$)<input id="adjValue" type="text" inputmode="decimal" autocomplete="off" required></label>
     <div class="dlg-actions">
       <button type="button" class="btn" data-close>Cancelar</button>
       <button class="btn primary" type="submit">Salvar</button>
@@ -653,6 +734,7 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
       <label class="field">Preço estimado (R$)<input id="wsPrice" type="text" inputmode="decimal" placeholder="Opcional" autocomplete="off"></label>
       <label class="field">Prioridade<select id="wsPrio"><option value="high">Alta</option><option value="normal">Média</option><option value="low">Baixa</option></select></label>
     </div>
+    <label class="field">Quero comprar em<select id="wsMonth"></select></label>
     <label class="field">Link da loja<input id="wsLink" type="text" inputmode="url" autocomplete="off" maxlength="500" placeholder="Cole o link da loja (opcional)"></label>
     <label class="field">Observações<textarea id="wsNotes" maxlength="500" rows="2" placeholder="Ex.: esperar a Black Friday"></textarea></label>
     <div class="dlg-actions">
@@ -765,10 +847,12 @@ const MOODS = ['😫', '😕', '😐', '🙂', '😄'];
 const NO_CAT = { id: '', name: 'Sem categoria', color: '#8a94a8', hidden: false };
 
 /* finanças: valores sempre em centavos (inteiros) */
-const ACC_TYPES = { card: 'Cartão de crédito', account: 'Conta / débito', cash: 'Dinheiro', other: 'Outro' };
+const ACC_TYPES = { account: 'Conta corrente', savings: 'Caixinha / poupança', invest: 'Investimento', card: 'Cartão de crédito', cash: 'Dinheiro', other: 'Outro' };
+// bancos agrupam contas; uma conta sem banco (bankId '') é avulsa: dinheiro ou um cartão só para acompanhar o limite
+const DEFAULT_BANKS = [{ id: 'b-principal', name: 'Meu banco', color: '#5468eb' }];
 const DEFAULT_ACCOUNTS = [
-  { id: 'a-conta', name: 'Conta principal', color: '#5468eb', type: 'account' },
-  { id: 'a-dinheiro', name: 'Dinheiro', color: '#24ad81', type: 'cash' }
+  { id: 'a-conta', name: 'Conta corrente', color: '#5468eb', type: 'account', bankId: 'b-principal', opening: 0, limit: 0, renewDay: 1 },
+  { id: 'a-dinheiro', name: 'Dinheiro', color: '#24ad81', type: 'cash', bankId: '', opening: 0, limit: 0, renewDay: 1 }
 ];
 const DEFAULT_FCATS = [
   ['f-alimentacao', 'Alimentação', '#e08a1e', 'expense'], ['f-transporte', 'Transporte', '#0ea5b7', 'expense'],
@@ -776,9 +860,10 @@ const DEFAULT_FCATS = [
   ['f-lazer', 'Lazer', '#d6457a', 'expense'], ['f-saude', 'Saúde', '#10b981', 'expense'],
   ['f-educacao', 'Educação', '#5468eb', 'expense'], ['f-compras', 'Compras', '#f59e0b', 'expense'],
   ['f-outros', 'Outros gastos', '#8a94a8', 'expense'],
-  ['f-salario', 'Salário', '#1f9d72', 'income'], ['f-extra', 'Renda extra', '#22c55e', 'income'], ['f-outros-ganhos', 'Outros ganhos', '#84cc16', 'income']
+  ['f-salario', 'Salário', '#1f9d72', 'income'], ['f-extra', 'Renda extra', '#22c55e', 'income'],
+  ['f-rendimentos', 'Rendimentos', '#0ea5b7', 'income'], ['f-outros-ganhos', 'Outros ganhos', '#84cc16', 'income']
 ].map(([id, name, color, kind]) => ({ id, name, color, kind, budget: 0 }));
-const blankFinance = () => ({ accounts: DEFAULT_ACCOUNTS.map(a => ({ ...a })), cats: DEFAULT_FCATS.map(c => ({ ...c })), entries: [], hide: false });
+const blankFinance = () => ({ banks: DEFAULT_BANKS.map(b => ({ ...b })), accounts: DEFAULT_ACCOUNTS.map(a => ({ ...a })), cats: DEFAULT_FCATS.map(c => ({ ...c })), entries: [], hide: false });
 
 function blank() {
   return {
@@ -865,13 +950,41 @@ function sanitize(raw) {
   // Finanças, dívidas e wishlist (backups antigos não têm: ficam os padrões)
   const f = raw.finance && typeof raw.finance === 'object' ? raw.finance : {};
   const color = c => /^#[0-9a-f]{6}$/i.test(c) ? c : '#8a94a8';
-  if (Array.isArray(f.accounts)) out.finance.accounts = arr(f.accounts, 50).filter(a => a && str(a.name, 40))
-    .map(a => ({ id: uid(a.id), name: str(a.name, 40), color: color(a.color), type: ACC_TYPES[a.type] ? a.type : 'other' }));
-  if (Array.isArray(f.cats)) out.finance.cats = arr(f.cats, 100).filter(c => c && str(c.name, 40) && ['expense', 'income'].includes(c.kind))
-    .map(c => ({ id: uid(c.id), name: str(c.name, 40), color: color(c.color), kind: c.kind, budget: c.kind === 'expense' && isMoney(c.budget) ? c.budget : 0 }));
+  if (Array.isArray(f.banks)) {
+    out.finance.banks = arr(f.banks, 50).filter(b => b && str(b.name, 40)).map(b => ({ id: uid(b.id), name: str(b.name, 40), color: color(b.color) }));
+    out.finance.accounts = arr(f.accounts, 100).filter(a => a && str(a.name, 40)).map(a => ({
+      id: uid(a.id), name: str(a.name, 40), color: color(a.color), type: ACC_TYPES[a.type] ? a.type : 'other',
+      bankId: out.finance.banks.some(b => b.id === a.bankId) ? a.bankId : '',
+      opening: Number.isInteger(a.opening) && Math.abs(a.opening) <= 1e11 ? a.opening : 0,
+      limit: isMoney(a.limit) ? a.limit : 0, renewDay: int(a.renewDay, 1, 31, 1)
+    }));
+  } else if (Array.isArray(f.accounts)) {
+    // formato anterior (sem bancos): cada conta vira um banco com uma conta corrente dentro;
+    // cartões e dinheiro ficam avulsos com o mesmo nome (dá para colocá-los num banco depois)
+    out.finance.banks = []; out.finance.accounts = [];
+    arr(f.accounts, 50).filter(a => a && str(a.name, 40)).forEach(a => {
+      const type = a.type === 'card' || a.type === 'cash' ? a.type : a.type === 'account' ? 'account' : 'other';
+      const acc = { id: uid(a.id), color: color(a.color), type, opening: 0, limit: 0, renewDay: 1, bankId: '', name: str(a.name, 40) };
+      if (type === 'account') {
+        const bank = { id: uid('b-' + acc.id), name: acc.name, color: acc.color };
+        out.finance.banks.push(bank);
+        Object.assign(acc, { bankId: bank.id, name: ACC_TYPES[type] });
+      }
+      out.finance.accounts.push(acc);
+    });
+  }
+  if (Array.isArray(f.cats)) {
+    out.finance.cats = arr(f.cats, 100).filter(c => c && str(c.name, 40) && ['expense', 'income'].includes(c.kind))
+      .map(c => ({ id: uid(c.id), name: str(c.name, 40), color: color(c.color), kind: c.kind, budget: c.kind === 'expense' && isMoney(c.budget) ? c.budget : 0 }));
+    if (!Array.isArray(f.banks) && !out.finance.cats.some(c => c.id === 'f-rendimentos')) out.finance.cats.push({ ...DEFAULT_FCATS.find(c => c.id === 'f-rendimentos') });
+  }
   out.finance.hide = f.hide === true;
   out.finance.entries = arr(f.entries, 20000).map(e => {
-    if (!e || !['expense', 'income'].includes(e.type) || !validDate(e.date) || !isMoney(e.amount)) return null;
+    if (!e || !['expense', 'income', 'transfer'].includes(e.type) || !validDate(e.date) || !isMoney(e.amount)) return null;
+    if (e.type === 'transfer') return typeof e.to === 'string' && e.to && e.to !== e.account ? {
+      id: uid(e.id), type: 'transfer', amount: e.amount, desc: str(e.desc, 120) || 'Transferência', cat: '', account: catId(e.account), to: catId(e.to),
+      bill: validDate(e.bill) ? e.bill : '', date: e.date, notes: str(e.notes, 500), recur: false, until: '', except: [], paid: {}, n: 1
+    } : null;
     const recur = e.recur === true, ym = e.date.slice(0, 7);
     return {
       id: uid(e.id), type: e.type, amount: e.amount, desc: str(e.desc, 120) || '(sem descrição)', cat: catId(e.cat), account: catId(e.account),
@@ -893,7 +1006,7 @@ function sanitize(raw) {
   }).filter(Boolean);
   out.wishes = arr(raw.wishes, 2000).map(w => !w || !str(w.name, 120) ? null : ({
     id: uid(w.id), name: str(w.name, 120), price: isMoney(w.price) ? w.price : 0, link: safeUrl(w.link),
-    priority: PRIORITY[w.priority] ? w.priority : 'normal', notes: str(w.notes, 500),
+    priority: PRIORITY[w.priority] ? w.priority : 'normal', notes: str(w.notes, 500), month: isYm(w.month) ? w.month : '',
     bought: w.bought === true, boughtDate: validDate(w.boughtDate) ? w.boughtDate : '', paid: isMoney(w.paid) ? w.paid : 0,
     created: Number.isFinite(w.created) ? w.created : Date.now()
   })).filter(Boolean);
@@ -971,6 +1084,7 @@ function greeting() {
 function render() {
   flushNote();
   finCache.clear();
+  balCache.clear();
   applyTheme();
   const sc = $('.tl-scroll'), prevScroll = sc && sc.dataset.view === ui.view ? sc.scrollTop : null;
   renderSidebar();
@@ -1289,6 +1403,7 @@ const BRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' 
 const moneyAlways = c => BRL.format(c / 100);
 const money = c => db.finance.hide ? 'R$ ••••' : moneyAlways(c);
 const moneyInput = c => c ? (c / 100).toFixed(2).replace('.', ',') : '';
+const moneyInputSigned = c => (c < 0 ? '-' : '') + (Math.abs(c) / 100).toFixed(2).replace('.', ',');
 function parseMoney(s) {
   s = String(s || '').replace(/[R$\s]/g, '');
   if (!s) return 0;
@@ -1297,6 +1412,16 @@ function parseMoney(s) {
   const v = Math.round(parseFloat(s) * 100);
   return Number.isFinite(v) && v > 0 && v <= 1e11 ? v : 0;
 }
+// Aceita zero e negativo (saldo de conta pode estar no vermelho). null = inválido.
+function parseSigned(s) {
+  s = String(s || '').replace(/[R$\s]/g, '');
+  if (!s) return null;
+  const neg = s.startsWith('-');
+  s = s.replace(/^-/, '');
+  if (/^[0.,]+$/.test(s)) return 0;
+  const v = parseMoney(s);
+  return v ? (neg ? -v : v) : null;
+}
 const ymOf = k => k.slice(0, 7);
 const ymAdd = (ym, n) => addMonths(ym + '-01', n).slice(0, 7);
 const ymDiff = (a, b) => (+b.slice(0, 4) - +a.slice(0, 4)) * 12 + (+b.slice(5, 7) - +a.slice(5, 7));
@@ -1304,10 +1429,15 @@ const dateIn = (ym, day) => `${ym}-${pad(Math.min(day, new Date(+ym.slice(0, 4),
 const fmtYm = (ym, o = { month: 'long', year: 'numeric' }) => parse(ym + '-01').toLocaleDateString('pt-BR', o);
 const fmtYmShort = ym => fmtYm(ym, { month: 'short', year: 'numeric' }).replace(' de ', '/').replace('.', '');
 const fcatOf = id => db.finance.cats.find(c => c.id === id) || { id: '', name: 'Sem categoria', color: '#8a94a8', budget: 0 };
-const accOf = id => db.finance.accounts.find(a => a.id === id) || { id: '', name: 'Sem cartão/conta', color: '#8a94a8', type: 'other' };
+const NO_ACC = { id: '', name: 'Sem conta', color: '#8a94a8', type: 'other', bankId: '', opening: 0, limit: 0, renewDay: 1 };
+const accOf = id => db.finance.accounts.find(a => a.id === id) || NO_ACC;
+const bankOf = a => db.finance.banks.find(b => b.id === a.bankId) || null;
+const accName = a => { const b = bankOf(a); return b ? `${b.name} · ${a.name}` : a.name; };
+const accColor = a => bankOf(a)?.color || a.color;
+const isCard = a => a.type === 'card';
 const debtLeft = d => Math.max(0, d.amount - d.payments.reduce((s, p) => s + p.amount, 0));
 
-// Todas as ocorrências de um mês: lançamentos únicos, parcelas e contas fixas (pagas ou previstas).
+// Todas as ocorrências de um mês: lançamentos únicos, transferências, parcelas e contas fixas (pagas ou previstas).
 const finCache = new Map();
 function finMonth(ym) {
   if (finCache.has(ym)) return finCache.get(ym);
@@ -1329,6 +1459,52 @@ function finMonth(ym) {
 const sumOcc = (list, type, paid = true) => list.filter(o => o.e.type === type && o.paid === paid).reduce((s, o) => s + o.amount, 0);
 const hideBtn = () => `<button class="btn ghost" data-act="toggle-hide">${db.finance.hide ? '👁️ Mostrar valores' : '🙈 Esconder valores'}</button>`;
 
+/* ----- saldos das contas: saldo inicial + ganhos − gastos ± transferências ----- */
+const balCache = new Map();
+function movements(upTo) {
+  if (balCache.has(upTo)) return balCache.get(upTo);
+  const m = new Map(), add = (id, v) => m.set(id, (m.get(id) || 0) + v);
+  const first = db.finance.entries.reduce((min, e) => e.date < min ? e.date : min, upTo);
+  for (let ym = ymOf(first); ym <= ymOf(upTo); ym = ymAdd(ym, 1)) {
+    finMonth(ym).forEach(o => {
+      if (!o.paid || o.date > upTo) return;
+      if (o.e.type === 'income') add(o.e.account, o.amount);
+      else if (o.e.type === 'expense') add(o.e.account, -o.amount);
+      else { add(o.e.account, -o.amount); add(o.e.to, o.amount); }
+    });
+  }
+  balCache.set(upTo, m);
+  return m;
+}
+const accBalance = (a, upTo = todayKey()) => a.opening + (movements(upTo).get(a.id) || 0);
+// Previsto no fim do mês atual: inclui lançamentos já agendados e contas fixas ainda não pagas.
+function accForecast(a) {
+  const ym = ymOf(todayKey());
+  let v = accBalance(a, dateIn(ym, 31));
+  finMonth(ym).forEach(o => { if (!o.paid && o.e.account === a.id) v += o.e.type === 'income' ? o.amount : -o.amount; });
+  return v;
+}
+
+/* ----- cartões de crédito: ciclo entre dois dias de renovação do limite ----- */
+function cardCycle(c, ref) {
+  let start = dateIn(ymOf(ref), c.renewDay);
+  if (start > ref) start = dateIn(ymAdd(ymOf(ref), -1), c.renewDay);
+  return { start, end: dateIn(ymAdd(ymOf(start), 1), c.renewDay) };
+}
+function cardSpent(c, cyc) {
+  const months = [...new Set([ymOf(cyc.start), ymOf(addDays(cyc.end, -1))])];
+  return months.flatMap(finMonth).filter(o => o.e.type === 'expense' && o.e.account === c.id && o.paid && o.date >= cyc.start && o.date < cyc.end).reduce((s, o) => s + o.amount, 0);
+}
+const billPaid = (c, start) => db.finance.entries.some(e => e.type === 'transfer' && e.to === c.id && e.bill === start);
+
+// <option>s agrupadas por banco
+function accOptions(sel, filter = () => true, none = 'Nenhum', showBal = false) {
+  const f = db.finance, opt = a => `<option value="${esc(a.id)}" ${a.id === sel ? 'selected' : ''}>${esc(a.name)}${isCard(a) ? ' 💳' : showBal ? ` — ${money(accBalance(a))}` : ''}</option>`;
+  const groups = [...f.banks.map(b => [b.name, f.accounts.filter(a => a.bankId === b.id && filter(a))]), ['Sem banco', f.accounts.filter(a => !bankOf(a) && filter(a))]];
+  return (none !== null ? `<option value="">${none}</option>` : '') +
+    groups.filter(([, l]) => l.length).map(([label, l]) => `<optgroup label="${esc(label)}">${l.map(opt).join('')}</optgroup>`).join('');
+}
+
 /* chips de vencimento no calendário (contas fixas e dívidas) */
 function chipsFinance(k) {
   const bills = finMonth(ymOf(k)).filter(o => o.kind === 'recur' && o.date === k).map(o => {
@@ -1344,14 +1520,51 @@ function chipsFinance(k) {
 }
 
 /* ----- Visão: finanças ----- */
+function banksCard() {
+  const f = db.finance;
+  const row = a => {
+    const on = ui.finAcc === a.id ? 'on' : '';
+    if (isCard(a)) {
+      const s = cardSpent(a, cardCycle(a, todayKey()));
+      return `<div class="acc-row ${on}" data-act="fin-acc" data-id="${esc(a.id)}" title="Filtrar lançamentos"><span class="acc-sw" style="--c:${accColor(a)}"></span><span class="grow"><b>${esc(a.name)}</b><small>Cartão de crédito${a.limit ? ` · limite ${money(a.limit)}` : ''}</small></span><span class="acc-v"><b>${money(s)}</b><small>gasto no ciclo</small></span></div>`;
+    }
+    const v = accBalance(a);
+    return `<div class="acc-row ${on}" data-act="fin-acc" data-id="${esc(a.id)}" title="Filtrar lançamentos"><span class="acc-sw" style="--c:${accColor(a)}"></span><span class="grow"><b>${esc(a.name)}</b><small>${ACC_TYPES[a.type]} · <button class="link" data-act="adj-acc" data-id="${esc(a.id)}">ajustar saldo</button></small></span><span class="acc-v"><b class="${v < 0 ? 'neg' : ''}">${money(v)}</b></span></div>`;
+  };
+  const blocks = f.banks.map(b => {
+    const list = f.accounts.filter(a => a.bankId === b.id), tot = list.filter(a => !isCard(a)).reduce((s, a) => s + accBalance(a), 0);
+    return `<div class="bank"><div class="bank-h"><span class="dot" style="--c:${b.color}"></span><b class="grow">${esc(b.name)}</b><b class="${tot < 0 ? 'neg' : ''}">${money(tot)}</b></div>${list.map(row).join('') || '<div class="empty">Nenhuma conta neste banco.</div>'}</div>`;
+  });
+  const loose = f.accounts.filter(a => !bankOf(a));
+  if (loose.length) blocks.push(`<div class="bank"><div class="bank-h"><b class="grow muted">Sem banco</b></div>${loose.map(row).join('')}</div>`);
+  return `<section class="card pad"><div class="card-h"><h3>🏦 Bancos e contas</h3><span><button class="btn sm" data-act="transfer">⇄ Transferir</button> <button class="link" data-act="fin-settings">Editar</button></span></div>
+    ${blocks.join('') || '<div class="empty">Cadastre seus bancos, contas e cartões em "Editar".</div>'}</section>`;
+}
+function cardsCard() {
+  const cards = db.finance.accounts.filter(isCard), t = todayKey();
+  if (!cards.length) return '';
+  return `<section class="card pad"><div class="card-h"><h3>💳 Limite dos cartões</h3><button class="link" data-act="fin-settings">Editar</button></div>${cards.map(c => {
+    const cyc = cardCycle(c, t), s = cardSpent(c, cyc), over = c.limit && s > c.limit, pct = c.limit ? s / c.limit * 100 : 0;
+    const pc = cardCycle(c, addDays(cyc.start, -1)), ps = cardSpent(c, pc), paid = billPaid(c, pc.start), left = daysBetween(t, cyc.end);
+    return `<div class="fbar card-limit">
+      <div class="fbar-h"><span><span class="dot" style="--c:${accColor(c)}"></span> ${esc(accName(c))}</span><b class="${over ? 'neg' : ''}">${money(s)}${c.limit ? ` <small>de ${money(c.limit)}</small>` : ''}</b></div>
+      ${c.limit ? `<div class="fbar-t"><i style="width:${Math.min(100, pct)}%;background:${over ? 'var(--danger)' : pct >= 80 ? 'var(--warn)' : accColor(c)}"></i></div>` : ''}
+      <small class="${over ? 'neg' : 'muted'}">${c.limit ? (over ? `Passou ${money(s - c.limit)} do limite` : `Disponível ${money(c.limit - s)}`) : '<button class="link" data-act="fin-settings">Definir limite</button>'} · renova ${left === 1 ? 'amanhã' : `em ${left} dias`} (dia ${c.renewDay})</small>
+      <div class="bill-line">${ps ? (paid ? `<small class="pos">Fatura anterior (${money(ps)}) paga ✓</small>` : `<small class="neg">Fatura fechada: ${money(ps)}</small>`) : '<small class="muted">Nenhuma fatura fechada em aberto</small>'}<button class="btn sm" data-act="pay-bill" data-id="${esc(c.id)}">Pagar fatura</button></div>
+    </div>`;
+  }).join('')}</section>`;
+}
 function viewFinance() {
-  const ym = ui.fmonth, t = todayKey(), occ = finMonth(ym), prev = finMonth(ymAdd(ym, -1));
+  const ym = ui.fmonth, t = todayKey(), occ = finMonth(ym), prev = finMonth(ymAdd(ym, -1)), isCur = ym === ymOf(t);
   const inc = sumOcc(occ, 'income'), exp = sumOcc(occ, 'expense'), pendIn = sumOcc(occ, 'income', false), pendOut = sumOcc(occ, 'expense', false);
   const prevExp = sumOcc(prev, 'expense'), diff = prevExp ? Math.round((exp - prevExp) / prevExp * 100) : null, bal = inc - exp;
-  const kpis = `<div class="kpis">
+  const pots = db.finance.accounts.filter(a => !isCard(a)), total = pots.reduce((s, a) => s + accBalance(a), 0);
+  const saved = pots.filter(a => a.type === 'savings' || a.type === 'invest').reduce((s, a) => s + accBalance(a), 0), forecast = pots.reduce((s, a) => s + accForecast(a), 0);
+  const kpis = `<div class="kpis four">
+    <section class="card kpi"><span>Saldo em contas hoje</span><b class="${total < 0 ? 'neg' : ''}">${money(total)}</b><small>${[saved ? `${money(saved)} guardado/investido` : '', forecast !== total ? `previsto no fim do mês: ${money(forecast)}` : ''].filter(Boolean).join(' · ') || 'somando todas as contas'}</small></section>
     <section class="card kpi"><span>Ganhos</span><b class="pos">${money(inc)}</b><small>${pendIn ? `+ ${money(pendIn)} previsto` : 'recebido no mês'}</small></section>
     <section class="card kpi"><span>Gastos</span><b class="neg">${money(exp)}</b><small>${pendOut ? `+ ${money(pendOut)} em contas a pagar` : diff === null ? 'gasto no mês' : `${diff <= 0 ? '▼' : '▲'} ${Math.abs(diff)}% vs. ${fmtYm(ymAdd(ym, -1), { month: 'long' })}`}</small></section>
-    <section class="card kpi"><span>Saldo do mês</span><b class="${bal >= 0 ? 'pos' : 'neg'}">${money(bal)}</b><small>${pendIn || pendOut ? `Previsto no fim do mês: ${money(bal + pendIn - pendOut)}` : 'ganhos − gastos'}</small></section>
+    <section class="card kpi"><span>Saldo do mês</span><b class="${bal >= 0 ? 'pos' : 'neg'}">${money(bal)}</b><small>${pendIn || pendOut ? `previsto: ${money(bal + pendIn - pendOut)}` : 'ganhos − gastos'}</small></section>
   </div>`;
 
   // por categoria (com orçamento)
@@ -1366,56 +1579,54 @@ function viewFinance() {
       ${b ? `<small class="${over ? 'neg' : 'muted'}">${over ? `Passou ${money(v - b)} do orçamento` : `Resta ${money(b - v)} do orçamento`}</small>` : ''}</div>`;
   }).join('');
 
-  // por cartão / conta
-  const byAcc = new Map();
-  occ.filter(o => o.paid).forEach(o => { const r = byAcc.get(o.e.account) || { out: 0, in: 0 }; r[o.e.type === 'expense' ? 'out' : 'in'] += o.amount; byAcc.set(o.e.account, r); });
-  const accRows = [...byAcc].sort((a, b) => b[1].out - a[1].out).map(([id, r]) => {
-    const a = accOf(id);
-    return `<button class="acc-row ${ui.finAcc === id ? 'on' : ''}" data-act="fin-acc" data-id="${esc(id)}" title="Filtrar lançamentos"><span class="acc-sw" style="--c:${a.color}"></span><span class="grow"><b>${esc(a.name)}</b><small>${ACC_TYPES[a.type] || ''}</small></span><span style="text-align:right">${r.out ? `<b class="neg">− ${money(r.out)}</b>` : ''}${r.in ? `<small class="pos">+ ${money(r.in)}</small>` : ''}</span></button>`;
-  }).join('');
-
   // contas fixas do mês
   const bills = occ.filter(o => o.kind === 'recur').sort((a, b) => a.date.localeCompare(b.date)).map(o => {
     const late = !o.paid && o.date < t, inc = o.e.type === 'income';
     const status = o.paid ? (inc ? 'Recebido' : 'Pago') : late ? `<span class="neg">Atrasada · dia ${+o.date.slice(8)}</span>` : `${inc ? 'Previsto' : 'Vence'} ${relDate(o.date).toLowerCase()}`;
     return `<div class="bill-row ${o.paid ? 'done' : ''}"><input type="checkbox" class="check" ${o.paid ? 'checked' : ''} data-act="toggle-bill" data-id="${o.e.id}" data-ym="${o.ym}" aria-label="Marcar ${esc(o.e.desc)} como ${inc ? 'recebido' : 'pago'}">
-      <div class="grow" data-act="open-entry" data-id="${o.e.id}" data-ym="${o.ym}"><b>${esc(o.e.desc)}</b><small>${status} · ${esc(accOf(o.e.account).name)}</small></div><b class="${inc ? 'pos' : ''}">${inc ? '+' : '−'} ${money(o.amount)}</b></div>`;
+      <div class="grow" data-act="open-entry" data-id="${o.e.id}" data-ym="${o.ym}"><b>${esc(o.e.desc)}</b><small>${status} · ${esc(accName(accOf(o.e.account)))}</small></div><b class="${inc ? 'pos' : ''}">${inc ? '+' : '−'} ${money(o.amount)}</b></div>`;
   }).join('');
 
   // parcelas em andamento
   const inst = db.finance.entries.filter(e => e.n > 1).map(e => ({ e, k: ymDiff(ymOf(e.date), ym) + 1 })).filter(x => x.k >= 1 && x.k <= x.e.n).map(({ e, k }) =>
-    `<div class="bill-row"><div class="grow" data-act="open-entry" data-id="${e.id}" data-ym="${ym}"><b>${esc(e.desc)} <span class="tag">${k}/${e.n}</span></b><small>${money(e.amount)}/mês · ${esc(accOf(e.account).name)} · termina em ${fmtYmShort(ymAdd(ymOf(e.date), e.n - 1))}</small></div>
+    `<div class="bill-row"><div class="grow" data-act="open-entry" data-id="${e.id}" data-ym="${ym}"><b>${esc(e.desc)} <span class="tag">${k}/${e.n}</span></b><small>${money(e.amount)}/mês · ${esc(accName(accOf(e.account)))} · termina em ${fmtYmShort(ymAdd(ymOf(e.date), e.n - 1))}</small></div>
       <span style="text-align:right"><b>${e.n - k ? money((e.n - k) * e.amount) : 'Última'}</b><small style="display:block">${e.n - k ? `faltam ${e.n - k}x` : 'parcela'}</small></span></div>`).join('');
 
   // lançamentos
-  const list = occ.filter(o => (ui.finFilter === 'all' || o.e.type === ui.finFilter) && (ui.finAcc === null || o.e.account === ui.finAcc));
+  const list = occ.filter(o => (ui.finFilter === 'all' || o.e.type === ui.finFilter) && (ui.finAcc === null || o.e.account === ui.finAcc || o.e.to === ui.finAcc));
   let rows = '', lastDay = '';
   list.forEach(o => {
-    if (o.date !== lastDay) { lastDay = o.date; rows += `<div class="day-label">${relDate(o.date)}${daysBetween(t, o.date) > 1 || daysBetween(t, o.date) < -1 ? '' : ' · ' + fmtShort(o.date)}</div>`; }
+    if (o.date !== lastDay) { lastDay = o.date; rows += `<div class="day-label">${relDate(o.date)}${Math.abs(daysBetween(t, o.date)) > 1 ? '' : ' · ' + fmtShort(o.date)}</div>`; }
+    if (o.e.type === 'transfer') {
+      rows += `<div class="frow" data-act="open-entry" data-id="${o.e.id}" data-ym="${o.ym}"><span class="fico" style="--c:var(--muted)">⇄</span>
+        <div class="grow"><b>${esc(o.e.desc)}</b><small>${o.e.bill ? '<span class="tag">fatura</span> ' : ''}${esc(accName(accOf(o.e.account)))} → ${esc(accName(accOf(o.e.to)))}</small></div><b class="muted">${money(o.amount)}</b></div>`;
+      return;
+    }
     const c = fcatOf(o.e.cat), inc = o.e.type === 'income';
     const tags = (o.kind === 'inst' ? `<span class="tag">parcela ${o.idx}/${o.e.n}</span> ` : '') + (o.kind === 'recur' ? `<span class="tag ${!o.paid && o.date < t ? 'warn' : ''}">${o.paid ? 'fixa' : o.date < t ? 'atrasada' : 'prevista'}</span> ` : '');
     rows += `<div class="frow ${o.paid ? '' : 'pending'}" data-act="open-entry" data-id="${o.e.id}" data-ym="${o.ym}"><span class="fico" style="--c:${c.color}">${inc ? '↑' : '↓'}</span>
-      <div class="grow"><b>${esc(o.e.desc)}</b><small>${tags}${esc(c.name)} · ${esc(accOf(o.e.account).name)}</small></div><b class="${inc ? 'pos' : ''}">${inc ? '+' : '−'} ${money(o.amount)}</b></div>`;
+      <div class="grow"><b>${esc(o.e.desc)}</b><small>${tags}${esc(c.name)} · ${esc(accName(accOf(o.e.account)))}</small></div><b class="${inc ? 'pos' : ''}">${inc ? '+' : '−'} ${money(o.amount)}</b></div>`;
   });
-  const filters = [['all', 'Todos'], ['expense', 'Gastos'], ['income', 'Ganhos']].map(([f, l]) => `<button class="tab ${ui.finFilter === f ? 'on' : ''}" data-act="fin-filter" data-f="${f}">${l}</button>`).join('');
-  const isCur = ym === ymOf(t);
+  const filters = [['all', 'Todos'], ['expense', 'Gastos'], ['income', 'Ganhos'], ['transfer', 'Transferências']].map(([f, l]) => `<button class="tab ${ui.finFilter === f ? 'on' : ''}" data-act="fin-filter" data-f="${f}">${l}</button>`).join('');
 
   return `<div class="fin-head">
       <button class="btn primary" data-act="new-entry" data-type="expense">− Novo gasto</button>
       <button class="btn" data-act="new-entry" data-type="income">+ Novo ganho</button>
+      <button class="btn" data-act="transfer">⇄ Transferir</button>
       <span class="grow"></span>${hideBtn()}
-      <button class="btn ghost" data-act="fin-settings">⚙️ Cartões e categorias</button>
+      <button class="btn ghost" data-act="fin-settings">⚙️ Bancos e categorias</button>
     </div>
     ${kpis}
     <div class="fin-grid">
       <section class="card pad">
-        <div class="card-h"><h3>📒 Lançamentos de ${fmtYm(ym, { month: 'long' })}</h3><div class="tabs" style="margin:0">${filters}</div></div>
-        ${ui.finAcc !== null ? `<div class="filter-note">Mostrando só: <b>${esc(accOf(ui.finAcc).name)}</b><button class="link" data-act="fin-acc" data-id="${esc(ui.finAcc)}">✕ limpar filtro</button></div>` : ''}
-        ${rows || `<div class="empty">Nenhum lançamento ${ui.finFilter === 'income' ? 'de ganho ' : ui.finFilter === 'expense' ? 'de gasto ' : ''}neste mês. ${isCur ? 'Use os botões acima para registrar.' : ''}</div>`}
+        <div class="card-h wrap"><h3>📒 Lançamentos de ${fmtYm(ym, { month: 'long' })}</h3><div class="tabs" style="margin:0">${filters}</div></div>
+        ${ui.finAcc !== null ? `<div class="filter-note">Mostrando só: <b>${esc(accName(accOf(ui.finAcc)))}</b><button class="link" data-act="fin-acc" data-id="${esc(ui.finAcc)}">✕ limpar filtro</button></div>` : ''}
+        ${rows || `<div class="empty">Nenhum lançamento ${ui.finFilter === 'income' ? 'de ganho ' : ui.finFilter === 'expense' ? 'de gasto ' : ui.finFilter === 'transfer' ? 'de transferência ' : ''}neste mês. ${isCur ? 'Use os botões acima para registrar.' : ''}</div>`}
       </section>
       <div class="fin-side">
+        ${banksCard()}
+        ${cardsCard()}
         <section class="card pad"><div class="card-h"><h3>📊 Gastos por categoria</h3><button class="link" data-act="fin-settings">Orçamentos</button></div>${catRows || '<div class="empty">Sem gastos neste mês.</div>'}</section>
-        <section class="card pad"><div class="card-h"><h3>💳 Por cartão / conta</h3></div>${accRows || '<div class="empty">Nada movimentado neste mês.</div>'}</section>
         <section class="card pad"><div class="card-h"><h3>🧾 Contas fixas</h3></div>${bills || '<div class="empty">Nenhuma conta fixa. Ao lançar, escolha "Todo mês (conta fixa)" em Repetição — serve para aluguel, salário, assinaturas…</div>'}</section>
         <section class="card pad"><div class="card-h"><h3>🗓️ Parcelas em andamento</h3></div>${inst || '<div class="empty">Nenhuma compra parcelada neste mês.</div>'}</section>
       </div>
@@ -1426,14 +1637,16 @@ function viewFinance() {
 let enCtx = { id: null, ym: null, link: null };
 function openEntry(id, ym, preset = {}) {
   const e = db.finance.entries.find(x => x.id === id);
+  if (e && e.type === 'transfer') return openTransfer(e.id);
   enCtx = { id: e ? e.id : null, ym: ym || (e ? ymOf(e.date) : ui.fmonth), link: preset.link || null };
   const type = e ? e.type : (preset.type || 'expense');
   $$('input[name=enType]').forEach(r => r.checked = r.value === type);
   $('#enAmount').value = moneyInput(e ? e.amount : preset.amount || 0);
   $('#enDate').value = e ? e.date : (preset.date || (ui.fmonth === ymOf(todayKey()) ? todayKey() : ui.fmonth + '-01'));
   $('#enDesc').value = e ? e.desc : (preset.desc || '');
-  $('#enAcc').innerHTML = '<option value="">Nenhum</option>' + db.finance.accounts.map(a => `<option value="${esc(a.id)}">${esc(a.name)}</option>`).join('');
-  $('#enAcc').value = e ? e.account : (preset.account ?? db.finance.accounts[0]?.id ?? '');
+  const acc = e ? e.account : (preset.account ?? db.finance.accounts[0]?.id ?? '');
+  $('#enAcc').innerHTML = accOptions(acc);
+  $('#enAcc').value = acc;
   $('#enMode').value = e ? (e.recur ? 'recur' : e.n > 1 ? 'inst' : 'once') : 'once';
   $('#enN').value = e && e.n > 1 ? e.n : 2;
   $('#enBasis').value = 'each';
@@ -1517,17 +1730,131 @@ $('#enDelete').addEventListener('click', async () => {
   notify('Lançamento excluído.');
 });
 
-/* ----- cartões, contas e categorias ----- */
+/* ----- transferir entre contas (não conta como gasto nem ganho) ----- */
+let trId = null;
+function openTransfer(id) {
+  const e = db.finance.entries.find(x => x.id === id && x.type === 'transfer'); trId = e ? e.id : null;
+  if (!e && db.finance.accounts.filter(a => !isCard(a)).length < 2) return notify('Cadastre pelo menos duas contas (ex.: conta corrente e caixinha) em "Bancos e categorias".');
+  $('#trTitle').textContent = e ? (e.bill ? 'Pagamento de fatura' : 'Editar transferência') : 'Transferir';
+  $('#trAmount').value = moneyInput(e ? e.amount : 0);
+  $('#trDate').value = e ? e.date : todayKey();
+  $('#trFrom').innerHTML = accOptions(e ? e.account : '', a => !isCard(a), 'Escolha a conta…', true);
+  $('#trTo').innerHTML = accOptions(e ? e.to : '', a => !isCard(a) || (e && a.id === e.to), 'Escolha a conta…', true);
+  $('#trDesc').value = e ? e.desc : '';
+  $('#trDelete').hidden = !e;
+  $('#trDlg').showModal();
+  if (!e) $('#trAmount').focus();
+}
+$('#trForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const amount = parseMoney($('#trAmount').value), date = $('#trDate').value, from = $('#trFrom').value, to = $('#trTo').value;
+  if (!amount) return notify('Informe um valor válido.');
+  if (!from || !to) return notify('Escolha a conta de origem e a de destino.');
+  if (from === to) return notify('A origem e o destino precisam ser contas diferentes.');
+  if (!validDate(date)) return notify('Escolha uma data válida.');
+  const dest = accOf(to), desc = $('#trDesc').value.trim() || (['savings', 'invest'].includes(dest.type) ? `Guardar em ${accName(dest)}` : `Transferência para ${accName(dest)}`);
+  const tr = db.finance.entries.find(x => x.id === trId);
+  if (tr) Object.assign(tr, { amount, date, account: from, to, desc });
+  else db.finance.entries.push({ id: newId(), type: 'transfer', amount, date, account: from, to, desc, bill: '', cat: '', notes: '', recur: false, until: '', except: [], paid: {}, n: 1 });
+  $('#trDlg').close();
+  save();
+  notify(tr ? 'Transferência atualizada.' : `${moneyAlways(amount)} transferidos para ${accName(dest)} ✓`);
+});
+$('#trDelete').addEventListener('click', async () => {
+  const tr = db.finance.entries.find(x => x.id === trId);
+  if (!tr || !await ask('Excluir transferência?', `${moneyAlways(tr.amount)} voltam para ${accName(accOf(tr.account))}.`, [{ label: 'Excluir', value: true, danger: true }])) return;
+  db.finance.entries = db.finance.entries.filter(x => x !== tr);
+  $('#trDlg').close();
+  save();
+  notify('Transferência excluída.');
+});
+
+/* ----- pagar fatura do cartão ----- */
+let billCtx = null;
+function openBill(c) {
+  if (!db.finance.accounts.some(a => !isCard(a))) return notify('Cadastre uma conta (ex.: conta corrente) para pagar a fatura.');
+  const t = todayKey(), cyc = cardCycle(c, t), pc = cardCycle(c, addDays(cyc.start, -1));
+  const opts = [
+    { start: pc.start, label: `Fatura fechada · ${fmtShort(pc.start)} a ${fmtShort(addDays(pc.end, -1))}`, amount: cardSpent(c, pc), paid: billPaid(c, pc.start) },
+    { start: cyc.start, label: `Ciclo atual · desde ${fmtShort(cyc.start)} (pagar antes)`, amount: cardSpent(c, cyc), paid: billPaid(c, cyc.start) }
+  ];
+  const pick = opts[0].amount && !opts[0].paid ? 0 : 1;
+  billCtx = { id: c.id, opts };
+  $('#billInfo').textContent = accName(c);
+  $('#billCycles').innerHTML = opts.map((o, i) => `<label><input type="radio" name="billCycle" value="${i}" ${i === pick ? 'checked' : ''}><span>${o.label}<b>${moneyAlways(o.amount)}${o.paid ? ' · já paga' : ''}</b></span></label>`).join('');
+  $('#billAmount').value = moneyInput(opts[pick].amount);
+  $('#billDate').value = t;
+  $('#billFrom').innerHTML = accOptions('', a => !isCard(a), 'Escolha a conta…', true);
+  // sugere a conta corrente do mesmo banco do cartão (ou a única conta que existir)
+  const sources = db.finance.accounts.filter(a => !isCard(a));
+  const pref = (c.bankId && sources.find(a => a.bankId === c.bankId && a.type === 'account')) || (sources.length === 1 && sources[0]);
+  if (pref) $('#billFrom').value = pref.id;
+  $('#billDlg').showModal();
+}
+$('#billForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const c = accOf(billCtx.id), opt = billCtx.opts[+($('input[name=billCycle]:checked')?.value ?? 1)];
+  const amount = parseMoney($('#billAmount').value), date = $('#billDate').value, from = $('#billFrom').value;
+  if (!amount) return notify('Informe o valor pago.');
+  if (!from) return notify('Escolha de onde saiu o dinheiro.');
+  if (!validDate(date)) return notify('Escolha uma data válida.');
+  db.finance.entries.push({ id: newId(), type: 'transfer', amount, date, account: from, to: c.id, bill: opt.start, desc: `Fatura ${accName(c)}`, cat: '', notes: '', recur: false, until: '', except: [], paid: {}, n: 1 });
+  $('#billDlg').close();
+  save();
+  notify(`Fatura paga com ${accName(accOf(from))} ✓`);
+});
+
+/* ----- ajustar saldo para o valor real do banco ----- */
+let adjId = null;
+function openAdjust(a) {
+  adjId = a.id;
+  const v = accBalance(a);
+  $('#adjInfo').textContent = `${accName(a)}: o planner calcula ${moneyAlways(v)}. Digite o valor que aparece no app do banco — pode ser negativo.`;
+  $('#adjValue').value = moneyInputSigned(v);
+  $('#adjDlg').showModal();
+  $('#adjValue').select();
+}
+$('#adjForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const a = accOf(adjId), v = parseSigned($('#adjValue').value);
+  if (v === null) return notify('Valor inválido (ex.: 1.250,00 ou -80,00).');
+  a.opening += v - accBalance(a);
+  $('#adjDlg').close();
+  save();
+  notify(`Saldo de ${accName(a)} ajustado para ${moneyAlways(v)}.`);
+});
+
+/* ----- bancos, contas, cartões e categorias ----- */
 const randColor = () => '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0');
-const fsRow = (x, kind) => `<div class="cat-row fs-row" data-id="${esc(x.id)}"><input type="color" value="${x.color}" aria-label="Cor"><input type="text" class="inp" value="${esc(x.name)}" maxlength="40" placeholder="${kind === 'acc' ? 'Ex.: Cartão Nubank' : 'Nome da categoria'}" aria-label="Nome">${kind === 'acc'
-  ? `<select class="inp" aria-label="Tipo">${Object.entries(ACC_TYPES).map(([k, v]) => `<option value="${k}" ${x.type === k ? 'selected' : ''}>${v}</option>`).join('')}</select>`
-  : kind === 'expense' ? `<input type="text" class="inp budget" inputmode="decimal" value="${moneyInput(x.budget)}" placeholder="Orçamento/mês" aria-label="Orçamento mensal de ${esc(x.name)}">` : ''}<button type="button" class="icon-btn sm" data-act="del-cat" aria-label="Remover">×</button></div>`;
+const fsRow = (x, kind) => `<div class="cat-row fs-row" data-id="${esc(x.id)}"><input type="color" value="${x.color}" aria-label="Cor"><input type="text" class="inp" value="${esc(x.name)}" maxlength="40" placeholder="Nome da categoria" aria-label="Nome">${kind === 'expense'
+  ? `<input type="text" class="inp budget" inputmode="decimal" value="${moneyInput(x.budget)}" placeholder="Orçamento/mês" aria-label="Orçamento mensal de ${esc(x.name)}">` : ''}<button type="button" class="icon-btn sm" data-act="del-cat" aria-label="Remover">×</button></div>`;
+function fsAccRow(a, loose) {
+  const card = isCard(a), known = db.finance.accounts.some(x => x.id === a.id);
+  return `<div class="cat-row fs-row fs-acc" data-id="${esc(a.id)}">
+    ${loose ? `<input type="color" value="${a.color}" aria-label="Cor">` : ''}
+    <select class="inp fs-type" aria-label="Tipo">${Object.entries(ACC_TYPES).filter(([k]) => loose || k !== 'cash').map(([k, v]) => `<option value="${k}" ${a.type === k ? 'selected' : ''}>${v}</option>`).join('')}</select>
+    <input type="text" class="inp fs-name" value="${esc(a.name)}" maxlength="40" placeholder="Nome" aria-label="Nome">
+    <label class="fs-mini fs-bal" ${card ? 'hidden' : ''}>Saldo hoje<input type="text" class="inp" inputmode="decimal" value="${known ? moneyInputSigned(accBalance(a)) : ''}" placeholder="0,00" data-orig="${known ? moneyInputSigned(accBalance(a)) : ''}"></label>
+    <label class="fs-mini fs-limit" ${card ? '' : 'hidden'}>Limite<input type="text" class="inp" inputmode="decimal" value="${moneyInput(a.limit)}" placeholder="0,00"></label>
+    <label class="fs-mini fs-day" ${card ? '' : 'hidden'}>Renova dia<input type="number" class="inp" min="1" max="31" step="1" value="${a.renewDay || 1}"></label>
+    <button type="button" class="icon-btn sm" data-act="del-row" aria-label="Remover">×</button></div>`;
+}
+const fsBank = (b, accs) => `<div class="fs-bank" data-id="${esc(b.id)}">
+  <div class="fs-bank-h"><input type="color" value="${b.color}" aria-label="Cor do banco"><input type="text" class="inp fs-bname" value="${esc(b.name)}" maxlength="40" placeholder="Nome do banco (ex.: Nubank)" aria-label="Nome do banco"><button type="button" class="btn sm ghost danger" data-act="del-bank">Excluir banco</button></div>
+  <div class="fs-accs">${accs.map(a => fsAccRow(a, false)).join('')}</div>
+  <button type="button" class="btn sm ghost" data-act="fs-add-acc">+ Conta, caixinha, investimento ou cartão</button></div>`;
 function openFinSettings() {
   const f = db.finance;
   $('#fsBody').innerHTML = `
-    <h3>Cartões e contas</h3><p class="small">De onde o dinheiro sai ou entra: cartões de crédito, contas, dinheiro…</p>
-    <div id="fsAcc">${f.accounts.map(a => fsRow(a, 'acc')).join('')}</div>
-    <button type="button" class="btn sm" data-act="fs-add" data-kind="acc">+ Cartão / conta</button>
+    <h3>Bancos e contas</h3>
+    <p class="small">Dentro de cada banco, coloque o que você tem lá: conta corrente, caixinha, investimento, cartão de crédito. Nas contas, informe o <b>saldo de hoje</b>; nos cartões, o <b>limite</b> e o <b>dia em que o limite renova</b>.</p>
+    <div id="fsBanks">${f.banks.map(b => fsBank(b, f.accounts.filter(a => a.bankId === b.id))).join('')}</div>
+    <button type="button" class="btn sm" data-act="fs-add-bank">+ Novo banco</button>
+    <div class="fs-bank" data-id="" id="fsLoose">
+      <div class="fs-bank-h"><b>Sem banco</b><span class="small muted">dinheiro em espécie e cartões avulsos (só para acompanhar o limite)</span></div>
+      <div class="fs-accs">${f.accounts.filter(a => !bankOf(a)).map(a => fsAccRow(a, true)).join('')}</div>
+      <button type="button" class="btn sm ghost" data-act="fs-add-loose">+ Cartão ou conta sem banco</button>
+    </div>
     <h3>Categorias de gasto</h3><p class="small">O orçamento é opcional: um limite por mês. A barra fica vermelha quando passa.</p>
     <div id="fsExp">${f.cats.filter(c => c.kind === 'expense').map(c => fsRow(c, 'expense')).join('')}</div>
     <button type="button" class="btn sm" data-act="fs-add" data-kind="expense">+ Categoria de gasto</button>
@@ -1538,15 +1865,42 @@ function openFinSettings() {
 }
 $('#fsForm').addEventListener('submit', e => {
   e.preventDefault();
+  const blocks = $$('#fsBody .fs-bank');
+  if (blocks.some(b => b.dataset.id && !b.querySelector('.fs-bname').value.trim())) return notify('Dê um nome para cada banco.');
+  const banks = [], accounts = [];
+  for (const b of blocks) {
+    const bankId = b.dataset.id, bankColor = bankId ? b.querySelector('.fs-bank-h input[type=color]').value : '';
+    if (bankId) banks.push({ id: bankId, name: b.querySelector('.fs-bname').value.trim().slice(0, 40), color: bankColor });
+    for (const r of b.querySelectorAll('.fs-acc')) {
+      const type = r.querySelector('.fs-type').value, old = db.finance.accounts.find(a => a.id === r.dataset.id);
+      const a = {
+        id: r.dataset.id, type, bankId, name: r.querySelector('.fs-name').value.trim().slice(0, 40) || ACC_TYPES[type],
+        color: bankId ? bankColor : r.querySelector('input[type=color]').value, opening: old ? old.opening : 0, limit: 0, renewDay: 1
+      };
+      if (type === 'card') {
+        a.limit = parseMoney(r.querySelector('.fs-limit input').value);
+        a.renewDay = Math.min(31, Math.max(1, Math.round(+r.querySelector('.fs-day input').value) || 1));
+      } else {
+        const inp = r.querySelector('.fs-bal input');
+        if (inp.value.trim() !== inp.dataset.orig) {
+          const v = parseSigned(inp.value);
+          if (v === null && inp.value.trim()) return notify(`Saldo inválido em "${a.name}" (ex.: 1.250,00).`);
+          a.opening = (v || 0) - (movements(todayKey()).get(a.id) || 0);
+        }
+      }
+      accounts.push(a);
+    }
+  }
   const read = sel => $$(sel + ' .fs-row').map(r => ({ r, id: r.dataset.id, name: r.querySelector('input[type=text]').value.trim().slice(0, 40), color: r.querySelector('input[type=color]').value })).filter(x => x.name);
-  db.finance.accounts = read('#fsAcc').map(x => ({ id: x.id, name: x.name, color: x.color, type: x.r.querySelector('select').value }));
+  db.finance.banks = banks;
+  db.finance.accounts = accounts;
   db.finance.cats = [
     ...read('#fsExp').map(x => ({ id: x.id, name: x.name, color: x.color, kind: 'expense', budget: parseMoney(x.r.querySelector('.budget').value) })),
     ...read('#fsInc').map(x => ({ id: x.id, name: x.name, color: x.color, kind: 'income', budget: 0 }))
   ];
   $('#fsDlg').close();
   save();
-  notify('Cartões e categorias salvos.');
+  notify('Bancos, contas e categorias salvos.');
 });
 
 /* ----- Visão: dívidas ----- */
@@ -1680,10 +2034,16 @@ $('#payForm').addEventListener('submit', e => {
   offerLaunch(d, v, date);
 });
 
-/* ----- Visão: wishlist ----- */
+/* ----- Visão: wishlist (dividida pelo mês em que você quer comprar) ----- */
 const PRIO_COLOR = { high: 'var(--danger)', normal: 'var(--accent)', low: 'var(--muted)' };
 const PRIO_LABEL = { high: 'Prioridade alta', normal: 'Prioridade média', low: 'Prioridade baixa' };
+function monthOptions(sel) {
+  const cur = ymOf(todayKey()), list = Array.from({ length: 24 }, (_, i) => ymAdd(cur, i));
+  if (sel && !list.includes(sel)) list.unshift(sel);
+  return '<option value="">Sem mês definido</option>' + list.map(m => `<option value="${m}" ${m === sel ? 'selected' : ''}>${cap(fmtYm(m))}</option>`).join('');
+}
 function wishCard(w) {
+  const late = !w.bought && w.month && w.month < ymOf(todayKey());
   return `<article class="card wish ${w.bought ? 'bought' : ''}" style="--c:${PRIO_COLOR[w.priority]}">
     <div class="wish-top">
       <input type="checkbox" class="check" ${w.bought ? 'checked' : ''} data-act="wish-check" data-id="${w.id}" aria-label="${w.bought ? 'Desmarcar' : 'Marcar'} ${esc(w.name)} como comprado">
@@ -1693,32 +2053,40 @@ function wishCard(w) {
     ${w.notes ? `<p>${esc(w.notes)}</p>` : ''}
     <div class="goal-actions">
       ${w.link ? `<a class="btn sm" href="${esc(w.link)}" target="_blank" rel="noopener noreferrer">🛒 Ver na loja ↗</a>` : ''}
+      ${late ? `<button class="btn sm" data-act="wish-now" data-id="${w.id}">Mover para este mês</button>` : ''}
       <button class="btn sm ghost" data-act="open-wish" data-id="${w.id}">Editar</button>
     </div>
   </article>`;
 }
 function viewWishlist() {
-  const open = db.wishes.filter(w => !w.bought), bought = db.wishes.filter(w => w.bought).sort((a, b) => b.boughtDate.localeCompare(a.boughtDate));
+  const cur = ymOf(todayKey()), open = db.wishes.filter(w => !w.bought), bought = db.wishes.filter(w => w.bought).sort((a, b) => b.boughtDate.localeCompare(a.boughtDate));
   const P = { high: 0, normal: 1, low: 2 }, noPrice = 1e12;
-  const sorters = {
+  const sorter = {
     priority: (a, b) => P[a.priority] - P[b.priority] || (a.price || noPrice) - (b.price || noPrice),
     cheap: (a, b) => (a.price || noPrice) - (b.price || noPrice),
     expensive: (a, b) => b.price - a.price,
     recent: (a, b) => b.created - a.created
-  };
-  open.sort(sorters[ui.wishSort]);
+  }[ui.wishSort];
+  const groups = new Map();
+  open.forEach(w => { const k = w.month || ''; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(w); });
+  const sections = [...groups.keys()].sort((a, b) => (a || '9999').localeCompare(b || '9999')).map(k => {
+    const items = groups.get(k).sort(sorter), sum = items.reduce((s, w) => s + w.price, 0);
+    const tag = !k ? '' : k < cur ? '<span class="tag warn">mês já passou</span>' : k === cur ? '<span class="tag">este mês</span>' : '';
+    return `<section class="wish-group"><div class="wish-month"><h3>${k ? cap(fmtYm(k)) : 'Sem mês definido'}</h3>${tag}<span class="grow"></span><span class="muted">${plural(items.length, 'item', 'itens')} · <b>${money(sum)}</b></span></div><div class="wishes">${items.map(wishCard).join('')}</div></section>`;
+  }).join('');
   const total = open.reduce((s, w) => s + w.price, 0), spent = bought.reduce((s, w) => s + w.paid, 0);
+  const thisMonth = open.filter(w => w.month && w.month <= cur).reduce((s, w) => s + w.price, 0);
   return `<div class="fin-head">
       <button class="btn primary" data-act="new-wish">+ Novo desejo</button>
-      <select class="sort" id="wishSort" aria-label="Ordenar">${[['priority', 'Ordenar por prioridade'], ['cheap', 'Menor preço'], ['expensive', 'Maior preço'], ['recent', 'Mais recentes']].map(([k, l]) => `<option value="${k}" ${ui.wishSort === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
+      <select class="sort" id="wishSort" aria-label="Ordenar dentro de cada mês">${[['priority', 'Ordenar por prioridade'], ['cheap', 'Menor preço'], ['expensive', 'Maior preço'], ['recent', 'Mais recentes']].map(([k, l]) => `<option value="${k}" ${ui.wishSort === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
       <span class="grow"></span>${hideBtn()}
     </div>
     <div class="kpis">
-      <section class="card kpi"><span>Na lista</span><b>${open.length}</b><small>${plural(open.filter(w => w.priority === 'high').length, 'com prioridade alta', 'com prioridade alta')}</small></section>
-      <section class="card kpi"><span>Total estimado</span><b>${money(total)}</b><small>${open.some(w => !w.price) ? 'alguns itens sem preço' : 'para comprar tudo'}</small></section>
+      <section class="card kpi"><span>Para este mês</span><b>${money(thisMonth)}</b><small>${plural(open.filter(w => w.month && w.month <= cur).length, 'item planejado', 'itens planejados')}</small></section>
+      <section class="card kpi"><span>Total da lista</span><b>${money(total)}</b><small>${plural(open.length, 'item', 'itens')}${open.some(w => !w.price) ? ' · alguns sem preço' : ''}</small></section>
       <section class="card kpi"><span>Já comprados</span><b>${bought.length}</b><small>${bought.length ? `${money(spent)} gastos` : 'nenhum ainda'}</small></section>
     </div>
-    ${open.length ? `<div class="wishes">${open.map(wishCard).join('')}</div>` : '<div class="card pad empty">Sua wishlist está vazia. Adicione aquilo que você quer comprar — com preço e link da loja para não esquecer.</div>'}
+    ${sections || '<div class="card pad empty">Sua wishlist está vazia. Adicione aquilo que você quer comprar — com preço, link da loja e o mês em que pretende comprar.</div>'}
     ${bought.length ? `<details style="margin-top:20px"><summary>Comprados (${bought.length})</summary><div class="wishes" style="margin-top:12px">${bought.map(wishCard).join('')}</div></details>` : ''}`;
 }
 let wsId = null;
@@ -1728,6 +2096,7 @@ function openWish(id) {
   $('#wsName').value = w ? w.name : '';
   $('#wsPrice').value = moneyInput(w ? w.price : 0);
   $('#wsPrio').value = w ? w.priority : 'normal';
+  $('#wsMonth').innerHTML = monthOptions(w ? w.month : '');
   $('#wsLink').value = w ? w.link : '';
   $('#wsNotes').value = w ? w.notes : '';
   $('#wsDelete').hidden = !w;
@@ -1739,7 +2108,7 @@ $('#wsForm').addEventListener('submit', e => {
   const name = $('#wsName').value.trim(), rawLink = $('#wsLink').value.trim(), link = safeUrl(rawLink && !/^https?:\/\//i.test(rawLink) ? 'https://' + rawLink : rawLink);
   if (!name) return notify('Diga o que você quer.');
   if (rawLink && !link) return notify('O link precisa ser um endereço de site (https://…).');
-  const data = { name, price: parseMoney($('#wsPrice').value), priority: $('#wsPrio').value, link, notes: $('#wsNotes').value.trim() };
+  const data = { name, price: parseMoney($('#wsPrice').value), priority: $('#wsPrio').value, month: $('#wsMonth').value, link, notes: $('#wsNotes').value.trim() };
   const w = db.wishes.find(x => x.id === wsId);
   if (w) Object.assign(w, data); else db.wishes.push({ id: newId(), bought: false, boughtDate: '', paid: 0, created: Date.now(), ...data });
   $('#wsDlg').close();
@@ -2163,10 +2532,19 @@ function loadDemo() {
 
   // finanças de exemplo
   const ym = ymOf(t), back = n => ymAdd(ym, -n);
+  db.finance.banks = [
+    { id: 'b-nubank', name: 'Nubank', color: '#8a05be' },
+    { id: 'b-itau', name: 'Itaú', color: '#ec7000' }
+  ];
+  const acc = (id, name, type, bankId, extra = {}) => ({ id, name, type, bankId, color: '#8a94a8', opening: 0, limit: 0, renewDay: 1, ...extra });
   db.finance.accounts = [
-    { id: 'a-nubank', name: 'Cartão Nubank', color: '#8a05be', type: 'card' },
-    { id: 'a-itau', name: 'Conta Itaú', color: '#ec7000', type: 'account' },
-    { id: 'a-dinheiro', name: 'Dinheiro', color: '#24ad81', type: 'cash' }
+    acc('a-nu-conta', 'Conta corrente', 'account', 'b-nubank', { opening: 85000 }),
+    acc('a-nu-caixinha', 'Caixinha', 'savings', 'b-nubank', { opening: 250000 }),
+    acc('a-nu-invest', 'CDB', 'invest', 'b-nubank', { opening: 800000 }),
+    acc('a-nubank', 'Cartão de crédito', 'card', 'b-nubank', { limit: 200000, renewDay: 5 }),
+    acc('a-itau', 'Conta corrente', 'account', 'b-itau', { opening: 40000 }),
+    acc('a-dinheiro', 'Dinheiro', 'cash', '', { color: '#24ad81', opening: 15000 }),
+    acc('a-renner', 'Cartão Renner', 'card', '', { color: '#d6457a', limit: 80000, renewDay: 10 })
   ];
   db.finance.cats.find(c => c.id === 'f-alimentacao').budget = 80000;
   db.finance.cats.find(c => c.id === 'f-lazer').budget = 30000;
@@ -2184,8 +2562,16 @@ function loadDemo() {
     fe('expense', 4200, 'Almoço', 'f-alimentacao', 'a-dinheiro', t),
     fe('expense', 18990, 'Farmácia', 'f-saude', 'a-nubank', d(-8)),
     fe('income', 60000, 'Freela de design', 'f-extra', 'a-itau', d(-6)),
-    fe('expense', 28000, 'Mercado', 'f-alimentacao', 'a-itau', d(-35))
+    fe('expense', 28000, 'Mercado', 'f-alimentacao', 'a-itau', d(-35)),
+    fe('expense', 15990, 'Calça jeans', 'f-compras', 'a-renner', d(-2)),
+    fe('income', 6250, 'Rendimento do CDB', 'f-rendimentos', 'a-nu-invest', d(-4)),
+    fe('transfer', 50000, 'Guardar na caixinha', '', 'a-itau', d(-7), { to: 'a-nu-caixinha', bill: '' })
   );
+  // fatura anterior do Nubank paga com a conta do Nubank
+  const nu = db.finance.accounts.find(a => a.id === 'a-nubank'), prevCyc = cardCycle(nu, addDays(cardCycle(nu, t).start, -1));
+  finCache.clear(); balCache.clear();
+  const prevBill = cardSpent(nu, prevCyc);
+  if (prevBill) db.finance.entries.push(fe('transfer', prevBill, 'Fatura Nubank · Cartão de crédito', '', 'a-nu-conta', cardCycle(nu, t).start, { to: 'a-nubank', bill: prevCyc.start }));
   const debt = (dir, person, amount, desc, extra = {}) => ({ id: newId(), dir, person, amount, desc, notes: '', date: d(-10), due: '', payments: [], done: false, doneDate: '', ...extra });
   db.debts.push(
     debt('owe', 'João', 23000, 'Pizza e ingresso do show', { due: d(4), payments: [{ date: d(-4), amount: 7000, final: false }] }),
@@ -2193,10 +2579,11 @@ function loadDemo() {
     debt('owed', 'Pedro', 4000, 'Uber dividido', { date: d(-3) }),
     debt('owe', 'Ana', 5000, 'Vaquinha do presente', { date: d(-20), payments: [{ date: d(-15), amount: 5000, final: true }], done: true, doneDate: d(-15) })
   );
-  const wish = (name, price, priority, extra = {}) => ({ id: newId(), name, price, priority, link: '', notes: '', bought: false, boughtDate: '', paid: 0, created: Date.now(), ...extra });
+  const wish = (name, price, priority, extra = {}) => ({ id: newId(), name, price, priority, month: '', link: '', notes: '', bought: false, boughtDate: '', paid: 0, created: Date.now(), ...extra });
   db.wishes.push(
-    wish('Fone de ouvido Bluetooth', 39900, 'high', { link: 'https://www.google.com/search?q=fone+de+ouvido+bluetooth&tbm=shop' }),
-    wish('Tênis de corrida', 54900, 'normal'),
+    wish('Fone de ouvido Bluetooth', 39900, 'high', { month: ymAdd(ym, 1), link: 'https://www.google.com/search?q=fone+de+ouvido+bluetooth&tbm=shop' }),
+    wish('Tênis de corrida', 54900, 'normal', { month: ymAdd(ym, 1) }),
+    wish('Presente de Natal da mãe', 25000, 'high', { month: ymOf(t) < ym.slice(0, 4) + '-12' ? ym.slice(0, 4) + '-12' : ymAdd(ym, 2) }),
     wish('Kindle', 49900, 'low', { notes: 'Esperar a Black Friday' }),
     wish('Mochila para notebook', 18900, 'normal', { bought: true, boughtDate: d(-9), paid: 17500 })
   );
@@ -2299,10 +2686,35 @@ document.addEventListener('click', async e => {
     case 'fin-settings': openFinSettings(); break;
     case 'fs-add': {
       const kind = el.dataset.kind;
-      $({ acc: '#fsAcc', expense: '#fsExp', income: '#fsInc' }[kind]).insertAdjacentHTML('beforeend', fsRow({ id: newId(), name: '', color: randColor(), type: 'card', budget: 0 }, kind));
+      $({ expense: '#fsExp', income: '#fsInc' }[kind]).insertAdjacentHTML('beforeend', fsRow({ id: newId(), name: '', color: randColor(), budget: 0 }, kind));
       el.previousElementSibling.lastElementChild.querySelector('input[type=text]').focus();
       break;
     }
+    case 'fs-add-bank': {
+      $('#fsBanks').insertAdjacentHTML('beforeend', fsBank({ id: newId(), name: '', color: randColor() }, [{ ...NO_ACC, id: newId(), type: 'account', name: 'Conta corrente' }]));
+      $('#fsBanks .fs-bank:last-child .fs-bname').focus();
+      break;
+    }
+    case 'fs-add-acc': {
+      el.previousElementSibling.insertAdjacentHTML('beforeend', fsAccRow({ ...NO_ACC, id: newId(), type: 'account', name: '' }, false));
+      el.previousElementSibling.lastElementChild.querySelector('.fs-name').focus();
+      break;
+    }
+    case 'fs-add-loose': {
+      el.previousElementSibling.insertAdjacentHTML('beforeend', fsAccRow({ ...NO_ACC, id: newId(), type: 'card', name: '', color: randColor() }, true));
+      el.previousElementSibling.lastElementChild.querySelector('.fs-name').focus();
+      break;
+    }
+    case 'del-row': el.closest('.fs-row').remove(); break;
+    case 'del-bank': {
+      const b = el.closest('.fs-bank'), name = b.querySelector('.fs-bname').value || 'este banco';
+      if (await ask('Excluir banco?', `"${name}" e as contas dentro dele saem da lista. Os lançamentos continuam registrados, mas ficam "sem conta". Só vale depois de clicar em Salvar.`, [{ label: 'Excluir', value: true, danger: true }])) b.remove();
+      break;
+    }
+    case 'transfer': openTransfer(null); break;
+    case 'pay-bill': openBill(accOf(id)); break;
+    case 'adj-acc': openAdjust(accOf(id)); break;
+    case 'wish-now': { const w = db.wishes.find(x => x.id === id); if (w) { w.month = ymOf(todayKey()); save(); notify('Movido para este mês.'); } break; }
     /* dívidas */
     case 'new-debt': openDebt(null, el.dataset.dir); break;
     case 'open-debt': hideResults(); openDebt(id); break;
@@ -2355,6 +2767,13 @@ document.addEventListener('input', e => {
   else if (t.id === 'glType') syncGoalForm();
   else if (t.name === 'enType' || ['enMode', 'enN', 'enBasis', 'enAmount', 'enDate'].includes(t.id)) syncEnForm();
   else if (t.id === 'wishSort') { ui.wishSort = t.value; render(); }
+  else if (t.name === 'billCycle') $('#billAmount').value = moneyInput(billCtx.opts[+t.value].amount);
+  else if (t.classList.contains('fs-type')) {
+    const r = t.closest('.fs-acc'), card = t.value === 'card', name = r.querySelector('.fs-name');
+    r.querySelector('.fs-bal').hidden = card;
+    r.querySelector('.fs-limit').hidden = r.querySelector('.fs-day').hidden = !card;
+    if (!name.value.trim() || Object.values(ACC_TYPES).includes(name.value.trim())) name.value = ACC_TYPES[t.value];
+  }
   else if (t.id === 'evStart' && isTime(t.value) && !$('#evAllDay').checked) {
     const end = $('#evEnd'); if (!isTime(end.value) || end.value <= t.value) end.value = fromMin(toMin(t.value) + 60);
   }

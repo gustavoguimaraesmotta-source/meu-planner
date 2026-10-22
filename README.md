@@ -34,8 +34,16 @@ Sem cadastro, sem servidor, sem instalação. Cada pessoa que abre o planner tem
 - Escolha os dias clicando no calendário **ou** use **✨ Distribuir automaticamente** (todos os dias ou só dias úteis).
 - Acompanhe o progresso com barra e anel de porcentagem, e a contagem regressiva até o prazo.
 
+### 🏦 Bancos, contas e cartões
+- Cadastre seus **bancos** e, dentro de cada um, o que você tem lá: **conta corrente, caixinha/poupança, investimento e cartão de crédito**.
+- Cada conta tem **saldo**: soma os ganhos, subtrai os gastos e se ajusta com um clique se ficar diferente do banco.
+- **Transferir** entre contas (ex.: guardar na caixinha, resgatar investimento) sem contar como gasto nem ganho.
+- **Cartões de crédito** com limite e dia em que o limite renova: uma barra mostra quanto já foi usado no ciclo e zera na renovação.
+- **Pagar fatura** escolhendo de qual conta saiu o dinheiro — sem contar os gastos duas vezes.
+- Cartões **avulsos**, sem banco, só para acompanhar o limite.
+
 ### 💰 Gastos e ganhos
-- Registre gastos e ganhos com valor, categoria, data e **de qual cartão ou conta** saiu (ex.: Cartão Nubank, Conta Itaú, Dinheiro).
+- Registre gastos e ganhos com valor, categoria, data e **de qual conta ou cartão** saiu.
 - **Contas fixas** (aluguel, salário, assinaturas): cadastre uma vez e elas aparecem todo mês como previstas — dê o check quando pagar.
 - **Compras parceladas**: informe o valor da parcela ou o total; cada parcela cai no mês certo e você vê quanto falta e quando termina.
 - **Orçamento por categoria** com barra que fica vermelha quando passa do limite.
@@ -48,7 +56,7 @@ Sem cadastro, sem servidor, sem instalação. Cada pessoa que abre o planner tem
 - Ao quitar, opção de lançar o valor nas Finanças automaticamente.
 
 ### 🎁 Wishlist
-- Lista do que você quer comprar, com preço, prioridade e link da loja.
+- Lista do que você quer comprar, com preço, prioridade e link da loja, **dividida pelo mês** em que você pretende comprar (com o total de cada mês).
 - Ao marcar como comprado, opção de lançar o gasto (inclusive parcelado).
 
 ### 📅 Tudo conectado
