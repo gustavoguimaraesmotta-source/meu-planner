@@ -271,6 +271,12 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .check-line{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:13px;font-weight:600;cursor:pointer}
 .check-line input{width:16px;height:16px;accent-color:var(--accent)}
+.gc-cal{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px}
+.gc-cal label{display:flex;align-items:center;gap:8px;flex:1;min-width:0;font-weight:600;cursor:pointer}
+.gc-cal label span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gc-cal input{width:16px;height:16px;accent-color:var(--accent);flex-shrink:0}
+.gc-cal i{width:10px;height:10px;border-radius:50%;background:var(--c);flex-shrink:0}
+.gc-cal select{width:auto;max-width:45%}
 .weekdays{display:flex;gap:5px;margin-top:10px;flex-wrap:wrap}
 .weekdays label{position:relative}
 .weekdays input{position:absolute;opacity:0;pointer-events:none}
@@ -489,6 +495,7 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
       <button class="side-link" data-act="export">⬇️ Salvar backup</button>
       <button class="side-link" data-act="import">⬆️ Restaurar backup</button>
       <button class="side-link" data-act="ics">📤 Exportar para Google Agenda (.ics)</button>
+      <button class="side-link" data-act="gcal-import" id="gcalBtn" hidden>📥 Importar do Google Agenda</button>
       <button class="side-link" data-act="print">🖨️ Imprimir visão atual</button>
       <button class="side-link" data-act="settings">⚙️ Configurações</button>
       <p class="status" id="status"></p>
@@ -822,6 +829,24 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
   </div>
 </dialog>
 
+<!-- Importar do Google Agenda -->
+<dialog id="gcDlg">
+  <form id="gcForm">
+    <h2>📥 Importar do Google Agenda</h2>
+    <p class="small">Escolha as agendas e em qual categoria do planner cada uma entra.</p>
+    <div id="gcCals"></div>
+    <div class="grid2">
+      <label class="field">De<input id="gcFrom" type="date" required></label>
+      <label class="field">Até<input id="gcTo" type="date" required></label>
+    </div>
+    <p class="hint">Pode importar de novo quando quiser: os compromissos que mudaram no Google são atualizados, os novos entram e os que foram apagados lá saem daqui — sem duplicar. O planner só lê a sua agenda, nunca altera nada nela.</p>
+    <div class="dlg-actions">
+      <button type="button" class="btn" data-close>Cancelar</button>
+      <button class="btn primary" type="submit" id="gcGo">Importar</button>
+    </div>
+  </form>
+</dialog>
+
 <!-- Confirmações -->
 <dialog id="askDlg" class="sm">
   <h2 id="askT"></h2>
@@ -985,7 +1010,8 @@ function sanitize(raw) {
       repeat, days: repeat === 'weekly' ? [...new Set(arr(e.days, 7).filter(d => Number.isInteger(d) && d >= 0 && d <= 6))] : [],
       until: repeat !== 'none' && validDate(e.until) && e.until >= e.date ? e.until : '',
       except: arr(e.except, 2000).filter(validDate), done: cleanDone(e.done),
-      cat: catId(e.cat), location: str(e.location, 160), notes: str(e.notes, 1000)
+      cat: catId(e.cat), location: str(e.location, 160), notes: str(e.notes, 1000),
+      gcal: str(e.gcal, 400)   // "agenda|evento" quando veio do Google Agenda (para reimportar sem duplicar)
     };
   }).filter(Boolean);
   out.tasks = arr(raw.tasks, 5000).map(t => !t || !str(t.title, 160) ? null : ({
@@ -2321,7 +2347,8 @@ function openEvent(id, date, preset = {}) {
   $('#evLoc').value = ev ? ev.location : '';
   $('#evNotes').value = ev ? ev.notes : '';
   $('#evDelete').hidden = !ev;
-  $('#evHint').textContent = ev && ev.repeat !== 'none' ? '↻ Este compromisso se repete. As alterações valem para todas as repetições.' : '';
+  $('#evHint').textContent = [ev && ev.repeat !== 'none' ? '↻ Este compromisso se repete. As alterações valem para todas as repetições.' : '',
+    ev?.gcal ? '📥 Veio do Google Agenda: se você importar de novo, título, data, horário, local e observações voltam a ser os do Google.' : ''].filter(Boolean).join(' ');
   syncEvForm();
   $('#evDlg').showModal();
   if (!ev) $('#evName').focus();
@@ -2777,6 +2804,7 @@ document.addEventListener('click', async e => {
     case 'export': exportBackup(); break;
     case 'import': $('#file').click(); break;
     case 'ics': exportIcs(); break;
+    case 'gcal-import': closeDrawer(); openGcalImport(); break;
     case 'print': closeDrawer(); setTimeout(() => window.print(), 50); break;
     case 'settings': closeDrawer(); openSettings(); break;
     case 'add-cat': $('#catRows').insertAdjacentHTML('beforeend', catRow({ id: newId(), name: '', color: '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0') })); $('#catRows .cat-row:last-child input[type=text]').focus(); break;
@@ -2964,7 +2992,7 @@ const pendingText = n => n === 1 ? '1 alteração só neste aparelho' : `${n} al
 function setSync(status) { sync.status = status; renderSync(); }
 function renderSync() {
   const btn = $('#syncBtn'), box = $('#syncBox'), banner = $('#syncBanner');
-  btn.hidden = box.hidden = !syncEnabled();
+  btn.hidden = box.hidden = $('#gcalBtn').hidden = !syncEnabled();
   if (!syncEnabled()) { banner.hidden = true; return; }
   const s = syncState ? sync.status : 'off', [label, title] = SYNC_LABELS[s] || SYNC_LABELS.auth, n = pendingCount();
   btn.textContent = label + (n && s !== 'saving' && s !== 'ok' ? ` · ${n}` : '');
@@ -3224,6 +3252,134 @@ document.addEventListener('visibilitychange', pullIfIdle);
 window.addEventListener('online', () => { if (syncState) { if (tokenValid()) syncNow(); else setSync('auth'); } });
 window.addEventListener('offline', () => { if (syncState) setSync('offline'); });
 setInterval(pullIfIdle, 30000);
+
+/* =========================================================
+   Importar do Google Agenda (só leitura)
+   Pede uma permissão separada da sincronização, só quando a pessoa clica em importar.
+   Cada compromisso importado guarda "agenda|evento" em ev.gcal: importar de novo atualiza
+   em vez de duplicar, e o que foi apagado no Google (no período escolhido) sai do planner.
+   ========================================================= */
+const CAL = 'https://www.googleapis.com/calendar/v3', CAL_SCOPE = 'https://www.googleapis.com/auth/calendar.readonly';
+const GCAL_KEY = 'meu-planner-gcal';   // escolhas deste aparelho: agendas marcadas e categoria de cada uma
+const gcal = { token: null, exp: 0, client: null, pending: null, cals: [] };
+function calToken() {
+  return new Promise((resolve, reject) => {
+    if (gcal.token && Date.now() < gcal.exp - 60000) return resolve();
+    if (!window.google?.accounts?.oauth2) return reject(Error('O login do Google ainda está carregando. Tente de novo em alguns segundos.'));
+    const settle = (fn, arg) => { const p = gcal.pending; gcal.pending = null; p?.[fn](arg); };
+    gcal.client ||= google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_CLIENT_ID,
+      scope: CAL_SCOPE,
+      callback: r => {
+        if (r.error) return settle('reject', Error('O Google recusou o acesso: ' + (r.error_description || r.error)));
+        if (!google.accounts.oauth2.hasGrantedAllScopes(r, CAL_SCOPE)) return settle('reject', Error('Para importar, marque a permissão de ver as suas agendas do Google Agenda.'));
+        gcal.token = r.access_token; gcal.exp = Date.now() + (r.expires_in || 3600) * 1000;
+        settle('resolve');
+      },
+      error_callback: e => settle('reject', Error(e.type === 'popup_closed' ? 'Login cancelado.' : 'Não foi possível abrir a janela do Google. Verifique se o navegador está bloqueando pop-ups.'))
+    });
+    gcal.pending = { resolve, reject };
+    gcal.client.requestAccessToken({ login_hint: syncState?.email || undefined });
+  });
+}
+async function calApi(path) {
+  if (!navigator.onLine) throw Error('Sem conexão com a internet.');
+  let r;
+  try { r = await fetch(CAL + path, { headers: { Authorization: 'Bearer ' + gcal.token } }); }
+  catch (e) { throw Error('Sem conexão com a internet.'); }
+  if (r.status === 401) { gcal.token = null; throw Error('O acesso ao Google Agenda expirou. Toque em importar de novo.'); }
+  if (!r.ok) {
+    const j = await r.json().catch(() => ({}));
+    if (r.status === 403 && /accessNotConfigured|has not been used|disabled/i.test(JSON.stringify(j))) throw Error('A "Google Calendar API" ainda não está ativada no projeto do Google Cloud.');
+    throw Error(`o Google Agenda respondeu ${r.status}`);
+  }
+  return r.json();
+}
+const gcalPrefs = () => { try { const p = JSON.parse(localStorage.getItem(GCAL_KEY)); return p && typeof p === 'object' ? p : {}; } catch (e) { return {}; } };
+async function openGcalImport() {
+  if (!syncEnabled()) return;
+  try {
+    await calToken();   // precisa ser a primeira coisa do clique (a janela do Google é um pop-up)
+    const j = await calApi('/users/me/calendarList?fields=items(id,summary,summaryOverride,backgroundColor,primary)');
+    gcal.cals = (j.items || []).filter(c => c && typeof c.id === 'string').sort((a, b) => !!b.primary - !!a.primary);
+  } catch (e) { return notify(e.message); }
+  if (!gcal.cals.length) return notify('Não encontrei nenhuma agenda nesta conta do Google.');
+  const p = gcalPrefs(), sel = Array.isArray(p.sel) ? p.sel : null, cats = p.cats || {};
+  const def = db.categories.find(c => c.id === 'compromisso')?.id ?? db.categories[0]?.id ?? '';
+  $('#gcCals').innerHTML = gcal.cals.map((c, i) => `<div class="gc-cal" style="--c:${/^#[0-9a-f]{6}$/i.test(c.backgroundColor) ? c.backgroundColor : '#8a94a8'}">
+    <label><input type="checkbox" value="${i}" ${(sel ? sel.includes(c.id) : c.primary) ? 'checked' : ''}><i></i><span>${esc(c.summaryOverride || c.summary || c.id)}</span></label>
+    <select aria-label="Categoria">${catOptions(db.categories.some(x => x.id === cats[c.id]) ? cats[c.id] : def)}</select></div>`).join('');
+  const t = todayKey();
+  $('#gcFrom').value = validDate(p.from) ? p.from : firstOfMonth(t);
+  $('#gcTo').value = addDays(addMonths(t, 7), -1);   // até o fim do 6º mês à frente
+  $('#gcGo').disabled = false; $('#gcGo').textContent = 'Importar';
+  $('#gcDlg').showModal();
+}
+// texto simples a partir da descrição do Google (que pode vir com HTML)
+const plainText = h => { const d = new DOMParser().parseFromString(String(h || '').replace(/<br\s*\/?>/gi, '\n').replace(/<\/p>/gi, '\n'), 'text/html'); return (d.body.textContent || '').replace(/\n{3,}/g, '\n\n').trim(); };
+// um evento do Google vira os campos de um compromisso do planner (eventos de vários dias inteiros repetem todo dia até o fim)
+function fromGoogle(g) {
+  const base = { title: str(g.summary, 120) || '(sem título)', location: str(g.location, 160), notes: plainText(g.description).slice(0, 1000), repeat: 'none', days: [], until: '' };
+  if (g.start?.date) {
+    if (!validDate(g.start.date)) return null;
+    const last = validDate(g.end?.date) ? addDays(g.end.date, -1) : g.start.date;
+    return { ...base, date: g.start.date, allDay: true, start: '', end: '', ...(last > g.start.date ? { repeat: 'daily', until: last } : {}) };
+  }
+  const s = new Date(g.start?.dateTime), e = new Date(g.end?.dateTime);
+  if (isNaN(s)) return null;
+  const date = keyOf(s), hm = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`, start = hm(s);
+  let end = !isNaN(e) && keyOf(e) === date ? hm(e) : '23:59';
+  if (end <= start) end = fromMin(toMin(start) + 60);
+  return { ...base, date, allDay: false, start, end };
+}
+$('#gcForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const from = $('#gcFrom').value, to = $('#gcTo').value;
+  if (!validDate(from) || !validDate(to) || to < from) return notify('"Até" precisa ser depois de "De".');
+  if (daysBetween(from, to) > 731) return notify('Escolha um período de até 2 anos.');
+  const rows = $$('#gcCals .gc-cal').map(r => ({ on: r.querySelector('input').checked, cal: gcal.cals[+r.querySelector('input').value], cat: r.querySelector('select').value }));
+  const chosen = rows.filter(r => r.on);
+  if (!chosen.length) return notify('Marque pelo menos uma agenda.');
+  try { localStorage.setItem(GCAL_KEY, JSON.stringify({ sel: chosen.map(r => r.cal.id), cats: Object.fromEntries(rows.map(r => [r.cal.id, r.cat])), from })); } catch (_) { /* sem armazenamento: só não lembra as escolhas */ }
+  const btn = $('#gcGo'); btn.disabled = true; btn.textContent = '⏳ Importando…';
+  const tMin = parse(from).toISOString(), tMax = parse(addDays(to, 1)).toISOString();
+  let added = 0, updated = 0, removed = 0;
+  try {
+    const found = [];
+    for (const { cal, cat } of chosen) {
+      let page = '';
+      do {
+        const j = await calApi(`/calendars/${encodeURIComponent(cal.id)}/events?singleEvents=true&orderBy=startTime&maxResults=2500&timeMin=${encodeURIComponent(tMin)}&timeMax=${encodeURIComponent(tMax)}` +
+          `&fields=nextPageToken,items(id,status,summary,location,description,start,end,eventType)${page ? '&pageToken=' + encodeURIComponent(page) : ''}`);
+        (j.items || []).forEach(g => { if (g.status !== 'cancelled' && g.eventType !== 'workingLocation' && g.id) found.push({ key: `${cal.id}|${g.id}`, cat, data: fromGoogle(g) }); });
+        page = j.nextPageToken || '';
+      } while (page);
+    }
+    const byKey = new Map(db.events.filter(x => x.gcal).map(x => [x.gcal, x])), seen = new Set();
+    found.forEach(({ key, cat, data }) => {
+      if (!data || seen.has(key)) return;
+      seen.add(key);
+      const ev = byKey.get(key);
+      if (!ev) { db.events.push({ id: newId(), done: {}, except: [], cat, gcal: key, ...data }); added++; return; }
+      const before = JSON.stringify(ev);
+      if (ev.repeat === 'none' && ev.date !== data.date) ev.done = ev.done[ev.date] ? { [data.date]: true } : {};
+      Object.assign(ev, data);
+      if (JSON.stringify(ev) !== before) updated++;
+    });
+    // apagados no Google: só dentro do período e das agendas importadas agora
+    const cals = new Set(chosen.map(r => r.cal.id));
+    db.events = db.events.filter(ev => {
+      if (!ev.gcal || seen.has(ev.gcal) || !cals.has(ev.gcal.slice(0, ev.gcal.lastIndexOf('|'))) || ev.date < from || ev.date > to) return true;
+      removed++; return false;
+    });
+    $('#gcDlg').close();
+    save();
+    const parts = [added && plural(added, 'novo', 'novos'), updated && plural(updated, 'atualizado', 'atualizados'), removed && plural(removed, 'removido', 'removidos')].filter(Boolean);
+    notify(parts.length ? `Google Agenda importado: ${parts.join(', ')}. 📥` : 'Tudo já estava igual ao Google Agenda. ✓');
+  } catch (err) {
+    notify('Erro ao importar: ' + err.message);
+  } finally { btn.disabled = false; btn.textContent = 'Importar'; }
+});
 
 /* =========================================================
    Instalar como app (PWA): ícone na tela inicial, tela cheia e uso sem internet

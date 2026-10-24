@@ -80,6 +80,7 @@ Sem cadastro, sem servidor, sem instalação. Cada pessoa que abre o planner tem
 - Salvamento automático no navegador.
 - **Backup** (.json) para guardar ou levar para outro computador/celular.
 - **Exportar .ics** para importar no Google Agenda, Outlook ou Apple Calendário.
+- **Importar do Google Agenda**: escolha as agendas, a categoria de cada uma e o período. Dá para importar de novo quando quiser: o que mudou no Google é atualizado, sem duplicar. Só leitura — o planner nunca altera a sua agenda.
 - Imprimir a visão atual.
 - Importa backups da versão anterior (V5) automaticamente.
 
@@ -131,8 +132,8 @@ Os dados ficam no `localStorage` do navegador de quem está usando. **Opcionalme
 
 Se você copiar este projeto para o seu GitHub, a sincronização com o Google Drive só funciona com um **ID do cliente OAuth seu**:
 
-1. Em [console.cloud.google.com](https://console.cloud.google.com), crie um projeto e ative a **Google Drive API**.
-2. Em **Google Auth Platform**, configure o app (público **Externo**), adicione os escopos `drive.appdata`, `openid`, `userinfo.email` e `userinfo.profile` e publique o app.
+1. Em [console.cloud.google.com](https://console.cloud.google.com), crie um projeto e ative a **Google Drive API** e a **Google Calendar API** (esta só para importar do Google Agenda).
+2. Em **Google Auth Platform**, configure o app (público **Externo**), adicione os escopos `drive.appdata`, `calendar.readonly`, `openid`, `userinfo.email` e `userinfo.profile` e publique o app. Como `calendar.readonly` é um escopo "sensível", o Google mostra o aviso de app não verificado até você pedir a verificação — para uso pessoal, basta clicar em **Avançado → Acessar**.
 3. Em **Clientes**, crie um cliente **Aplicativo da Web** com a origem JavaScript do seu site (ex.: `https://seu-usuario.github.io`).
 4. Cole o ID do cliente em `GOOGLE_CLIENT_ID`, no começo do `<script>` do `index.html`.
 
