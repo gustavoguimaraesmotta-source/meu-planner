@@ -34,6 +34,12 @@ Sem cadastro, sem servidor, sem instalação. Cada pessoa que abre o planner tem
 - Escolha os dias clicando no calendário **ou** use **✨ Distribuir automaticamente** (todos os dias ou só dias úteis).
 - Acompanhe o progresso com barra e anel de porcentagem, e a contagem regressiva até o prazo.
 
+### ✈️ Viagens
+- Crie uma viagem escolhendo o **dia da ida e o da volta** (com destino, cor e observações).
+- Ela aparece como uma **faixa em todos os dias** da viagem — no Dia, na Semana e no Mês ("dia 2 de 6").
+- **Orçamento da viagem**: ligue os gastos à viagem (passagem, hotel, passeios…) e veja quanto já gastou e quanto resta. Compras parceladas contam pelo total.
+- Ao lançar um gasto numa data dentro da viagem, o planner já sugere ligá-lo a ela.
+
 ### 🏦 Bancos, contas e cartões
 - Cadastre seus **bancos** e, dentro de cada um, o que você tem lá: **conta corrente, caixinha/poupança, investimento e cartão de crédito**.
 - Cada conta tem **saldo**: soma os ganhos, subtrai os gastos e se ajusta com um clique se ficar diferente do banco.
@@ -63,7 +69,7 @@ Sem cadastro, sem servidor, sem instalação. Cada pessoa que abre o planner tem
 
 ### 📅 Tudo conectado
 - Vencimentos de contas fixas e dívidas aparecem no calendário e no seu dia, com check direto de lá.
-- A busca encontra compromissos, tarefas, metas, lançamentos, dívidas e itens da wishlist.
+- A busca encontra compromissos, tarefas, metas, viagens, lançamentos, dívidas e itens da wishlist.
 
 ### 📓 Como foi o dia
 - Anotações livres por dia (situações, ideias, lembretes) e registro de humor.

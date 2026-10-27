@@ -61,7 +61,7 @@ h1,h2,h3{margin:0;letter-spacing:-.3px}
 .brand .icon-btn{margin-left:auto}
 .logo{width:36px;height:36px;border-radius:11px;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:18px;flex-shrink:0}
 .logo.big{width:54px;height:54px;font-size:26px;border-radius:16px;margin-bottom:14px}
-.quick-row{display:flex;gap:6px;margin-top:-8px}.quick-row .btn{flex:1;padding:6px 4px}
+.quick-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:-8px}.quick-row .btn{flex:1 1 40%;padding:6px 4px}
 .nav{display:flex;flex-direction:column;gap:2px}
 .nav button{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;font-weight:600;color:var(--muted);text-align:left}
 .nav button:hover{background:var(--surface-2);color:var(--ink)}
@@ -175,6 +175,18 @@ kbd{font:600 10.5px ui-monospace,monospace;border:1px solid var(--line);border-b
 .chip.deadline{background:var(--danger-soft);color:var(--danger);font-weight:700}
 .chip.tasks{background:var(--surface-2);color:var(--muted)}
 .chip.done span{text-decoration:line-through;opacity:.65}
+.chip.trip{background:var(--c);color:#fff;font-weight:700}
+
+/* viagens */
+.trip-banner{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;margin-bottom:16px;border-radius:14px;background:color-mix(in srgb,var(--c) 14%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 40%,transparent);font-size:13px}
+.trip-banner .grow{flex:1 1 200px;min-width:0}
+.trip-banner b{display:block;font-size:14.5px;overflow-wrap:anywhere}
+.trip-banner small{color:var(--muted)}
+.trip-banner .acts{display:flex;gap:6px;flex-wrap:wrap}
+.trip .fbar{margin:14px 0 0}
+.trip details{margin-top:10px;font-size:13px}
+.trip details summary{cursor:pointer;color:var(--accent-ink);font-weight:600}
+.trip>p{font-size:12.5px;color:var(--muted);margin:10px 0 0;overflow-wrap:anywhere}
 
 /* ---------- visão mês ---------- */
 .plan-banner{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 16px;margin-bottom:14px;background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);border-radius:14px;font-size:13px}
@@ -471,6 +483,7 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
       <button class="btn sm" data-act="new-task">+ Tarefa</button>
       <button class="btn sm" data-act="new-goal" data-type="exam">+ Prova</button>
       <button class="btn sm" data-act="new-goal" data-type="project">+ Projeto</button>
+      <button class="btn sm" data-act="new-trip">+ Viagem</button>
     </div>
     <nav class="nav" id="nav">
       <button data-act="view" data-view="day"><span class="ni">☀️</span>Meu dia</button>
@@ -478,6 +491,7 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
       <button data-act="view" data-view="month"><span class="ni">📅</span>Mês</button>
       <button data-act="view" data-view="tasks"><span class="ni">✅</span>Tarefas<span class="badge" id="taskBadge" hidden></span></button>
       <button data-act="view" data-view="goals"><span class="ni">🎯</span>Provas e metas</button>
+      <button data-act="view" data-view="trips"><span class="ni">✈️</span>Viagens</button>
       <div class="nav-sep">Finanças</div>
       <button data-act="view" data-view="finance"><span class="ni">💰</span>Gastos e ganhos</button>
       <button data-act="view" data-view="debts"><span class="ni">🤝</span>Dívidas<span class="badge" id="debtBadge" hidden></span></button>
@@ -630,6 +644,7 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
       <label class="field">Categoria<select id="enCat"></select></label>
       <label class="field">Cartão / conta<select id="enAcc"></select></label>
     </div>
+    <label class="field" id="enTripBox">Viagem<select id="enTrip"></select></label>
     <label class="field">Repetição<select id="enMode"><option value="once">Só uma vez</option><option value="recur">Todo mês (conta fixa)</option><option value="inst">Parcelado</option></select></label>
     <div class="grid2" id="enInstBox">
       <label class="field">Nº de parcelas<input id="enN" type="number" min="2" max="120" step="1" value="2"></label>
@@ -779,6 +794,31 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
     <label class="field">Observações<textarea id="wsNotes" maxlength="500" rows="2" placeholder="Ex.: esperar a Black Friday"></textarea></label>
     <div class="dlg-actions">
       <button type="button" class="btn ghost danger" id="wsDelete">Excluir</button>
+      <span class="grow"></span>
+      <button type="button" class="btn" data-close>Cancelar</button>
+      <button class="btn primary" type="submit">Salvar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Viagem -->
+<dialog id="tpDlg">
+  <form id="tpForm">
+    <h2 id="tpTitle">Nova viagem</h2>
+    <label class="field">Nome da viagem<input id="tpName" type="text" maxlength="120" placeholder="Ex.: Férias em Salvador, congresso…" required></label>
+    <div class="grid2">
+      <label class="field">Ida<input id="tpFrom" type="date" required></label>
+      <label class="field">Volta<input id="tpTo" type="date" required></label>
+    </div>
+    <p class="hint" id="tpHint"></p>
+    <label class="field">Destino<input id="tpPlace" type="text" maxlength="160" placeholder="Opcional"></label>
+    <div class="grid2">
+      <label class="field">Orçamento (R$)<input id="tpBudget" type="text" inputmode="decimal" placeholder="Opcional" autocomplete="off"></label>
+      <label class="field">Cor<input id="tpColor" type="color" value="#0ea5b7"></label>
+    </div>
+    <label class="field">Observações<textarea id="tpNotes" maxlength="1000" rows="2" placeholder="Ex.: hotel, voo, o que levar…"></textarea></label>
+    <div class="dlg-actions">
+      <button type="button" class="btn ghost danger" id="tpDelete">Excluir</button>
       <span class="grow"></span>
       <button type="button" class="btn" data-close>Cancelar</button>
       <button class="btn primary" type="submit">Salvar</button>
@@ -948,7 +988,7 @@ function blank() {
     version: 6,
     settings: { name: '', theme: 'auto', weekStart: 0, dayStart: 6, dayEnd: 23, onboarded: false },
     categories: DEFAULT_CATS.map(c => ({ ...c, hidden: false })),
-    events: [], tasks: [], goals: [], notes: {},
+    events: [], tasks: [], goals: [], notes: {}, trips: [],
     finance: blankFinance(), debts: [], wishes: [],
     updatedAt: 0
   };
@@ -1059,11 +1099,16 @@ function sanitize(raw) {
     if (!Array.isArray(f.banks) && !out.finance.cats.some(c => c.id === 'f-rendimentos')) out.finance.cats.push({ ...DEFAULT_FCATS.find(c => c.id === 'f-rendimentos') });
   }
   out.finance.hide = f.hide === true;
+  out.trips = arr(raw.trips, 1000).map(tr => {
+    if (!tr || !str(tr.name, 120) || !validDate(tr.from) || !validDate(tr.to) || tr.to < tr.from) return null;
+    return { id: uid(tr.id), name: str(tr.name, 120), from: tr.from, to: tr.to, place: str(tr.place, 160), color: color(tr.color), budget: isMoney(tr.budget) ? tr.budget : 0, notes: str(tr.notes, 1000) };
+  }).filter(Boolean);
+  const tripIds = new Set(out.trips.map(tr => tr.id));
   out.finance.entries = arr(f.entries, 20000).map(e => {
     if (!e || !['expense', 'income', 'transfer'].includes(e.type) || !validDate(e.date) || !isMoney(e.amount)) return null;
     if (e.type === 'transfer') return typeof e.to === 'string' && e.to && e.to !== e.account ? {
       id: uid(e.id), type: 'transfer', amount: e.amount, desc: str(e.desc, 120) || 'Transferência', cat: '', account: catId(e.account), to: catId(e.to),
-      bill: validDate(e.bill) ? e.bill : '', date: e.date, notes: str(e.notes, 500), recur: false, until: '', except: [], paid: {}, n: 1
+      bill: validDate(e.bill) ? e.bill : '', date: e.date, notes: str(e.notes, 500), recur: false, until: '', except: [], paid: {}, n: 1, trip: ''
     } : null;
     const recur = e.recur === true, ym = e.date.slice(0, 7);
     return {
@@ -1074,7 +1119,8 @@ function sanitize(raw) {
       // true = confirmado; false = desmarcado de propósito (importa quando "confirmar sozinho" está ligado)
       paid: recur ? Object.fromEntries(Object.keys(e.paid || {}).filter(k => isYm(k) && typeof e.paid[k] === 'boolean').slice(0, 600).map(k => [k, e.paid[k]])) : {},
       rule: recur && RECUR_RULES[e.rule] ? e.rule : 'day', ruleN: int(e.ruleN, 1, 23, 5), auto: recur && e.auto === true,
-      n: !recur && e.type === 'expense' ? int(e.n, 1, 120, 1) : 1
+      n: !recur && e.type === 'expense' ? int(e.n, 1, 120, 1) : 1,
+      trip: !recur && e.type === 'expense' && tripIds.has(e.trip) ? e.trip : ''   // gasto ligado a uma viagem
     };
   }).filter(Boolean);
   out.debts = arr(raw.debts, 5000).map(d => {
@@ -1150,7 +1196,13 @@ function sessionsOn(k) {
 const deadlinesOn = k => db.goals.filter(g => shown(g.cat) && g.deadline === k);
 const tasksOn = k => db.tasks.filter(t => shown(t.cat) && t.date === k);
 const overdueTasks = () => { const t = todayKey(); return db.tasks.filter(x => shown(x.cat) && !x.done && x.date && x.date < t); };
-const hasItems = k => eventsOn(k).length || sessionsOn(k).length || deadlinesOn(k).length || tasksOn(k).some(t => !t.done) || chipsFinance(k).length;
+const tripsOn = k => db.trips.filter(tr => k >= tr.from && k <= tr.to).sort((a, b) => a.from.localeCompare(b.from));
+const tripOf = id => db.trips.find(tr => tr.id === id) || null;
+const tripLen = tr => daysBetween(tr.from, tr.to) + 1;
+const tripEntries = tr => db.finance.entries.filter(e => e.trip === tr.id && e.type === 'expense').sort((a, b) => a.date.localeCompare(b.date));
+// compra parcelada conta inteira: a passagem em 3x é gasto da viagem
+const tripSpent = tr => tripEntries(tr).reduce((s, e) => s + e.amount * e.n, 0);
+const hasItems = k => tripsOn(k).length || eventsOn(k).length ||sessionsOn(k).length || deadlinesOn(k).length || tasksOn(k).some(t => !t.done) || chipsFinance(k).length;
 const sortTasks = list => list.sort((a, b) => (a.done - b.done) || ((a.date || '9999').localeCompare(b.date || '9999')) ||
   (['high', 'normal', 'low'].indexOf(a.priority) - ['high', 'normal', 'low'].indexOf(b.priority)) || a.created - b.created);
 
@@ -1174,7 +1226,7 @@ function render() {
   const sc = $('.tl-scroll'), prevScroll = sc && sc.dataset.view === ui.view ? sc.scrollTop : null;
   renderSidebar();
   renderTop();
-  $('#view').innerHTML = ({ day: viewDay, week: viewWeek, month: viewMonth, tasks: viewTasks, goals: viewGoals, finance: viewFinance, debts: viewDebts, wishlist: viewWishlist })[ui.view]();
+  $('#view').innerHTML = ({ day: viewDay, week: viewWeek, month: viewMonth, tasks: viewTasks, goals: viewGoals, trips: viewTrips, finance: viewFinance, debts: viewDebts, wishlist: viewWishlist })[ui.view]();
   const nsc = $('.tl-scroll');
   if (nsc) nsc.scrollTop = prevScroll ?? Math.max(0, new Date().getHours() - db.settings.dayStart - 1) * HOUR;
 }
@@ -1231,6 +1283,8 @@ function renderTop() {
     title = 'Dívidas'; sub = 'Quem você deve e quem te deve';
   } else if (ui.view === 'wishlist') {
     title = 'Wishlist'; sub = 'O que você quer comprar';
+  } else if (ui.view === 'trips') {
+    title = 'Viagens'; sub = 'Ida, volta, orçamento e gastos de cada viagem';
   } else {
     title = 'Provas e metas'; sub = 'Provas, projetos e entregas com dias planejados';
   }
@@ -1251,11 +1305,13 @@ function chipSession(x, k, planning) {
     <input type="checkbox" ${x.s.done ? 'checked' : ''} data-act="toggle-session" data-id="${x.g.id}" data-date="${k}" aria-label="Concluir ${esc(x.g.name)} dia ${x.i + 1}">
     <span>${t.icon} ${esc(x.g.name)} · ${x.i + 1}/${x.g.target}</span></div>`;
 }
-const chipDeadline = g => `<div class="chip deadline" data-act="plan-goal" data-id="${g.id}" title="Planejar ${esc(g.name)}"><span>⚑ ${GOAL_TYPES[g.type].label}: ${esc(g.name)}</span></div>`;
+const chipTrip = (tr, k) => `<div class="chip trip" style="--c:${tr.color}" data-act="open-trip" data-id="${tr.id}" title="${esc(tr.name)} · ${tripRange(tr)}"><span>✈️ ${esc(tr.name)} · ${daysBetween(tr.from, k) + 1}/${tripLen(tr)}</span></div>`;
+const chipDeadline = g =>`<div class="chip deadline" data-act="plan-goal" data-id="${g.id}" title="Planejar ${esc(g.name)}"><span>⚑ ${GOAL_TYPES[g.type].label}: ${esc(g.name)}</span></div>`;
 
 function allDayItems(k) {
   const tk = tasksOn(k).filter(t => !t.done).length;
-  return deadlinesOn(k).map(chipDeadline).join('') +
+  return (ui.view === 'week' ? tripsOn(k).map(tr => chipTrip(tr, k)).join('') : '') +   // no dia, a viagem aparece na faixa do topo
+    deadlinesOn(k).map(chipDeadline).join('') +
     chipsFinance(k).join('') +
     sessionsOn(k).map(x => chipSession(x, k)).join('') +
     eventsOn(k).filter(x => x.ev.allDay).map(x => chipEvent(x)).join('') +
@@ -1321,7 +1377,7 @@ function viewDay() {
       next = `<div class="next-pill" style="--c:${catOf(n.ev.cat).color}"><i></i><b>${n.ev.start}</b> ${esc(n.ev.title)} · <span class="muted">${when}</span></div>`;
     }
   }
-  return `
+  return `${tripsOn(k).map(tr => tripBanner(tr, k)).join('')}
   <section class="card hero">
     <div><h2>${isToday ? greeting() : cap(fmt(k, { weekday: 'long', day: 'numeric', month: 'long' }))}</h2><p>${summary}</p>${next}</div>
     <div class="hero-stats">
@@ -1379,6 +1435,9 @@ function upcomingCard() {
   db.goals.forEach(g => {
     if (shown(g.cat) && g.deadline > t && g.deadline <= addDays(t, 90)) items.push({ date: g.deadline, c: catOf(g.cat).color, icon: GOAL_TYPES[g.type].icon, title: g.name, meta: `${GOAL_TYPES[g.type].label} · ${relDate(g.deadline)} · <span class="${daysBetween(t, g.deadline) <= 3 ? 'urgent' : ''}">${countdown(g.deadline)}</span>` });
   });
+  db.trips.forEach(tr => {
+    if (tr.from > t && tr.from <= addDays(t, 30)) items.push({ date: tr.from, c: tr.color, icon: '✈️', title: tr.name, meta: `Viagem · ${relDate(tr.from)} · ${plural(tripLen(tr), 'dia', 'dias')} · <span class="${daysBetween(t, tr.from) <= 3 ? 'urgent' : ''}">${tripStatus(tr)}</span>` });
+  });
   db.events.forEach(ev => {
     if (ev.repeat === 'none' && shown(ev.cat) && ev.date > t && ev.date <= lim) items.push({ date: ev.date, c: catOf(ev.cat).color, icon: '🕒', title: ev.title, meta: `${relDate(ev.date)}${ev.allDay ? '' : ' · ' + ev.start}${ev.location ? ' · 📍 ' + esc(ev.location) : ''}` });
   });
@@ -1411,6 +1470,7 @@ function viewMonth() {
     if (k === t) cls.push('today');
     if (g) { if (k > g.deadline) cls.push('blocked'); else cls.push('plannable'); if (g.sessions.some(s => s.date === k)) cls.push('planned'); }
     const chips = [
+      ...tripsOn(k).map(tr => chipTrip(tr, k)),
       ...deadlinesOn(k).map(chipDeadline),
       ...chipsFinance(k),
       ...sessionsOn(k).map(x => chipSession(x, k, !!g)),
@@ -1727,7 +1787,7 @@ function viewFinance() {
       return;
     }
     const c = fcatOf(o.e.cat), inc = o.e.type === 'income';
-    const tags = (o.kind === 'inst' ? `<span class="tag">parcela ${o.idx}/${o.e.n}</span> ` : '') + (o.kind === 'recur' ? `<span class="tag ${!o.paid && o.date < t ? 'warn' : ''}">${o.paid ? 'fixa' : o.date < t ? 'atrasada' : 'prevista'}</span> ` : '');
+    const tags = (o.e.trip && tripOf(o.e.trip) ? `<span class="tag">✈️ ${esc(tripOf(o.e.trip).name)}</span> ` : '') + (o.kind === 'inst' ? `<span class="tag">parcela ${o.idx}/${o.e.n}</span> ` : '') +(o.kind === 'recur' ? `<span class="tag ${!o.paid && o.date < t ? 'warn' : ''}">${o.paid ? 'fixa' : o.date < t ? 'atrasada' : 'prevista'}</span> ` : '');
     rows += `<div class="frow ${o.paid ? '' : 'pending'}" data-act="open-entry" data-id="${o.e.id}" data-ym="${o.ym}"><span class="fico" style="--c:${c.color}">${inc ? '↑' : '↓'}</span>
       <div class="grow"><b>${esc(o.e.desc)}</b><small>${tags}${esc(c.name)} · ${esc(accName(accOf(o.e.account)))}</small></div><b class="${inc ? 'pos' : ''}">${inc ? '+' : '−'} ${money(o.amount)}</b></div>`;
   });
@@ -1758,11 +1818,12 @@ function viewFinance() {
 }
 
 /* ----- lançamento: formulário ----- */
-let enCtx = { id: null, ym: null, link: null };
+let enCtx = { id: null, ym: null, link: null, tripAuto: false };
 function openEntry(id, ym, preset = {}) {
   const e = db.finance.entries.find(x => x.id === id);
   if (e && e.type === 'transfer') return openTransfer(e.id);
-  enCtx = { id: e ? e.id : null, ym: ym || (e ? ymOf(e.date) : ui.fmonth), link: preset.link || null };
+  // gasto novo sem viagem escolhida: sugere a viagem que estiver acontecendo na data (até a pessoa mexer no campo)
+  enCtx = { id: e ? e.id : null, ym: ym || (e ? ymOf(e.date) : ui.fmonth), link: preset.link || null, tripAuto: !e && !preset.trip };
   const type = e ? e.type : (preset.type || 'expense');
   $$('input[name=enType]').forEach(r => r.checked = r.value === type);
   $('#enAmount').value = moneyInput(e ? e.amount : preset.amount || 0);
@@ -1779,6 +1840,10 @@ function openEntry(id, ym, preset = {}) {
   $('#enRuleN').value = e?.recur ? e.ruleN : 5;
   $('#enAuto').checked = !!e?.auto;
   $('#enNotes').value = e ? e.notes : '';
+  const trip = e ? e.trip : (preset.trip || tripsOn($('#enDate').value)[0]?.id || '');
+  $('#enTrip').innerHTML = '<option value="">Nenhuma</option>' + [...db.trips].sort((a, b) => b.from.localeCompare(a.from))
+    .map(tr => `<option value="${esc(tr.id)}">✈️ ${esc(tr.name)} (${fmtShort(tr.from)}–${fmtShort(tr.to)})</option>`).join('');
+  $('#enTrip').value = trip;
   $('#enDelete').hidden = !e;
   syncEnForm(e ? e.cat : (preset.cat || ''));
   $('#enDlg').showModal();
@@ -1794,6 +1859,7 @@ function syncEnForm(keepCat) {
   const mode = $('#enMode').value, v = parseMoney($('#enAmount').value), n = Math.round(+$('#enN').value), date = $('#enDate').value;
   $('#enInstBox').hidden = mode !== 'inst';
   $('#enRecurBox').hidden = mode !== 'recur';
+  $('#enTripBox').hidden = type !== 'expense' || mode === 'recur' || !db.trips.length;
   const rule = $('#enRule').value, auto = $('#enAuto').checked;
   $('#enRuleNBox').hidden = rule !== 'biz';
   $('#enAutoLabel').textContent = `Confirmar sozinho no dia (${type === 'income' ? 'soma no' : 'desconta do'} saldo automaticamente)`;
@@ -1829,7 +1895,8 @@ $('#enForm').addEventListener('submit', e => {
   const u = $('#enUntil').value, until = mode === 'recur' && validDate(u) ? ymOf(u) : '';
   if (until && until < ymOf(date)) return notify('"Repetir até" precisa ser depois da data inicial.');
   const data = { type, amount, desc, date, n, cat: $('#enCat').value, account: $('#enAcc').value, notes: $('#enNotes').value.trim(), recur: mode === 'recur', until,
-    rule: mode === 'recur' ? $('#enRule').value : 'day', ruleN: Math.min(23, Math.max(1, Math.round(+$('#enRuleN').value) || 5)), auto: mode === 'recur' && $('#enAuto').checked };
+    rule: mode === 'recur' ? $('#enRule').value : 'day', ruleN: Math.min(23, Math.max(1, Math.round(+$('#enRuleN').value) || 5)), auto: mode === 'recur' && $('#enAuto').checked,
+    trip: type === 'expense' && mode !== 'recur' ? $('#enTrip').value : '' };
   let en = db.finance.entries.find(x => x.id === enCtx.id);
   if (en) {
     if (!data.recur) { en.paid = {}; en.except = []; }
@@ -2267,6 +2334,106 @@ async function toggleWish(w) {
   if (v === 'launch') openEntry(null, null, { type: 'expense', amount: w.price, desc: w.name, cat: 'f-compras', date: todayKey(), link: { kind: 'wish', id: w.id } });
 }
 
+/* ----- Visão: viagens (período de vários dias, com orçamento e gastos ligados) ----- */
+function tripRange(tr) {
+  const y = d => d.slice(0, 4) !== todayKey().slice(0, 4) || tr.from.slice(0, 4) !== tr.to.slice(0, 4) ? { year: 'numeric' } : {};
+  const end = fmt(tr.to, { day: 'numeric', month: 'long', ...y(tr.to) });
+  if (tr.from === tr.to) return end;
+  return `${tr.from.slice(0, 7) === tr.to.slice(0, 7) ? parse(tr.from).getDate() : fmt(tr.from, { day: 'numeric', month: 'long', ...y(tr.from) })} a ${end}`;
+}
+function tripStatus(tr) {
+  const t = todayKey();
+  if (t < tr.from) return countdown(tr.from);
+  if (t > tr.to) return 'encerrada';
+  return `acontecendo · dia ${daysBetween(tr.from, t) + 1} de ${tripLen(tr)}`;
+}
+// dia sugerido para lançar um gasto da viagem: hoje, se estiver dentro dela
+const tripDay = tr => { const t = todayKey(); return t < tr.from ? t : t > tr.to ? tr.to : t; };
+function tripBudgetBar(tr) {
+  const spent = tripSpent(tr), b = tr.budget, over = b && spent > b, pct = b ? spent / b * 100 : 0;
+  return `<div class="fbar"><div class="fbar-h"><span>Gastos da viagem</span><b class="${over ? 'neg' : ''}">${money(spent)}${b ? ` <small>de ${money(b)}</small>` : ''}</b></div>
+    ${b ? `<div class="fbar-t"><i style="width:${Math.min(100, pct)}%;background:${over ? 'var(--danger)' : pct >= 80 ? 'var(--warn)' : tr.color}"></i></div>
+    <small class="${over ? 'neg' : 'muted'}">${over ? `Passou ${money(spent - b)} do orçamento` : `Resta ${money(b - spent)} do orçamento`}</small>` : '<small class="muted">Sem orçamento definido</small>'}</div>`;
+}
+function tripBanner(tr, k) {
+  const n = daysBetween(tr.from, k) + 1, len = tripLen(tr), b = tr.budget, spent = tripSpent(tr);
+  const when = len === 1 ? 'bate e volta' : n === 1 ? `dia da ida · ${len} dias` : n === len ? `dia da volta · ${len} dias` : `dia ${n} de ${len}`;
+  return `<div class="trip-banner" style="--c:${tr.color}"><span class="goal-ico">✈️</span>
+    <div class="grow"><b>${esc(tr.name)}</b><small>${when} · ${tripRange(tr)}${tr.place ? ' · 📍 ' + esc(tr.place) : ''} · gastos: ${money(spent)}${b ? ` de ${money(b)}` : ''}</small></div>
+    <div class="acts"><button class="btn sm" data-act="trip-expense" data-id="${tr.id}" data-date="${k}">− Gasto da viagem</button><button class="btn sm ghost" data-act="view" data-view="trips">Ver viagem</button></div></div>`;
+}
+function tripCard(tr) {
+  const list = tripEntries(tr);
+  const rows = list.map(e => { const c = fcatOf(e.cat); return `<div class="frow" data-act="open-entry" data-id="${e.id}"><span class="fico" style="--c:${c.color}">↓</span>
+    <div class="grow"><b>${esc(e.desc)}</b><small>${fmtShort(e.date)} · ${esc(c.name)}${e.n > 1 ? ` · ${e.n}x de ${money(e.amount)}` : ''}</small></div><b>− ${money(e.amount * e.n)}</b></div>`; }).join('');
+  return `<article class="card goal trip" style="--c:${tr.color}">
+    <div class="goal-top"><span class="goal-ico">✈️</span><div class="grow"><h3>${esc(tr.name)}</h3><small class="muted">${cap(tripRange(tr))} · ${plural(tripLen(tr), 'dia', 'dias')}${tr.place ? ' · 📍 ' + esc(tr.place) : ''}</small></div><span class="tag">${tripStatus(tr)}</span></div>
+    ${tripBudgetBar(tr)}
+    ${list.length ? `<details><summary>Ver ${plural(list.length, 'gasto', 'gastos')}</summary>${rows}</details>` : ''}
+    ${tr.notes ? `<p>${esc(tr.notes)}</p>` : ''}
+    <div class="goal-actions">
+      <button class="btn sm primary" data-act="trip-expense" data-id="${tr.id}">− Gasto da viagem</button>
+      <button class="btn sm" data-act="go-day" data-date="${tripDay(tr)}">📅 Ver na agenda</button>
+      <button class="btn sm ghost" data-act="open-trip" data-id="${tr.id}">Editar</button>
+    </div></article>`;
+}
+function viewTrips() {
+  const t = todayKey();
+  const next = db.trips.filter(tr => tr.to >= t).sort((a, b) => a.from.localeCompare(b.from));
+  const past = db.trips.filter(tr => tr.to < t).sort((a, b) => b.from.localeCompare(a.from));
+  return `<div class="fin-head"><button class="btn primary" data-act="new-trip">+ Nova viagem</button><span class="grow"></span>${hideBtn()}</div>
+    ${next.length ? `<div class="goals">${next.map(tripCard).join('')}</div>` : '<div class="card pad empty">Nenhuma viagem pela frente. Crie uma escolhendo o dia da ida e o da volta: ela aparece em todos esses dias na agenda, e os gastos ligados a ela somam no orçamento da viagem.</div>'}
+    ${past.length ? `<details style="margin-top:20px"><summary>Viagens passadas (${past.length})</summary><div class="goals" style="margin-top:12px">${past.map(tripCard).join('')}</div></details>` : ''}`;
+}
+let tpId = null;
+function openTrip(id, preset = {}) {
+  const tr = db.trips.find(x => x.id === id); tpId = tr ? tr.id : null;
+  const from = tr ? tr.from : (preset.date || todayKey());
+  $('#tpTitle').textContent = tr ? 'Editar viagem' : 'Nova viagem';
+  $('#tpName').value = tr ? tr.name : '';
+  $('#tpFrom').value = $('#tpFrom').dataset.prev = from;
+  $('#tpTo').value = tr ? tr.to : addDays(from, 2);
+  $('#tpPlace').value = tr ? tr.place : '';
+  $('#tpBudget').value = moneyInput(tr ? tr.budget : 0);
+  $('#tpColor').value = tr ? tr.color : '#0ea5b7';
+  $('#tpNotes').value = tr ? tr.notes : '';
+  $('#tpDelete').hidden = !tr;
+  syncTpForm();
+  $('#tpDlg').showModal();
+  if (!tr) $('#tpName').focus();
+}
+function syncTpForm() {
+  const from = $('#tpFrom').value, to = $('#tpTo').value;
+  $('#tpTo').min = validDate(from) ? from : '';
+  const ok = validDate(from) && validDate(to) && to >= from;
+  $('#tpHint').textContent = !ok ? (validDate(from) && validDate(to) ? 'A volta precisa ser no mesmo dia da ida ou depois.' : '')
+    : `${plural(daysBetween(from, to) + 1, 'dia', 'dias')}: de ${fmt(from, { weekday: 'short' }).replace('.', '')}, ${fmtShort(from)} a ${fmt(to, { weekday: 'short' }).replace('.', '')}, ${fmtShort(to)}.`;
+}
+$('#tpForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = $('#tpName').value.trim(), from = $('#tpFrom').value, to = $('#tpTo').value;
+  if (!name) return notify('Dê um nome à viagem.');
+  if (!validDate(from) || !validDate(to)) return notify('Escolha o dia da ida e o da volta.');
+  if (to < from) return notify('A volta precisa ser no mesmo dia da ida ou depois.');
+  if (daysBetween(from, to) > 365) return notify('A viagem pode ter no máximo um ano.');
+  const data = { name, from, to, place: $('#tpPlace').value.trim(), budget: parseMoney($('#tpBudget').value), color: $('#tpColor').value, notes: $('#tpNotes').value.trim() };
+  const tr = db.trips.find(x => x.id === tpId);
+  if (tr) Object.assign(tr, data); else db.trips.push({ id: newId(), ...data });
+  $('#tpDlg').close();
+  save();
+  notify(tr ? 'Viagem atualizada.' : 'Viagem criada. ✈️ Boa viagem!');
+});
+$('#tpDelete').addEventListener('click', async () => {
+  const i = db.trips.findIndex(x => x.id === tpId); if (i < 0) return;
+  const tr = db.trips[i], linked = tripEntries(tr);
+  if (!await ask('Excluir viagem?', `"${tr.name}" sai da agenda.${linked.length ? ` ${plural(linked.length, 'gasto continua', 'gastos continuam')} nas Finanças, só sem a ligação com a viagem.` : ''}`, [{ label: 'Excluir', value: true, danger: true }])) return;
+  db.trips.splice(i, 1);
+  linked.forEach(e => e.trip = '');
+  $('#tpDlg').close();
+  save();
+  notify('Viagem excluída.', () => { db.trips.splice(i, 0, tr); linked.forEach(e => e.trip = tr.id); save(); });
+});
+
 /* ---------- navegação ---------- */
 function setCursor(k) { ui.cursor = k; ui.mini = firstOfMonth(k); }
 function setView(v) { ui.view = v; closeDrawer(); render(); window.scrollTo({ top: 0 }); }
@@ -2279,7 +2446,7 @@ function shift(n) {
   render();
 }
 // Abas que, no celular, ficam atrás do botão "Mais"
-const MORE_VIEWS = [['week', '🗓️ Semana'], ['goals', '🎯 Provas e metas'], ['debts', '🤝 Dívidas'], ['wishlist', '🎁 Wishlist']];
+const MORE_VIEWS = [['week', '🗓️ Semana'], ['goals', '🎯 Provas e metas'], ['trips', '✈️ Viagens'],['debts', '🤝 Dívidas'], ['wishlist', '🎁 Wishlist']];
 const openDrawer = () => $('#sidebar').classList.add('open');
 const closeDrawer = () => $('#sidebar').classList.remove('open');
 
@@ -2543,6 +2710,7 @@ function renderResults() {
     }
   });
   db.tasks.forEach(t => { if ((t.title + ' ' + t.notes).toLowerCase().includes(q)) r.push({ icon: t.done ? '☑' : '☐', title: t.title, meta: 'Tarefa · ' + (t.date ? relDate(t.date) : 'sem data'), act: 'open-task', id: t.id }); });
+  db.trips.forEach(tr => { if ((tr.name + ' ' + tr.place + ' ' + tr.notes).toLowerCase().includes(q)) r.push({ icon: '✈️', title: tr.name, meta: `Viagem · ${tripRange(tr)}`, act: 'open-trip', id: tr.id }); });
   db.goals.forEach(g => { if (g.name.toLowerCase().includes(q)) r.push({ icon: GOAL_TYPES[g.type].icon, title: g.name, meta: `${GOAL_TYPES[g.type].label} · ${relDate(g.deadline)}`, act: 'go-day', date: g.deadline }); });
   db.finance.entries.forEach(e => { if ((e.desc + ' ' + e.notes).toLowerCase().includes(q)) r.push({ icon: e.type === 'income' ? '💰' : '🧾', title: e.desc, meta: `${e.type === 'income' ? 'Ganho' : 'Gasto'} · ${money(e.amount)}${e.recur ? ' · todo mês' : e.n > 1 ? ` · ${e.n}x` : ' · ' + relDate(e.date)}`, act: 'open-entry', id: e.id }); });
   db.debts.forEach(d => { if ((d.person + ' ' + d.desc).toLowerCase().includes(q)) r.push({ icon: '🤝', title: d.person, meta: `${d.done ? 'Quitada' : d.dir === 'owe' ? 'Você deve' : 'Te deve'} · ${money(d.done ? d.amount : debtLeft(d))}${d.desc ? ' · ' + esc(d.desc) : ''}`, act: 'open-debt', id: d.id }); });
@@ -2566,7 +2734,7 @@ function exportBackup() {
 async function importBackup(file) {
   try {
     const clean = sanitize(JSON.parse(await file.text()));
-    const has = db.events.length || db.tasks.length || db.goals.length || db.finance.entries.length || db.debts.length || db.wishes.length;
+    const has = db.events.length || db.tasks.length || db.goals.length || db.trips.length || db.finance.entries.length || db.debts.length || db.wishes.length;
     if (has && !await ask('Restaurar backup?', 'Os dados atuais deste navegador serão substituídos pelos do arquivo.', [{ label: 'Substituir', value: true, danger: true }])) return;
     clean.settings.onboarded = true;
     db = clean; ui.planning = null;
@@ -2595,6 +2763,8 @@ function exportIcs() {
     if (ev.notes) L.push(`DESCRIPTION:${e(ev.notes)}`);
     L.push('END:VEVENT');
   });
+  db.trips.forEach(tr => L.push('BEGIN:VEVENT', `UID:${tr.id}@meu-planner`, `DTSTAMP:${stamp}`, `SUMMARY:${e('✈️ ' + tr.name)}`, `DTSTART;VALUE=DATE:${d8(tr.from)}`, `DTEND;VALUE=DATE:${d8(addDays(tr.to, 1))}`,
+    ...(tr.place ? [`LOCATION:${e(tr.place)}`] : []), ...(tr.notes ? [`DESCRIPTION:${e(tr.notes)}`] : []), 'END:VEVENT'));
   db.goals.forEach(g => {
     const t = GOAL_TYPES[g.type];
     allDay(g.id + '-prazo', g.deadline, `${t.label}: ${g.name}`);
@@ -2688,7 +2858,7 @@ function loadDemo() {
   db.finance.cats.find(c => c.id === 'f-alimentacao').budget = 80000;
   db.finance.cats.find(c => c.id === 'f-lazer').budget = 30000;
   const paidUpTo = day => { const p = {}; for (let i = 3; i >= 0; i--) if (dateIn(back(i), day) <= t) p[back(i)] = true; return p; };
-  const fe = (type, amount, desc, cat, account, date, extra = {}) => ({ id: newId(), type, amount, desc, cat, account, date, notes: '', recur: false, until: '', except: [], paid: {}, rule: 'day', ruleN: 5, auto: false, n: 1, ...extra });
+  const fe = (type, amount, desc, cat, account, date, extra = {}) => ({ id: newId(), type, amount, desc, cat, account, date, notes: '', recur: false, until: '', except: [], paid: {}, rule: 'day', ruleN: 5, auto: false, n: 1, trip: '', ...extra });
   db.finance.entries.push(
     fe('income', 350000, 'Salário', 'f-salario', 'a-itau', dateIn(back(3), 1), { recur: true, rule: 'biz', ruleN: 5, auto: true }),
     fe('expense', 120000, 'Aluguel', 'f-moradia', 'a-itau', dateIn(back(3), 10), { recur: true, paid: paidUpTo(10) }),
@@ -2709,6 +2879,13 @@ function loadDemo() {
   // fatura anterior do Nubank paga com a conta do Nubank
   const nu = db.finance.accounts.find(a => a.id === 'a-nubank'), prevCyc = cardCycle(nu, addDays(cardCycle(nu, t).start, -1));
   finCache.clear(); balCache.clear();
+  // viagem de exemplo, com orçamento e gastos ligados a ela
+  const trip = { id: newId(), name: 'Férias em Salvador', from: d(12), to: d(17), place: 'Salvador, BA', color: '#0ea5b7', budget: 300000, notes: 'Hotel perto do Farol da Barra. Levar protetor solar!' };
+  db.trips.push(trip);
+  db.finance.entries.push(
+    fe('expense', 41300, 'Passagem aérea', 'f-transporte', 'a-nubank', d(-6), { n: 3, trip: trip.id }),
+    fe('expense', 98000, 'Hotel (5 diárias)', 'f-lazer', 'a-nubank', d(-6), { trip: trip.id })
+  );
   const prevBill = cardSpent(nu, prevCyc);
   if (prevBill) db.finance.entries.push(fe('transfer', prevBill, 'Fatura Nubank · Cartão de crédito', '', 'a-nu-conta', cardCycle(nu, t).start, { to: 'a-nubank', bill: prevCyc.start }));
   const debt = (dir, person, amount, desc, extra = {}) => ({ id: newId(), dir, person, amount, desc, notes: '', date: d(-10), due: '', payments: [], done: false, doneDate: '', ...extra });
@@ -2728,7 +2905,7 @@ function loadDemo() {
   );
 }
 function showWelcome() {
-  const has = db.events.length || db.tasks.length || db.goals.length || db.finance.entries.length || db.debts.length || db.wishes.length;
+  const has = db.events.length || db.tasks.length || db.goals.length || db.trips.length || db.finance.entries.length || db.debts.length || db.wishes.length;
   $('#wName').value = db.settings.name;
   $('#wDemo').hidden = !!has;
   $('#wGo').textContent = has ? 'Continuar' : 'Começar do zero';
@@ -2877,6 +3054,10 @@ document.addEventListener('click', async e => {
     case 'debt-check': { const d = db.debts.find(x => x.id === id); if (d) toggleDebt(d); break; }
     case 'debt-pay': { const d = db.debts.find(x => x.id === id); if (d) openPay(d); break; }
     case 'debt-tab': ui.debtTab = el.dataset.f; render(); break;
+    /* viagens */
+    case 'new-trip': closeDrawer(); openTrip(null, { date: ['day', 'week', 'month'].includes(ui.view) && ui.cursor >= todayKey() ? ui.cursor : todayKey() }); break;
+    case 'open-trip': hideResults(); openTrip(id); break;
+    case 'trip-expense': { const tr = tripOf(id); if (tr) openEntry(null, null, { type: 'expense', trip: tr.id, date: date || tripDay(tr) }); break; }
     /* wishlist */
     case 'new-wish': openWish(null); break;
     case 'open-wish': hideResults(); openWish(id); break;
@@ -2889,8 +3070,9 @@ document.addEventListener('click', async e => {
     case 'drawer': openDrawer(); break;
     case 'drawer-close': closeDrawer(); break;
     case 'fab': {
-      const v = await ask('Adicionar', 'O que você quer criar?', [{ label: '✅ Tarefa', value: 'task', secondary: true }, { label: '🎯 Prova / meta', value: 'goal', secondary: true }, { label: '− Gasto', value: 'expense', secondary: true }, { label: '+ Ganho', value: 'income', secondary: true }, { label: '🤝 Dívida', value: 'debt', secondary: true }, { label: '🎁 Desejo', value: 'wish', secondary: true }, { label: '🕒 Compromisso', value: 'event', secondary: true }], true);
+      const v = await ask('Adicionar', 'O que você quer criar?', [{ label: '✅ Tarefa', value: 'task', secondary: true }, { label: '🎯 Prova / meta', value: 'goal', secondary: true }, { label: '− Gasto', value: 'expense', secondary: true }, { label: '+ Ganho', value: 'income', secondary: true }, { label: '🤝 Dívida', value: 'debt', secondary: true }, { label: '🎁 Desejo', value: 'wish', secondary: true }, { label: '✈️ Viagem', value: 'trip', secondary: true }, { label: '🕒 Compromisso', value: 'event', secondary: true }], true);
       if (v === 'event') openEvent(null, ui.cursor);
+      else if (v === 'trip') openTrip(null, { date: ui.cursor >= todayKey() ? ui.cursor : todayKey() });
       else if (v === 'expense' || v === 'income') openEntry(null, null, { type: v });
       else if (v === 'debt') openDebt(null, 'owe');
       else if (v === 'wish') openWish(null);
@@ -2921,6 +3103,14 @@ document.addEventListener('input', e => {
   } else if (t.id === 'search') renderResults();
   else if (t.id === 'evAllDay' || t.id === 'evRepeat') syncEvForm();
   else if (t.id === 'glType') syncGoalForm();
+  else if (t.id === 'tpFrom' || t.id === 'tpTo') {
+    // mudou a ida: a volta acompanha, mantendo a duração
+    if (t.id === 'tpFrom' && validDate(t.value) && validDate(t.dataset.prev || '') && validDate($('#tpTo').value)) $('#tpTo').value = addDays($('#tpTo').value, daysBetween(t.dataset.prev, t.value));
+    if (t.id === 'tpFrom') t.dataset.prev = t.value;
+    syncTpForm();
+  }
+  else if (t.id === 'enTrip') enCtx.tripAuto = false;
+  else if (t.id === 'enDate' && enCtx.tripAuto) { $('#enTrip').value = tripsOn(t.value)[0]?.id || ''; syncEnForm(); }
   else if (t.name === 'enType' || ['enMode', 'enN', 'enBasis', 'enAmount', 'enDate', 'enRule', 'enRuleN', 'enAuto'].includes(t.id)) syncEnForm();
   else if (t.id === 'wishSort') { ui.wishSort = t.value; render(); }
   else if (t.name === 'billCycle') $('#billAmount').value = moneyInput(billCtx.opts[+t.value].amount);
@@ -3146,7 +3336,7 @@ function mergeList(b, l, r, preferLocal) {
   }
   return out;
 }
-const MERGE_LISTS = [['categories'], ['events'], ['tasks'], ['goals'], ['debts'], ['wishes'], ['finance', 'banks'], ['finance', 'accounts'], ['finance', 'cats'], ['finance', 'entries']];
+const MERGE_LISTS = [['categories'], ['events'], ['tasks'], ['goals'], ['trips'], ['debts'], ['wishes'],['finance', 'banks'], ['finance', 'accounts'], ['finance', 'cats'], ['finance', 'entries']];
 function mergeDb(base, local, remote) {
   const preferLocal = (local.updatedAt || 0) >= (remote.updatedAt || 0);
   const at = (o, p) => p.reduce((x, k) => x?.[k], o) || [];
@@ -3161,7 +3351,7 @@ function sameData(a, b) {
   const canon = d => { try { const c = sanitize(JSON.parse(JSON.stringify(d))); c.updatedAt = 0; c.settings.onboarded = true; return JSON.stringify(c); } catch (e) { return Math.random(); } };
   return canon(a) === canon(b);
 }
-const hasData = d => d.events.length || d.tasks.length || d.goals.length || d.finance.entries.length || d.debts.length || d.wishes.length || Object.keys(d.notes).length;
+const hasData = d => d.events.length || d.tasks.length || d.goals.length || d.trips.length ||d.finance.entries.length || d.debts.length || d.wishes.length || Object.keys(d.notes).length;
 const fmtWhen = t => t ? new Date(t).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'sem data';
 
 // Compara este aparelho com a nuvem: envia, baixa ou pergunta qual versão manter.
