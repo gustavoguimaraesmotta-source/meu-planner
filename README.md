@@ -65,6 +65,7 @@ Sem cadastro, sem servidor, sem instalação. Cada pessoa que abre o planner tem
 
 ### 🎁 Wishlist
 - Lista do que você quer comprar, com preço, prioridade e link da loja, **dividida pelo mês** em que você pretende comprar (com o total de cada mês).
+- **Fotos do item** (até 4): tire na hora, escolha da galeria ou cole uma imagem copiada. A primeira aparece no card; toque para ampliar e passar as outras. As fotos são reduzidas automaticamente para não pesar.
 - Ao marcar como comprado, opção de lançar o gasto (inclusive parcelado).
 
 ### 📅 Tudo conectado
