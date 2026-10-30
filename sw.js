@@ -1,7 +1,7 @@
 // Service worker do Meu Planner: permite instalar o app e abri-lo sem internet.
 // A página vem da rede quando há conexão (sempre a versão mais nova) e do aparelho quando não há.
 // Mude VERSION a cada publicação: quem estiver com o app aberto recebe o aviso "Nova versão disponível".
-const VERSION = '2026-10-28-1';
+const VERSION = '2026-10-30-1';
 const CACHE = 'meu-planner-' + VERSION;
 const SHELL = [
   './', './index.html', './privacidade.html', './manifest.webmanifest',

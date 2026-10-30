@@ -1,6 +1,6 @@
 # ✦ Meu Planner
 
-Planner pessoal completo em **um único arquivo HTML**: compromissos, trabalho, estudos, tarefas, provas e projetos — tudo em um só lugar.
+Planner pessoal completo em **um único arquivo HTML**: compromissos, trabalho, estudos, tarefas, provas e projetos, exercícios e finanças — tudo em um só lugar.
 
 Sem cadastro, sem servidor, sem instalação. Cada pessoa que abre o planner tem **o seu próprio planejamento**, salvo apenas no navegador dela.
 
@@ -40,6 +40,16 @@ Sem cadastro, sem servidor, sem instalação. Cada pessoa que abre o planner tem
 - **Orçamento da viagem**: ligue os gastos à viagem (passagem, hotel, passeios…) e veja quanto já gastou e quanto resta. Compras parceladas contam pelo total.
 - Ao lançar um gasto numa data dentro da viagem, o planner já sugere ligá-lo a ela.
 
+### 💪 Exercícios
+- **Peso**: anote o peso de tempos em tempos e acompanhe num gráfico (30 dias, 3 meses, 1 ano ou tudo), com a **meta** e quanto falta.
+- **Ficha da academia**: monte os treinos (A, B, C…) com séries, repetições, carga, descanso e observação — ou **importe a ficha de um PDF ou de uma foto**: o planner lê o arquivo e organiza os treinos e exercícios para você conferir antes de salvar. Entende listas ("Supino 4x10 30kg"), tabelas e treinos lado a lado; PDFs escaneados e fotos passam por reconhecimento de texto.
+- **Treinos em sequência** nos dias de academia que você escolher (A → B → C → A…), a partir da **data de início da ficha** (dá para montar agora e começar só no mês que vem). Se faltar ou pular um dia, o próximo continua de onde parou.
+- **Horário de cada dia** (opcional): com horário, o treino entra na linha do tempo como um compromisso (ex.: segunda 07:00, sexta 18:00, com a duração que você escolher); sem horário, aparece no "Dia todo", como os dias de estudo.
+- No **Meu dia** aparece qual treino fazer hoje: marque cada exercício, anote a carga usada e conclua — ou marque a caixinha do treino direto na agenda. Na Semana e no Mês aparecem os treinos feitos, os previstos e os dias em que faltou.
+- **Evolução de carga** de cada exercício num gráfico (continua mesmo quando você troca de ficha).
+- **Outras atividades**: corrida, caminhada, bicicleta, natação, futebol, luta… com duração e distância.
+- Contador de treinos do mês e de **semanas seguidas** treinando.
+
 ### 🏦 Bancos, contas e cartões
 - Cadastre seus **bancos** e, dentro de cada um, o que você tem lá: **conta corrente, caixinha/poupança, investimento e cartão de crédito**.
 - Cada conta tem **saldo**: soma os ganhos, subtrai os gastos e se ajusta com um clique se ficar diferente do banco.
@@ -70,6 +80,7 @@ Sem cadastro, sem servidor, sem instalação. Cada pessoa que abre o planner tem
 
 ### 📅 Tudo conectado
 - Vencimentos de contas fixas e dívidas aparecem no calendário e no seu dia, com check direto de lá.
+- Treinos da academia e atividades físicas aparecem na agenda, ao lado dos compromissos.
 - A busca encontra compromissos, tarefas, metas, viagens, lançamentos, dívidas e itens da wishlist.
 
 ### 📓 Como foi o dia
@@ -120,6 +131,8 @@ Os dados ficam no `localStorage` do navegador de quem está usando. **Opcionalme
 - Limpar os dados do navegador apaga o planejamento — **faça backups** de vez em quando.
 - Para usar em outro aparelho, salve um backup e restaure no outro.
 
+Ao **importar a ficha da academia** (PDF ou foto), o arquivo é lido no próprio aparelho: o planner baixa, só nessa hora, leitores gratuitos e abertos ([PDF.js](https://mozilla.github.io/pdf.js/) e [Tesseract.js](https://tesseract.projectnaptha.com/)) e o arquivo não é enviado para nenhum servidor.
+
 ## Publicar no GitHub Pages
 
 1. Crie um repositório no GitHub (por exemplo, `meu-planner`).
@@ -148,7 +161,7 @@ Sem ID, o planner funciona normalmente, só no navegador.
 
 ## Tecnologia
 
-HTML, CSS e JavaScript puros — nenhuma biblioteca, nenhum build. Para modificar, edite o `index.html`.
+HTML, CSS e JavaScript puros — nenhum build. Para modificar, edite o `index.html`. A única exceção são os leitores de PDF e de imagem da importação da ficha, baixados só quando a pessoa importa um arquivo.
 
 O `sw.js` (service worker) deixa o app abrir sem internet. **A cada publicação, mude o valor de `VERSION` no `sw.js`**: assim quem estiver com o app aberto recebe o aviso "Nova versão disponível".
 
