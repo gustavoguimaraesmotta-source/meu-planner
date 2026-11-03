@@ -54,6 +54,7 @@ Sem cadastro, sem servidor, sem instalação. Cada pessoa que abre o planner tem
 - **Escolha o seu time** (Brasileirão Série A e B, Argentina, Portugal, Inglaterra, Espanha, Itália, Alemanha, França e MLS) e acompanhe tudo numa central:
 - **Meu time**: próximo jogo com contagem regressiva, últimos resultados (V/E/D), vitórias, empates, derrotas e aproveitamento no ano e a posição em cada campeonato.
 - **Tabelas** de todas as competições que o time está jogando (liga, estadual, Libertadores…), com o time destacado e as **zonas** (Libertadores, Sul-Americana, acesso, playoffs, rebaixamento) do jeito que estão valendo naquele ano; nas copas em mata-mata, os confrontos fase por fase.
+- **Temporadas anteriores** (desde 2007): nas abas Tabelas e Jogos, escolha o ano para ver as tabelas e os jogos daquela temporada e marcar **"🏟️ Fui"** nos jogos antigos.
 - **Jogos**: próximos e resultados, filtrando por competição. Um toque coloca o jogo na **agenda**, com horário e estádio.
 - **Diário de estádio**: anote os jogos a que você foi — placar, estádio, com quem foi, nota, fotos e quanto gastou. Em um jogo que já passou, **"🏟️ Fui"** preenche tudo sozinho. Mostra quantos jogos você viu, o aproveitamento do seu time com você no estádio e o total gasto. O gasto pode ir para as **Finanças**, se você quiser.
 

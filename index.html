@@ -497,6 +497,9 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
 .fb-center{justify-content:center}
 .fb-pos{min-width:40px;height:40px;border-radius:10px;background:var(--accent-soft);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px}
 .fb-comps{margin-top:-4px}
+.fb-season{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:-2px 0 12px;font-size:13px;font-weight:600}
+.fb-season label{display:flex;align-items:center;gap:8px}
+.fb-season .link{font-size:12.5px}
 .fb-intro{margin:-4px 0 12px}
 .fb-tables{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:14px;margin-bottom:14px}
 .fb-tables>.card{margin:0}
@@ -539,7 +542,8 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
 .gm-stars-in button.on{color:#e0a100}
 @media (max-width:900px){.fb-grid{grid-template-columns:1fr}}
 @media (max-width:600px){
-  .fb-game{grid-template-columns:38px minmax(0,1fr);gap:8px}
+  .fb-game{grid-template-columns:46px minmax(0,1fr);gap:6px}
+  .fb-when b{white-space:nowrap}
   .fb-act{grid-column:2;justify-content:center}
   .fb-t{font-size:12.5px}
   .fb-t .fb-logo{width:20px;height:20px}
@@ -1327,7 +1331,7 @@ function blank() {
 }
 
 let db = blank(), storageOk = true, migrated = false;
-const ui = { view: 'day', cursor: todayKey(), mini: firstOfMonth(todayKey()), planning: null, taskFilter: 'today', fmonth: todayKey().slice(0, 7), finFilter: 'all', finAcc: null, debtTab: 'owe', wishSort: 'priority', fitRange: 'm3', fitEx: '', fbTab: 'team', fbComp: '', fbFilter: '' };
+const ui = { view: 'day', cursor: todayKey(), mini: firstOfMonth(todayKey()), planning: null, taskFilter: 'today', fmonth: todayKey().slice(0, 7), finFilter: 'all', finAcc: null, debtTab: 'owe', wishSort: 'priority', fitRange: 'm3', fitEx: '', fbTab: 'team', fbComp: '', fbFilter: '', fbSeason: 0 };
 
 /* ---------- validação (backup e armazenamento) ---------- */
 const str = (v, max) => typeof v === 'string' ? v.trim().slice(0, max) : '';
@@ -2904,7 +2908,7 @@ $('#tpDelete').addEventListener('click', async () => {
 const ESPN = 'https://site.api.espn.com/apis/';
 // só guarda os dados baixados (ESPN e Wikipédia): não vai para o backup nem para o Drive.
 // Mude o número quando o formato guardado mudar, para o app baixar tudo de novo.
-const FB_KEY = 'meu-planner-futebol-2';
+const FB_KEY = 'meu-planner-futebol-3';
 const FB_LEAGUES = [['bra.1', 'Brasileirão Série A'], ['bra.2', 'Brasileirão Série B'], ['arg.1', 'Argentina'], ['por.1', 'Portugal'], ['eng.1', 'Inglaterra'], ['esp.1', 'Espanha'], ['ita.1', 'Itália'], ['ger.1', 'Alemanha'], ['fra.1', 'França'], ['usa.1', 'Estados Unidos (MLS)']];
 const FB_COMP = {
   'bra.1': 'Brasileirão', 'bra.2': 'Série B', 'bra.3': 'Série C', 'bra.copa_do_brazil': 'Copa do Brasil', 'bra.supercopa_do_brazil': 'Supercopa do Brasil',
@@ -2921,10 +2925,10 @@ const FB_STAGE = [[/group/i, 'Fase de grupos'], [/round of 32/i, '16 avos de fin
 const stagePt = s => FB_STAGE.find(([re]) => re.test(s || ''))?.[1] || '';
 
 let fbCache = {};
-try { localStorage.removeItem('meu-planner-futebol'); fbCache = JSON.parse(localStorage.getItem(FB_KEY)) || {}; } catch (e) { fbCache = {}; }
+try { ['meu-planner-futebol', 'meu-planner-futebol-2'].forEach(k => localStorage.removeItem(k)); fbCache = JSON.parse(localStorage.getItem(FB_KEY)) || {}; } catch (e) { fbCache = {}; }
 const fbBusy = new Set(), fbFail = new Set();
 function fbSaveCache() {
-  Object.keys(fbCache).sort((a, b) => fbCache[b].t - fbCache[a].t).slice(30).forEach(k => delete fbCache[k]);
+  Object.keys(fbCache).sort((a, b) => fbCache[b].t - fbCache[a].t).slice(45).forEach(k => delete fbCache[k]);
   try { localStorage.setItem(FB_KEY, JSON.stringify(fbCache)); } catch (e) { /* sem espaço: fica só na memória */ }
 }
 // devolve o que já foi baixado (mesmo antigo) e, se estiver velho, busca de novo em segundo plano
@@ -2945,9 +2949,17 @@ async function fbLoad(path, parse) {
   if (ui.view === 'foot') render();
   if ($('#ftDlg').open) renderPicker();
 }
-const fbPastPath = id => `site/v2/sports/soccer/all/teams/${id}/schedule`;
+const fbPastPath = (id, y = 0) => `site/v2/sports/soccer/all/teams/${id}/schedule${y ? '?season=' + y : ''}`;
 const fbNextPath = id => `site/v2/sports/soccer/all/teams/${id}/schedule?fixture=true`;
-const fbTablePath = lg => `v2/sports/soccer/${lg}/standings`;
+const fbTablePath = (lg, y = 0) => `v2/sports/soccer/${lg}/standings${y ? '?season=' + y : ''}`;
+const FB_FIRST_SEASON = 2007;   // antes disso a ESPN quase não tem jogos dos times brasileiros
+const FB_OLD_TTL = 30 * 86400e3;   // temporada que já acabou não muda: busca de novo só depois de um mês
+const fbCurSeason = () => fbCache[fbPastPath(db.football.team?.id)]?.d?.season || +todayKey().slice(0, 4);
+// 0 = temporada atual; senão, o ano escolhido (se for o atual, trata como atual)
+const fbSel = () => ui.fbSeason && ui.fbSeason < fbCurSeason() ? ui.fbSeason : 0;
+// ligas europeias: a temporada vai de um ano ao outro (2025/26)
+const fbSeasonLabel = y => /^(eng|esp|ita|ger|fra|por)\./.test(db.football.team?.league || '') ? `${y}/${String(y + 1).slice(2)}` : String(y);
+const fbSchedulePaths = (id, y = 0) => y ? [fbPastPath(id, y)] : [fbPastPath(id), fbNextPath(id)];
 
 // formato enxuto dos jogos e tabelas (é o que fica guardado no aparelho)
 const fbSide = x => ({ id: String(x?.team?.id || x?.id || ''), name: x?.team?.shortDisplayName || x?.team?.displayName || '?', logo: espnLogo(x?.team?.logos?.[0]?.href || x?.team?.logo || '') });
@@ -2964,7 +2976,7 @@ function fbGame(e) {
     venue: (c.venue?.fullName || '').replace(/^Estadio\b/, 'Estádio'), city: c.venue?.address?.city || ''
   };
 }
-const fbParseSchedule = j => (j.events || []).map(fbGame).filter(Boolean);
+const fbParseSchedule = j => ({ season: j.season?.year || j.requestedSeason?.year || 0, games: (j.events || []).map(fbGame).filter(Boolean) });
 function fbParseTable(j) {
   const stat = (e, n) => { const s = e.stats?.find(x => x.name === n); return s ? (typeof s.value === 'number' ? s.value : +s.displayValue || 0) : 0; };
   const groups = (j.children || []).map(ch => ({
@@ -2983,10 +2995,11 @@ const gTime = g => { const d = new Date(g.at); return `${pad(d.getHours())}:${pa
 const fbMine = g => { const id = db.football.team?.id; return !id ? '' : g.home.id === id ? 'home' : g.away.id === id ? 'away' : ''; };
 const fbRes = (mine, other) => mine > other ? 'v' : mine < other ? 'd' : 'e';
 const RES_LABEL = { v: 'Vitória', e: 'Empate', d: 'Derrota' };
-function fbGames() {
+function fbGames(y = 0) {
   const t = db.football.team; if (!t) return [];
   const m = new Map();
-  [fbData(fbPastPath(t.id), fbParseSchedule), fbData(fbNextPath(t.id), fbParseSchedule, 30 * 60e3)].forEach(l => (l || []).forEach(g => m.set(g.id, g)));
+  const lists = y ? [fbData(fbPastPath(t.id, y), fbParseSchedule, FB_OLD_TTL)] : [fbData(fbPastPath(t.id), fbParseSchedule), fbData(fbNextPath(t.id), fbParseSchedule, 30 * 60e3)];
+  lists.forEach(l => (l?.games || []).forEach(g => m.set(g.id, g)));
   return [...m.values()].sort((a, b) => a.at.localeCompare(b.at));
 }
 function gameResult(g) {   // resultado do ponto de vista do meu time
@@ -3011,6 +3024,13 @@ function fbStatus(paths) {
   const when = fmtWhen(Math.min(...ts));
   return `<p class="fb-note">${paths.some(p => fbFail.has(p)) ? `⚠️ Sem conexão com a ESPN: mostrando os dados de ${when}.` : `Atualizado em ${when}`} · Dados: ESPN</p>`;
 }
+const fbFind = id => fbGames().find(x => x.id === id) || fbGames(fbSel()).find(x => x.id === id);
+function fbSeasonPicker() {
+  const cur = fbCurSeason(), y = fbSel() || cur, opts = [];
+  for (let i = cur; i >= FB_FIRST_SEASON; i--) opts.push(`<option value="${i === cur ? 0 : i}" ${i === y ? 'selected' : ''}>${fbSeasonLabel(i)}${i === cur ? ' (atual)' : ''}</option>`);
+  return `<div class="fb-season"><label>Temporada <select class="sort" id="fbSeason" aria-label="Temporada">${opts.join('')}</select></label>
+    ${fbSel() ? `<button class="link" data-act="fb-season-now">Voltar para a atual</button>` : ''}</div>`;
+}
 function fbEmpty(paths, what = 'os jogos') {
   if (paths.some(p => fbBusy.has(p) || !fbCache[p] && !fbFail.has(p))) return `<div class="card pad empty">⏳ Buscando ${what}…</div>`;
   if (paths.some(p => fbFail.has(p))) return `<div class="card pad empty">Não consegui buscar ${what} agora. Confira a internet e toque em <button data-act="fb-reload">Atualizar</button>.</div>`;
@@ -3034,7 +3054,7 @@ function fbRow(g) {
 }
 function viewFoot() {
   const t = db.football.team, tab = ui.fbTab;
-  const paths = t ? [fbPastPath(t.id), fbNextPath(t.id)] : [];
+  const y = tab === 'tables' || tab === 'games' ? fbSel() : 0, paths = t ? fbSchedulePaths(t.id, y) : [];
   const tabs = [['team', '⚽ Meu time'], ['tables', '📊 Tabelas'], ['games', '🗓️ Jogos'], ['diary', '🏟️ Diário de estádio', db.football.games.length]]
     .map(([id, l, n]) => `<button class="tab ${tab === id ? 'on' : ''}" data-act="fb-tab" data-f="${id}">${l}${n ? `<em>${n}</em>` : ''}</button>`).join('');
   const head = `<div class="fin-head">
@@ -3046,7 +3066,7 @@ function viewFoot() {
   let body;
   if (tab === 'diary') body = fbDiary();
   else if (!t) body = `<div class="card pad empty">Escolha o seu time para ver aqui os próximos jogos, os últimos resultados e as tabelas de todas as competições que ele está jogando. <button data-act="fb-team">Escolher meu time</button><br><br>O <b>Diário de estádio</b> funciona mesmo sem escolher um time: anote ali os jogos a que você foi.</div>`;
-  else body = ({ team: fbTeamTab, tables: fbTablesTab, games: fbGamesTab })[tab]() + fbStatus(tab === 'tables' && ui.fbComp ? [...paths, fbTablePath(ui.fbComp)] : paths);
+  else body = ({ team: fbTeamTab, tables: fbTablesTab, games: fbGamesTab })[tab]() + fbStatus(tab === 'tables' && ui.fbComp ? [...paths, fbTablePath(ui.fbComp, y)] : paths);
   return head + `<div class="tabs">${tabs}</div>` + body;
 }
 function fbTeamTab() {
@@ -3135,15 +3155,16 @@ const FB_NOTES = [[/relegation playoff|play-?out/i, 'Repescagem contra o rebaixa
 // devolve a zona de cada linha e de onde ela veio
 function fbZoneOf(lg, tb) {
   if (FB_WIKI[lg]) {
-    const url = fbWikiUrl(lg, tb.season || +todayKey().slice(0, 4)), wk = fbData(url, fbParseWiki, 6 * 3600e3);
+    const y = tb.season || +todayKey().slice(0, 4), url = fbWikiUrl(lg, y), wk = fbData(url, fbParseWiki, y < fbCurSeason() ? FB_OLD_TTL : 6 * 3600e3);
     if (wk && Object.keys(wk.zones).length) return {
-      src: `Zonas da tabela: Wikipédia${wk.update ? `, atualizada em ${wk.update}` : ''}`,
+      src: `Zonas da tabela: Wikipédia${/complet|encerr|final/i.test(wk.update) ? ' (temporada encerrada)' : wk.update ? `, atualizada em ${wk.update}` : ''}`,
       of: r => { const code = wk.zones[r.rank], inf = code && wk.info[code]; return code ? { cls: ZONE_CLS[inf?.color] || 'z-n', text: inf?.text || code } : null; }
     };
     if (!fbFail.has(url) && !wk) return { src: '', of: () => null };   // ainda carregando
-    // sem Wikipédia: pelo menos o rebaixamento (4 últimos nas Séries A e B)
-    const total = tb.groups[0]?.rows.length || 0;
-    return { src: '', of: r => r.rank > total - 4 ? { cls: 'z-r', text: 'Rebaixamento' } : null };
+    // sem a tabela da Wikipédia (anos antigos ou fora do ar): o rebaixamento dos 4 últimos, que vale desde 2006,
+    // e o acesso dos 4 primeiros da Série B, que valeu de 2006 a 2025
+    const total = tb.groups[0]?.rows.length || 0, up = lg === 'bra.2' && y >= 2006 && y <= 2025;
+    return { src: '', of: r => r.rank > total - 4 ? { cls: 'z-r', text: 'Rebaixamento' } : up && r.rank <= 4 ? { cls: 'z-g1', text: 'Acesso à Série A' } : null };
   }
   return { src: '', of: r => { const n = r.note && FB_NOTES.find(([re]) => re.test(r.note)); return n ? { cls: n[2], text: n[1] } : r.note ? { cls: 'z-n', text: r.note } : null; } };
 }
@@ -3160,17 +3181,17 @@ function fbTable(lg, grp, title, zone) {
   </table></div>${legend.size ? `<div class="fb-legend">${[...legend].map(([t, c]) => `<span><i class="${c}"></i>${esc(t)}</span>`).join('')}</div>` : ''}</section>`;
 }
 function fbTablesTab() {
-  const t = db.football.team, all = fbGames(), comps = fbComps(all);
-  if (!comps.length) return fbEmpty([fbPastPath(t.id), fbNextPath(t.id)], 'as competições');
+  const t = db.football.team, y = fbSel(), all = fbGames(y), comps = fbComps(all), picker = fbSeasonPicker();
+  if (!comps.length) return picker + fbEmpty(fbSchedulePaths(t.id, y), 'as competições');
   if (!comps.some(c => c.lg === ui.fbComp)) ui.fbComp = comps[0].lg;
-  const lg = ui.fbComp, c = comps.find(x => x.lg === lg), path = fbTablePath(lg), tb = fbData(path, fbParseTable, 30 * 60e3);
-  const chips = `<div class="tabs fb-comps">${comps.map(x => `<button class="tab ${x.lg === lg ? 'on' : ''}" data-act="fb-comp" data-lg="${esc(x.lg)}">${esc(x.name)}</button>`).join('')}</div>`;
+  const lg = ui.fbComp, c = comps.find(x => x.lg === lg), path = fbTablePath(lg, y), tb = fbData(path, fbParseTable, y ? FB_OLD_TTL : 30 * 60e3);
+  const chips = picker + `<div class="tabs fb-comps">${comps.map(x => `<button class="tab ${x.lg === lg ? 'on' : ''}" data-act="fb-comp" data-lg="${esc(x.lg)}">${esc(x.name)}</button>`).join('')}</div>`;
   const games = all.filter(g => g.lg === lg);
   if (!tb) return chips + fbEmpty([path], 'a tabela');
   if (!tb.groups.length) {   // mata-mata (ex.: Copa do Brasil): mostra os confrontos do time, fase por fase
     const stages = new Map();
     [...games].reverse().forEach(g => { const s = stagePt(g.stage) || 'Jogos'; if (!stages.has(s)) stages.set(s, []); stages.get(s).push(g); });
-    return chips + `<p class="muted small fb-intro">${esc(c.name)} é disputada em mata-mata, sem tabela de pontos. Aqui estão os confrontos do ${esc(t.name)}, da fase mais recente para a primeira.</p>`
+    return chips + `<p class="muted small fb-intro">${esc(c.name)} é disputada em mata-mata, sem tabela de pontos. Aqui estão os confrontos do ${esc(t.name)}${y ? ` em ${fbSeasonLabel(y)}` : ''}, da fase mais recente para a primeira.</p>`
       + [...stages].map(([s, l]) => `<section class="card pad"><div class="card-h"><h3>${esc(s)}</h3></div>${[...l].reverse().map(fbRow).join('')}</section>`).join('');
   }
   const groups = [...tb.groups].sort((a, b) => b.rows.some(r => r.id === t.id) - a.rows.some(r => r.id === t.id));
@@ -3179,19 +3200,20 @@ function fbTablesTab() {
   return chips + `<div class="fb-tables">${groups.map(g => fbTable(lg, g, g.name ? `${c.name} · ${g.name}` : c.name, zone)).join('')}</div>`
     + (zone.src ? `<p class="fb-note">${esc(zone.src)}</p>` : '')
     + (knock.length ? `<section class="card pad"><div class="card-h"><h3>Mata-mata</h3></div>${knock.map(fbRow).join('')}</section>` : '')
-    + (games.length ? `<section class="card pad"><details style="margin:0"><summary>Jogos do ${esc(t.name)} em ${esc(c.name)} (${games.length})</summary>${[...games].reverse().map(fbRow).join('')}</details></section>` : '');
+    + (games.length ? `<section class="card pad"><details style="margin:0"><summary>Jogos do ${esc(t.name)} em ${esc(c.name)}${y ? ` ${fbSeasonLabel(y)}` : ''} (${games.length})</summary>${[...games].reverse().map(fbRow).join('')}</details></section>` : '');
 }
 function fbGamesTab() {
-  const t = db.football.team, all = fbGames(), comps = fbComps(all);
-  if (!all.length) return fbEmpty([fbPastPath(t.id), fbNextPath(t.id)]);
+  const t = db.football.team, y = fbSel(), all = fbGames(y), comps = fbComps(all), picker = fbSeasonPicker();
+  if (!all.length) return picker + fbEmpty(fbSchedulePaths(t.id, y));
   if (ui.fbFilter && !comps.some(c => c.lg === ui.fbFilter)) ui.fbFilter = '';
   const list = all.filter(g => !ui.fbFilter || g.lg === ui.fbFilter), now = Date.now();
   const live = list.filter(g => g.state === 'in'), next = list.filter(g => g.state === 'pre' && Date.parse(g.at) > now - 3 * 3600e3), past = list.filter(g => g.state === 'post').reverse();
-  const chips = `<div class="tabs fb-comps"><button class="tab ${!ui.fbFilter ? 'on' : ''}" data-act="fb-filter" data-lg="">Todas<em>${all.length}</em></button>${comps.map(c => `<button class="tab ${c.lg === ui.fbFilter ? 'on' : ''}" data-act="fb-filter" data-lg="${esc(c.lg)}">${esc(c.name)}<em>${c.n}</em></button>`).join('')}</div>`;
+  const went = past.filter(g => db.football.games.some(x => x.espn === g.id)).length;
+  const chips = picker + `<div class="tabs fb-comps"><button class="tab ${!ui.fbFilter ? 'on' : ''}" data-act="fb-filter" data-lg="">Todas<em>${all.length}</em></button>${comps.map(c => `<button class="tab ${c.lg === ui.fbFilter ? 'on' : ''}" data-act="fb-filter" data-lg="${esc(c.lg)}">${esc(c.name)}<em>${c.n}</em></button>`).join('')}</div>`;
   return chips
     + (live.length ? `<section class="card pad"><div class="card-h"><h3>🔴 Ao vivo</h3></div>${live.map(fbRow).join('')}</section>` : '')
-    + `<section class="card pad"><div class="card-h"><h3>Próximos jogos</h3></div>${next.length ? next.map(fbRow).join('') : '<div class="empty">Nenhum jogo marcado por enquanto.</div>'}</section>`
-    + `<section class="card pad"><div class="card-h"><h3>Resultados</h3></div>${past.length ? past.map(fbRow).join('') : '<div class="empty">Nenhum jogo ainda nesta temporada.</div>'}</section>`;
+    + (y ? '' : `<section class="card pad"><div class="card-h"><h3>Próximos jogos</h3></div>${next.length ? next.map(fbRow).join('') : '<div class="empty">Nenhum jogo marcado por enquanto.</div>'}</section>`)
+    + `<section class="card pad"><div class="card-h"><h3>Resultados${y ? ' de ' + fbSeasonLabel(y) : ''}</h3>${went ? `<span class="tag ok">🏟️ você foi em ${plural(went, 'jogo', 'jogos')}</span>` : ''}</div>${past.length ? past.map(fbRow).join('') : '<div class="empty">Nenhum jogo ainda nesta temporada.</div>'}</section>`;
 }
 
 /* ----- diário de estádio ----- */
@@ -3354,7 +3376,7 @@ function pickTeam(id) {
   if (!r) return;
   const changed = db.football.team?.id !== r.id;
   db.football.team = { id: r.id, name: r.name, abbr: r.abbr, logo: r.logo, league: lg };
-  if (changed) { ui.fbTab = 'team'; ui.fbComp = ''; ui.fbFilter = ''; }
+  if (changed) { ui.fbTab = 'team'; ui.fbComp = ''; ui.fbFilter = ''; ui.fbSeason = 0; }
   $('#ftDlg').close();
   save();
   notify(`${r.name} é o seu time agora. ⚽`);
@@ -4886,13 +4908,14 @@ document.addEventListener('click', async e => {
     case 'ft-retry': fbFail.clear(); renderPicker(); break;
     case 'fb-reload': Object.values(fbCache).forEach(c => c.t = 0); fbFail.clear(); render(); break;
     case 'fb-agenda': {
-      const g = fbGames().find(x => x.id === id); if (!g) break;
+      const g = fbFind(id); if (!g) break;
       const ev = fbInAgenda(g); if (ev) { setCursor(gDate(g)); setView('day'); break; }
       const st = gTime(g), stage = stagePt(g.stage);
       openEvent(null, gDate(g), { title: fbEventTitle(g), start: st, end: fromMin(toMin(st) + 120), location: [g.venue, g.city].filter(Boolean).join(', '), notes: compName(g.lg, g.lgName) + (stage ? ' · ' + stage : '') });
       break;
     }
-    case 'fb-went': { const g = fbGames().find(x => x.id === id); if (g) openGame(null, gamePreset(g)); break; }
+    case 'fb-went': { const g = fbFind(id); if (g) openGame(null, gamePreset(g)); break; }
+    case 'fb-season-now': ui.fbSeason = 0; ui.fbComp = ''; ui.fbFilter = ''; render(); break;
     case 'new-game': closeDrawer(); openGame(null); break;
     case 'open-game': hideResults(); openGame(id); break;
     case 'gm-star': { const n = +el.dataset.n; gmCtx.rating = gmCtx.rating === n ? 0 : n; renderGmStars(); break; }
@@ -4965,6 +4988,7 @@ document.addEventListener('input', e => {
   else if (t.id === 'wishSort') { ui.wishSort = t.value; render(); }
   else if (t.id === 'fitEx') { ui.fitEx = t.value; render(); }
   else if (t.id === 'ftLeague' || t.id === 'ftSearch') renderPicker();
+  else if (t.id === 'fbSeason') { ui.fbSeason = +t.value; ui.fbComp = ''; ui.fbFilter = ''; render(); }
   else if (t.closest('#fpDays')) fpRenderTimes();
   else if (t.name === 'billCycle') $('#billAmount').value = moneyInput(billCtx.opts[+t.value].amount);
   else if (t.classList.contains('fs-type')) {
