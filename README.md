@@ -50,6 +50,13 @@ Sem cadastro, sem servidor, sem instalação. Cada pessoa que abre o planner tem
 - **Outras atividades**: corrida, caminhada, bicicleta, natação, futebol, luta… com duração e distância.
 - Contador de treinos do mês e de **semanas seguidas** treinando.
 
+### ⚽ Futebol
+- **Escolha o seu time** (Brasileirão Série A e B, Argentina, Portugal, Inglaterra, Espanha, Itália, Alemanha, França e MLS) e acompanhe tudo numa central:
+- **Meu time**: próximo jogo com contagem regressiva, últimos resultados (V/E/D), vitórias, empates, derrotas e aproveitamento no ano e a posição em cada campeonato.
+- **Tabelas** de todas as competições que o time está jogando (liga, estadual, Libertadores…), com o time destacado e as **zonas** (Libertadores, Sul-Americana, acesso, playoffs, rebaixamento) do jeito que estão valendo naquele ano; nas copas em mata-mata, os confrontos fase por fase.
+- **Jogos**: próximos e resultados, filtrando por competição. Um toque coloca o jogo na **agenda**, com horário e estádio.
+- **Diário de estádio**: anote os jogos a que você foi — placar, estádio, com quem foi, nota, fotos e quanto gastou. Em um jogo que já passou, **"🏟️ Fui"** preenche tudo sozinho. Mostra quantos jogos você viu, o aproveitamento do seu time com você no estádio e o total gasto. O gasto pode ir para as **Finanças**, se você quiser.
+
 ### 🏦 Bancos, contas e cartões
 - Cadastre seus **bancos** e, dentro de cada um, o que você tem lá: **conta corrente, caixinha/poupança, investimento e cartão de crédito**.
 - Cada conta tem **saldo**: soma os ganhos, subtrai os gastos e se ajusta com um clique se ficar diferente do banco.
@@ -132,6 +139,8 @@ Os dados ficam no `localStorage` do navegador de quem está usando. **Opcionalme
 - Para usar em outro aparelho, salve um backup e restaure no outro.
 
 Ao **importar a ficha da academia** (PDF ou foto), o arquivo é lido no próprio aparelho: o planner baixa, só nessa hora, leitores gratuitos e abertos ([PDF.js](https://mozilla.github.io/pdf.js/) e [Tesseract.js](https://tesseract.projectnaptha.com/)) e o arquivo não é enviado para nenhum servidor.
+
+Na área de **Futebol**, os jogos e as tabelas vêm da ESPN (dados públicos e gratuitos, sem cadastro). As zonas das Séries A e B vêm da tabela da Wikipédia em português. O planner só *baixa* essas informações; nada seu é enviado. O diário de estádio fica com o resto dos seus dados.
 
 ## Publicar no GitHub Pages
 

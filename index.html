@@ -460,6 +460,92 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
 #phDlg img{display:block;max-width:100%;max-height:calc(100vh - 150px);margin:0 auto;border-radius:12px;object-fit:contain}
 #phDlg .dlg-actions{margin-top:12px;justify-content:center}
 .sort{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 10px}
+/* futebol */
+.fb-me{display:flex;align-items:center;gap:10px}
+.fb-me b{display:block;font-size:16px}
+.fb-me .link{font-size:12px}
+.fb-logo{display:inline-block;object-fit:contain;flex:none;vertical-align:middle}
+.fb-logo.none{display:inline-flex;align-items:center;justify-content:center;font-size:12px;opacity:.6}
+.fb-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.fb-game{display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid var(--line-2)}
+.fb-game:last-of-type{border-bottom:0}
+.fb-game.live{background:var(--danger-soft);border-radius:8px}
+.fb-when{text-align:center;line-height:1.15}
+.fb-when b{display:block;font-size:12.5px}.fb-when small{font-size:11px;color:var(--muted)}
+.fb-match{min-width:0}
+.fb-match>small{display:block;font-size:11.5px;color:var(--muted);margin-top:3px;text-align:center;overflow-wrap:anywhere}
+.fb-teams{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px}
+.fb-t{display:flex;align-items:center;gap:6px;min-width:0;font-size:13.5px}
+.fb-t>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fb-t.home{justify-content:flex-end;text-align:right}
+.fb-t.me{font-weight:700}
+.fb-score{font-size:15px;font-variant-numeric:tabular-nums;white-space:nowrap;padding:2px 8px;border-radius:7px;background:var(--surface-2)}
+.fb-score small{font-weight:400;color:var(--muted);margin:0 4px;font-size:12px}
+.fb-score.time{font-size:12.5px;font-weight:600;color:var(--muted)}
+.fb-act{display:flex;align-items:center;gap:6px}
+.fb-res{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;font-size:11.5px;font-weight:800;color:#fff;background:var(--muted);flex:none}
+.fb-res.v{background:var(--ok)}.fb-res.d{background:var(--danger)}
+.fb-form{display:flex;gap:4px}
+.fb-more{margin-top:8px}
+.fb-next .fb-big{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin:8px 0 6px}
+.fb-bt{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;min-width:0}
+.fb-bt b{font-size:14px;overflow-wrap:anywhere}
+.fb-vs{text-align:center}
+.fb-vs b{display:block;font-size:22px;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+.fb-vs small{font-size:12px;color:var(--muted)}
+.fb-meta{text-align:center;font-size:12.5px;color:var(--muted);margin:6px 0 0}
+.fb-center{justify-content:center}
+.fb-pos{min-width:40px;height:40px;border-radius:10px;background:var(--accent-soft);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px}
+.fb-comps{margin-top:-4px}
+.fb-intro{margin:-4px 0 12px}
+.fb-tables{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:14px;margin-bottom:14px}
+.fb-tables>.card{margin:0}
+.fb-tw{overflow-x:auto;margin:0 -6px}
+.fb-table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.fb-table th{font-size:11px;font-weight:700;color:var(--muted);padding:4px 6px;text-align:center;border-bottom:1px solid var(--line)}
+.fb-table td{padding:6px;text-align:center;border-bottom:1px solid var(--line-2)}
+.fb-table .l{text-align:left;width:100%}
+.fb-table tr.me td{background:var(--accent-soft);font-weight:700}
+.fb-tn{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.fb-rank{display:inline-block;min-width:22px;padding:1px 0;border-radius:5px;font-weight:700}
+.fb-legend{display:flex;gap:6px 14px;flex-wrap:wrap;margin-top:10px;font-size:11.5px;color:var(--muted)}
+.fb-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.z-g1{background:var(--ok)!important;color:#fff!important}
+.z-g2{background:var(--ok-soft)!important;color:var(--ok)!important;box-shadow:inset 0 0 0 1px var(--ok)}
+.z-b1{background:var(--accent)!important;color:#fff!important}
+.z-b2{background:var(--accent-soft)!important;color:var(--accent-ink)!important;box-shadow:inset 0 0 0 1px var(--accent)}
+.z-y{background:var(--warn-soft)!important;color:var(--warn)!important;box-shadow:inset 0 0 0 1px var(--warn)}
+.z-r{background:var(--danger)!important;color:#fff!important}
+.z-n{background:var(--surface-2)!important;box-shadow:inset 0 0 0 1px var(--line)}
+.fb-note{font-size:11.5px;color:var(--muted);margin:10px 2px 0;text-align:right}
+.ft-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;max-height:min(52vh,440px);overflow-y:auto;margin-top:12px;padding:2px}
+.ft-team{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:12.5px;font-weight:600;text-align:center}
+.ft-team:hover{background:var(--surface-2)}
+.ft-team.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink)}
+.ft-list .empty{grid-column:1/-1}
+.gm h3.gm-title{font-weight:400}
+.gm h3.gm-title b{font-weight:700}
+.gm h3.gm-title span{font-weight:800;white-space:nowrap;margin:0 2px}
+.kpi b em{font-style:normal}
+.gm-info{display:flex;gap:6px 12px;flex-wrap:wrap;margin-top:8px;font-size:12.5px}
+.gm-info .tag{font-style:normal;margin-left:4px}
+.gm-stars{color:#e0a100;letter-spacing:1px}
+.gm-score{display:grid;grid-template-columns:minmax(0,1fr) 58px auto 58px minmax(0,1fr);gap:8px;align-items:end}
+.gm-score input{width:100%;text-align:center}
+.gm-score .gm-h input,.gm-score .gm-a input{text-align:left}
+.gm-x{padding-bottom:10px;font-weight:700;color:var(--muted)}
+.gm-stars-in{display:flex;gap:2px;margin-top:4px}
+.gm-stars-in button{font-size:26px;line-height:1;color:var(--line);padding:0 2px}
+.gm-stars-in button.on{color:#e0a100}
+@media (max-width:900px){.fb-grid{grid-template-columns:1fr}}
+@media (max-width:600px){
+  .fb-game{grid-template-columns:38px minmax(0,1fr);gap:8px}
+  .fb-act{grid-column:2;justify-content:center}
+  .fb-t{font-size:12.5px}
+  .fb-t .fb-logo{width:20px;height:20px}
+  .gm-score{grid-template-columns:minmax(0,1fr) 64px;column-gap:10px}
+  .gm-x{display:none}
+}
 .kpis.four{grid-template-columns:repeat(4,minmax(0,1fr))}
 .card-h.wrap{flex-wrap:wrap}
 .bank{margin-bottom:10px}.bank:last-child{margin-bottom:0}
@@ -572,6 +658,7 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
       <button data-act="view" data-view="goals"><span class="ni">🎯</span>Provas e metas</button>
       <button data-act="view" data-view="trips"><span class="ni">✈️</span>Viagens</button>
       <button data-act="view" data-view="fit"><span class="ni">💪</span>Exercícios</button>
+      <button data-act="view" data-view="foot"><span class="ni">⚽</span>Futebol</button>
       <div class="nav-sep">Finanças</div>
       <button data-act="view" data-view="finance"><span class="ni">💰</span>Gastos e ganhos</button>
       <button data-act="view" data-view="debts"><span class="ni">🤝</span>Dívidas<span class="badge" id="debtBadge" hidden></span></button>
@@ -894,6 +981,61 @@ dialog p{color:var(--muted);line-height:1.55;margin:6px 0}
   </div>
 </dialog>
 
+<!-- Futebol: escolher o time -->
+<dialog id="ftDlg">
+  <form method="dialog">
+    <h2>Qual é o seu time?</h2>
+    <p class="muted small">Os jogos, resultados e tabelas vêm da ESPN (grátis). Nada seu é enviado para lá.</p>
+    <div class="grid2">
+      <label class="field">Liga<select id="ftLeague"></select></label>
+      <label class="field">Procurar<input id="ftSearch" type="search" placeholder="Nome do time" autocomplete="off"></label>
+    </div>
+    <div class="ft-list" id="ftList"></div>
+    <div class="dlg-actions">
+      <button type="button" class="btn ghost danger" id="ftNone">Não acompanhar time</button>
+      <span class="grow"></span>
+      <button type="button" class="btn" data-close>Fechar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Futebol: jogo no estádio (diário) -->
+<dialog id="gmDlg">
+  <form id="gmForm">
+    <h2 id="gmTitle">Jogo no estádio</h2>
+    <p class="hint" id="gmHint" hidden></p>
+    <div class="grid2">
+      <label class="field">Data<input id="gmDate" type="date" required></label>
+      <label class="field">Competição<input id="gmComp" type="text" maxlength="80" list="gmComps" placeholder="Ex.: Brasileirão" autocomplete="off"></label>
+    </div>
+    <div class="gm-score">
+      <label class="field gm-h">Mandante<input id="gmHome" type="text" maxlength="60" list="gmTeams" placeholder="Time da casa" autocomplete="off" required></label>
+      <label class="field gm-hs">Gols<input id="gmHs" type="text" inputmode="numeric" maxlength="2" placeholder="–" autocomplete="off"></label>
+      <span class="gm-x">x</span>
+      <label class="field gm-as">Gols<input id="gmAs" type="text" inputmode="numeric" maxlength="2" placeholder="–" autocomplete="off"></label>
+      <label class="field gm-a">Visitante<input id="gmAway" type="text" maxlength="60" list="gmTeams" placeholder="Time de fora" autocomplete="off" required></label>
+    </div>
+    <label class="field">Eu torcia para<select id="gmSide"><option value="home">o mandante</option><option value="away">o visitante</option><option value="">nenhum dos dois (só fui assistir)</option></select></label>
+    <div class="grid2">
+      <label class="field">Estádio<input id="gmStadium" type="text" maxlength="120" list="gmStadiums" placeholder="Ex.: Mineirão" autocomplete="off"></label>
+      <label class="field">Com quem eu fui<input id="gmWith" type="text" maxlength="160" placeholder="Opcional"></label>
+    </div>
+    <div class="field">Minha nota para o dia<div class="gm-stars-in" id="gmStars"></div></div>
+    <label class="field">Quanto eu gastei (R$)<input id="gmCost" type="text" inputmode="decimal" placeholder="Ingresso, lanche, transporte… (opcional)" autocomplete="off"></label>
+    <label class="check-line" id="gmFinBox"><input type="checkbox" id="gmFin"> Lançar esse gasto nas Finanças</label>
+    <p class="hint" id="gmFinInfo" hidden></p>
+    <label class="field">Como foi<textarea id="gmNotes" maxlength="1000" rows="2" placeholder="Gols, lances, o clima da torcida…"></textarea></label>
+    <div class="field">Fotos <small class="muted" style="font-weight:400">(até 4)</small><div class="ws-photos" id="gmPhotos"></div></div>
+    <datalist id="gmTeams"></datalist><datalist id="gmStadiums"></datalist><datalist id="gmComps"></datalist>
+    <div class="dlg-actions">
+      <button type="button" class="btn ghost danger" id="gmDelete">Excluir</button>
+      <span class="grow"></span>
+      <button type="button" class="btn" data-close>Cancelar</button>
+      <button class="btn primary" type="submit">Salvar</button>
+    </div>
+  </form>
+</dialog>
+
 <!-- Viagem -->
 <dialog id="tpDlg">
   <form id="tpForm">
@@ -1179,13 +1321,13 @@ function blank() {
     settings: { name: '', theme: 'auto', weekStart: 0, dayStart: 6, dayEnd: 23, onboarded: false },
     categories: DEFAULT_CATS.map(c => ({ ...c, hidden: false })),
     events: [], tasks: [], goals: [], notes: {}, trips: [],
-    finance: blankFinance(), debts: [], wishes: [], fitness: blankFitness(),
+    finance: blankFinance(), debts: [], wishes: [], fitness: blankFitness(), football: { team: null, games: [] },
     updatedAt: 0
   };
 }
 
 let db = blank(), storageOk = true, migrated = false;
-const ui = { view: 'day', cursor: todayKey(), mini: firstOfMonth(todayKey()), planning: null, taskFilter: 'today', fmonth: todayKey().slice(0, 7), finFilter: 'all', finAcc: null, debtTab: 'owe', wishSort: 'priority', fitRange: 'm3', fitEx: '' };
+const ui = { view: 'day', cursor: todayKey(), mini: firstOfMonth(todayKey()), planning: null, taskFilter: 'today', fmonth: todayKey().slice(0, 7), finFilter: 'all', finAcc: null, debtTab: 'owe', wishSort: 'priority', fitRange: 'm3', fitEx: '', fbTab: 'team', fbComp: '', fbFilter: '' };
 
 /* ---------- validação (backup e armazenamento) ---------- */
 const str = (v, max) => typeof v === 'string' ? v.trim().slice(0, max) : '';
@@ -1197,6 +1339,7 @@ const isYm = s => typeof s === 'string' && /^\d{4}-(0[1-9]|1[0-2])$/.test(s);
 // Fotos da wishlist: imagens reduzidas (JPEG) guardadas como data URL junto dos dados
 const WISH_MAX_PHOTOS = 4;
 const isPhoto = v => typeof v === 'string' && v.length <= 400000 && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(v);
+const espnLogo = v => typeof v === 'string' && /^https:\/\/a\.espncdn\.com\/[\w\/.-]{1,200}$/.test(v) ? v : '';
 function safeUrl(v) {
   try { const u = new URL(String(v || '').trim()); return ['http:', 'https:'].includes(u.protocol) ? u.href.slice(0, 500) : ''; }
   catch (e) { return ''; }
@@ -1371,6 +1514,19 @@ function sanitize(raw) {
     id: uid(a.id), date: a.date, type: a.type, min: int(a.min, 0, 1440, 0),
     km: typeof a.km === 'number' && a.km > 0 && a.km <= 1000 ? Math.round(a.km * 100) / 100 : 0, notes: str(a.notes, 200)
   })).filter(Boolean);
+  // Futebol: time favorito (dados da ESPN) e diário de estádio
+  const fb = raw.football && typeof raw.football === 'object' ? raw.football : {}, tm = fb.team;
+  out.football.team = tm && /^\d{1,10}$/.test(tm.id) && str(tm.name, 60) ? {
+    id: tm.id, name: str(tm.name, 60), abbr: str(tm.abbr, 8), logo: espnLogo(tm.logo),
+    league: typeof tm.league === 'string' && /^[a-z0-9._]{2,40}$/.test(tm.league) ? tm.league : ''
+  } : null;
+  const goals = v => Number.isInteger(v) && v >= 0 && v <= 99 ? v : -1;   // -1 = placar não anotado
+  out.football.games = arr(fb.games, 3000).map(g => !g || !validDate(g.date) || !str(g.home, 60) || !str(g.away, 60) ? null : ({
+    id: uid(g.id), date: g.date, home: str(g.home, 60), away: str(g.away, 60), hs: goals(g.hs), as: goals(g.as),
+    side: ['home', 'away'].includes(g.side) ? g.side : '', comp: str(g.comp, 80), stadium: str(g.stadium, 120), with: str(g.with, 160),
+    notes: str(g.notes, 1000), rating: int(g.rating, 0, 5, 0), cost: isMoney(g.cost) ? g.cost : 0, entry: catId(g.entry),
+    espn: typeof g.espn === 'string' && /^\d{1,15}$/.test(g.espn) ? g.espn : '', photos: arr(g.photos, WISH_MAX_PHOTOS).filter(isPhoto)
+  })).filter(Boolean);
   return out;
 }
 
@@ -1459,7 +1615,7 @@ function render() {
   const sc = $('.tl-scroll'), prevScroll = sc && sc.dataset.view === ui.view ? sc.scrollTop : null;
   renderSidebar();
   renderTop();
-  $('#view').innerHTML = ({ day: viewDay, week: viewWeek, month: viewMonth, tasks: viewTasks, goals: viewGoals, trips: viewTrips, finance: viewFinance, debts: viewDebts, wishlist: viewWishlist, fit: viewFit })[ui.view]();
+  $('#view').innerHTML = ({ day: viewDay, week: viewWeek, month: viewMonth, tasks: viewTasks, goals: viewGoals, trips: viewTrips, finance: viewFinance, debts: viewDebts, wishlist: viewWishlist, fit: viewFit, foot: viewFoot })[ui.view]();
   const nsc = $('.tl-scroll');
   if (nsc) nsc.scrollTop = prevScroll ?? Math.max(0, new Date().getHours() - db.settings.dayStart - 1) * HOUR;
 }
@@ -1520,6 +1676,8 @@ function renderTop() {
     title = 'Viagens'; sub = 'Ida, volta, orçamento e gastos de cada viagem';
   } else if (ui.view === 'fit') {
     title = 'Exercícios'; sub = 'Peso, ficha da academia e atividades';
+  } else if (ui.view === 'foot') {
+    title = 'Futebol'; sub = db.football.team ? `${db.football.team.name}: jogos, tabelas e diário de estádio` : 'Seu time, tabelas e diário de estádio';
   } else {
     title = 'Provas e metas'; sub = 'Provas, projetos e entregas com dias planejados';
   }
@@ -2158,6 +2316,10 @@ $('#enForm').addEventListener('submit', e => {
     const w = db.wishes.find(x => x.id === enCtx.link.id);
     if (w) Object.assign(w, { bought: true, paid: amount * n, boughtDate: date });
   }
+  if (enCtx.link?.kind === 'game') {
+    const g = db.football.games.find(x => x.id === enCtx.link.id);
+    if (g) g.entry = en.id;
+  }
   const isNew = !enCtx.id;
   $('#enDlg').close();
   // mostra o mês do lançamento; conta fixa que começou antes continua no mês que está na tela
@@ -2564,16 +2726,17 @@ function shrinkPhoto(file) {
     img.src = url;
   });
 }
-async function addWsPhotos(files) {
+async function addPhotos(list, files, rerender, what = 'item') {
   const imgs = [...files].filter(f => f.type.startsWith('image/'));
   if (!imgs.length) return;
-  const room = WISH_MAX_PHOTOS - wsPhotos.length;
-  if (imgs.length > room) notify(`Cabem até ${WISH_MAX_PHOTOS} fotos por item.`);
+  const room = WISH_MAX_PHOTOS - list.length;
+  if (imgs.length > room) notify(`Cabem até ${WISH_MAX_PHOTOS} fotos por ${what}.`);
   for (const f of imgs.slice(0, room)) {
-    try { wsPhotos.push(await shrinkPhoto(f)); } catch (e) { notify('Não consegui abrir essa imagem.'); }
+    try { list.push(await shrinkPhoto(f)); } catch (e) { notify('Não consegui abrir essa imagem.'); }
   }
-  renderWsPhotos();
+  rerender();
 }
+const addWsPhotos = files => addPhotos(wsPhotos, files, renderWsPhotos);
 $('#wsPhotos').addEventListener('change', e => { if (e.target.id === 'wsFile') addWsPhotos(e.target.files); });
 $('#wsDlg').addEventListener('paste', e => {
   const files = [...(e.clipboardData?.files || [])].filter(f => f.type.startsWith('image/'));
@@ -2734,6 +2897,468 @@ $('#tpDelete').addEventListener('click', async () => {
   save();
   notify('Viagem excluída.', () => { db.trips.splice(i, 0, tr); linked.forEach(e => e.trip = tr.id); save(); });
 });
+
+/* =========================================================
+   Futebol: time favorito, tabelas e jogos (dados públicos da ESPN) e diário de estádio
+   ========================================================= */
+const ESPN = 'https://site.api.espn.com/apis/';
+// só guarda os dados baixados (ESPN e Wikipédia): não vai para o backup nem para o Drive.
+// Mude o número quando o formato guardado mudar, para o app baixar tudo de novo.
+const FB_KEY = 'meu-planner-futebol-2';
+const FB_LEAGUES = [['bra.1', 'Brasileirão Série A'], ['bra.2', 'Brasileirão Série B'], ['arg.1', 'Argentina'], ['por.1', 'Portugal'], ['eng.1', 'Inglaterra'], ['esp.1', 'Espanha'], ['ita.1', 'Itália'], ['ger.1', 'Alemanha'], ['fra.1', 'França'], ['usa.1', 'Estados Unidos (MLS)']];
+const FB_COMP = {
+  'bra.1': 'Brasileirão', 'bra.2': 'Série B', 'bra.3': 'Série C', 'bra.copa_do_brazil': 'Copa do Brasil', 'bra.supercopa_do_brazil': 'Supercopa do Brasil',
+  'conmebol.libertadores': 'Libertadores', 'conmebol.sudamericana': 'Sul-Americana', 'conmebol.recopa': 'Recopa',
+  'bra.camp.mineiro': 'Campeonato Mineiro', 'bra.camp.paulista': 'Paulistão', 'bra.camp.carioca': 'Carioca', 'bra.camp.gaucho': 'Gauchão',
+  'fifa.cwc': 'Mundial de Clubes', 'club.friendly': 'Amistoso', 'arg.1': 'Campeonato Argentino', 'eng.1': 'Premier League', 'esp.1': 'La Liga',
+  'ita.1': 'Campeonato Italiano', 'ger.1': 'Bundesliga', 'fra.1': 'Ligue 1', 'por.1': 'Liga Portugal', 'usa.1': 'MLS',
+  'uefa.champions': 'Champions League', 'uefa.europa': 'Liga Europa', 'uefa.europa.conf': 'Conference League'
+};
+const compName = (slug, raw = '') => FB_COMP[slug] || raw.replace(/^(Brazilian|Argentine|English|Spanish|Italian|German|French|Portuguese)\s+/, '') || 'Outra competição';
+const FB_STAGE = [[/group/i, 'Fase de grupos'], [/round of 32/i, '16 avos de final'], [/round of 16/i, 'Oitavas de final'], [/quarter/i, 'Quartas de final'],
+  [/semi/i, 'Semifinal'], [/(3rd|third) place/i, 'Disputa do 3º lugar'], [/final/i, 'Final'], [/(first|1st) round/i, '1ª fase'], [/(second|2nd) round/i, '2ª fase'],
+  [/(third|3rd) round/i, '3ª fase'], [/(fourth|4th) round/i, '4ª fase'], [/(fifth|5th) round/i, '5ª fase'], [/qualif|prelim/i, 'Fase preliminar'], [/playoff|knockout/i, 'Mata-mata']];
+const stagePt = s => FB_STAGE.find(([re]) => re.test(s || ''))?.[1] || '';
+
+let fbCache = {};
+try { localStorage.removeItem('meu-planner-futebol'); fbCache = JSON.parse(localStorage.getItem(FB_KEY)) || {}; } catch (e) { fbCache = {}; }
+const fbBusy = new Set(), fbFail = new Set();
+function fbSaveCache() {
+  Object.keys(fbCache).sort((a, b) => fbCache[b].t - fbCache[a].t).slice(30).forEach(k => delete fbCache[k]);
+  try { localStorage.setItem(FB_KEY, JSON.stringify(fbCache)); } catch (e) { /* sem espaço: fica só na memória */ }
+}
+// devolve o que já foi baixado (mesmo antigo) e, se estiver velho, busca de novo em segundo plano
+function fbData(path, parse, ttl = 15 * 60e3) {
+  const c = fbCache[path];
+  if ((!c || Date.now() - c.t > ttl) && !fbBusy.has(path) && !fbFail.has(path)) fbLoad(path, parse);
+  return c ? c.d : null;
+}
+async function fbLoad(path, parse) {
+  fbBusy.add(path);
+  try {
+    const r = await fetch(/^https:/.test(path) ? path : ESPN + path);
+    if (!r.ok) throw Error('HTTP ' + r.status);
+    fbCache[path] = { t: Date.now(), d: parse(await r.json()) };
+    fbSaveCache();
+  } catch (e) { fbFail.add(path); }
+  fbBusy.delete(path);
+  if (ui.view === 'foot') render();
+  if ($('#ftDlg').open) renderPicker();
+}
+const fbPastPath = id => `site/v2/sports/soccer/all/teams/${id}/schedule`;
+const fbNextPath = id => `site/v2/sports/soccer/all/teams/${id}/schedule?fixture=true`;
+const fbTablePath = lg => `v2/sports/soccer/${lg}/standings`;
+
+// formato enxuto dos jogos e tabelas (é o que fica guardado no aparelho)
+const fbSide = x => ({ id: String(x?.team?.id || x?.id || ''), name: x?.team?.shortDisplayName || x?.team?.displayName || '?', logo: espnLogo(x?.team?.logos?.[0]?.href || x?.team?.logo || '') });
+const fbScore = x => { const v = x?.score && typeof x.score === 'object' ? x.score.displayValue : x?.score; return v == null || v === '' || isNaN(+v) ? null : +v; };
+function fbGame(e) {
+  const c = e?.competitions?.[0], cs = c?.competitors || [];
+  const h = cs.find(x => x.homeAway === 'home') || cs[0], a = cs.find(x => x.homeAway === 'away') || cs[1];
+  if (!h || !a || !e.date) return null;
+  const st = c.status?.type || {};
+  return {
+    id: String(e.id), at: e.date, lg: e.league?.slug || '', lgName: e.league?.name || '', stage: e.seasonType?.name || '',
+    home: fbSide(h), away: fbSide(a), hs: fbScore(h), as: fbScore(a), state: st.state || 'pre', detail: st.shortDetail || '',
+    pens: h.shootoutScore != null && a.shootoutScore != null ? [+h.shootoutScore, +a.shootoutScore] : null,
+    venue: (c.venue?.fullName || '').replace(/^Estadio\b/, 'Estádio'), city: c.venue?.address?.city || ''
+  };
+}
+const fbParseSchedule = j => (j.events || []).map(fbGame).filter(Boolean);
+function fbParseTable(j) {
+  const stat = (e, n) => { const s = e.stats?.find(x => x.name === n); return s ? (typeof s.value === 'number' ? s.value : +s.displayValue || 0) : 0; };
+  const groups = (j.children || []).map(ch => ({
+    name: /^group /i.test(ch.name || '') ? 'Grupo ' + ch.name.slice(6) : /conference/i.test(ch.name || '') ? ch.name.replace(/Eastern Conference/i, 'Conferência Leste').replace(/Western Conference/i, 'Conferência Oeste') : '',
+    rows: (ch.standings?.entries || []).map((e, i) => ({
+      id: String(e.team?.id || ''), name: e.team?.shortDisplayName || e.team?.displayName || '?', abbr: e.team?.abbreviation || '', logo: espnLogo(e.team?.logos?.[0]?.href || ''),
+      rank: stat(e, 'rank') || i + 1, pts: stat(e, 'points'), j: stat(e, 'gamesPlayed'), v: stat(e, 'wins'), e: stat(e, 'ties'), d: stat(e, 'losses'),
+      gp: stat(e, 'pointsFor'), gc: stat(e, 'pointsAgainst'), note: e.note?.description || ''
+    })).sort((a, b) => a.rank - b.rank)
+  })).filter(g => g.rows.length);
+  return { groups, season: j.season?.year || parseInt(j.children?.[0]?.name) || 0 };
+}
+
+const gDate = g => keyOf(new Date(g.at));
+const gTime = g => { const d = new Date(g.at); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+const fbMine = g => { const id = db.football.team?.id; return !id ? '' : g.home.id === id ? 'home' : g.away.id === id ? 'away' : ''; };
+const fbRes = (mine, other) => mine > other ? 'v' : mine < other ? 'd' : 'e';
+const RES_LABEL = { v: 'Vitória', e: 'Empate', d: 'Derrota' };
+function fbGames() {
+  const t = db.football.team; if (!t) return [];
+  const m = new Map();
+  [fbData(fbPastPath(t.id), fbParseSchedule), fbData(fbNextPath(t.id), fbParseSchedule, 30 * 60e3)].forEach(l => (l || []).forEach(g => m.set(g.id, g)));
+  return [...m.values()].sort((a, b) => a.at.localeCompare(b.at));
+}
+function gameResult(g) {   // resultado do ponto de vista do meu time
+  const side = fbMine(g);
+  if (!side || g.state !== 'post' || g.hs == null) return '';
+  return side === 'home' ? fbRes(g.hs, g.as) : fbRes(g.as, g.hs);
+}
+// competições do time na temporada: a liga dele primeiro, depois a que tiver mais jogos
+function fbComps(all) {
+  const m = new Map(), soon = addDays(todayKey(), -60);
+  all.forEach(g => { const c = m.get(g.lg) || { lg: g.lg, name: compName(g.lg, g.lgName), n: 0, recent: false }; c.n++; if (gDate(g) >= soon) c.recent = true; m.set(g.lg, c); });
+  const main = db.football.team?.league;
+  return [...m.values()].sort((a, b) => (b.lg === main) - (a.lg === main) || b.recent - a.recent || b.n - a.n);
+}
+const fbLogo = (t, size = 24) => t.logo ? `<img class="fb-logo" src="${esc(t.logo)}" alt="" width="${size}" height="${size}" loading="lazy" onerror="this.style.visibility='hidden'">` : `<span class="fb-logo none" style="width:${size}px;height:${size}px">⚽</span>`;
+const fbEventTitle = g => `⚽ ${g.home.name} x ${g.away.name}`;
+const fbInAgenda = g => db.events.find(ev => ev.date === gDate(g) && ev.title === fbEventTitle(g)) || null;
+function fbStatus(paths) {
+  const ts = paths.map(p => fbCache[p]?.t).filter(Boolean);
+  if (paths.some(p => fbBusy.has(p))) return '<p class="fb-note">⏳ Atualizando…</p>';
+  if (!ts.length) return '';
+  const when = fmtWhen(Math.min(...ts));
+  return `<p class="fb-note">${paths.some(p => fbFail.has(p)) ? `⚠️ Sem conexão com a ESPN: mostrando os dados de ${when}.` : `Atualizado em ${when}`} · Dados: ESPN</p>`;
+}
+function fbEmpty(paths, what = 'os jogos') {
+  if (paths.some(p => fbBusy.has(p) || !fbCache[p] && !fbFail.has(p))) return `<div class="card pad empty">⏳ Buscando ${what}…</div>`;
+  if (paths.some(p => fbFail.has(p))) return `<div class="card pad empty">Não consegui buscar ${what} agora. Confira a internet e toque em <button data-act="fb-reload">Atualizar</button>.</div>`;
+  return `<div class="card pad empty">Nenhum jogo encontrado nesta temporada.</div>`;
+}
+function fbRow(g) {
+  const done = g.state === 'post', live = g.state === 'in', res = gameResult(g), k = gDate(g);
+  const diary = db.football.games.find(x => x.espn === g.id), ag = !done && !live ? fbInAgenda(g) : null, stage = stagePt(g.stage);
+  const mid = g.hs != null && (done || live) ? `<b class="fb-score">${g.hs}<small>x</small>${g.as}</b>` : `<span class="fb-score time">${gTime(g)}</span>`;
+  const mine = fbMine(g);
+  return `<div class="fb-game${res ? ' r-' + res : ''}${live ? ' live' : ''}">
+    <div class="fb-when"><b>${pad(parse(k).getDate())} ${fmt(k, { month: 'short' }).replace('.', '')}</b><small>${cap(fmt(k, { weekday: 'short' }).replace('.', ''))}</small></div>
+    <div class="fb-match">
+      <div class="fb-teams"><span class="fb-t home${mine === 'home' ? ' me' : ''}"><span>${esc(g.home.name)}</span>${fbLogo(g.home)}</span>${mid}<span class="fb-t away${mine === 'away' ? ' me' : ''}">${fbLogo(g.away)}<span>${esc(g.away.name)}</span></span></div>
+      <small>${esc(compName(g.lg, g.lgName))}${stage ? ' · ' + stage : ''}${live ? ` · <b class="neg">ao vivo ${esc(g.detail)}</b>` : ''}${g.pens ? ` · pênaltis ${g.pens[0]} x ${g.pens[1]}` : ''}${g.venue ? ' · ' + esc(g.venue) : ''}</small>
+    </div>
+    <div class="fb-act">${res ? `<span class="fb-res ${res}" title="${RES_LABEL[res]}">${res.toUpperCase()}</span>` : ''}
+      ${done ? (diary ? `<button class="btn sm ghost" data-act="open-game" data-id="${diary.id}" title="Ver no diário de estádio">🏟️ ✓</button>` : `<button class="btn sm" data-act="fb-went" data-id="${esc(g.id)}" title="Fui nesse jogo: anotar no diário de estádio">🏟️ Fui</button>`)
+        : live ? '' : ag ? `<button class="btn sm ghost" data-act="go-day" data-date="${k}" title="Já está na agenda">📅 ✓</button>` : `<button class="btn sm" data-act="fb-agenda" data-id="${esc(g.id)}" title="Colocar na agenda">📅 Agenda</button>`}</div>
+  </div>`;
+}
+function viewFoot() {
+  const t = db.football.team, tab = ui.fbTab;
+  const paths = t ? [fbPastPath(t.id), fbNextPath(t.id)] : [];
+  const tabs = [['team', '⚽ Meu time'], ['tables', '📊 Tabelas'], ['games', '🗓️ Jogos'], ['diary', '🏟️ Diário de estádio', db.football.games.length]]
+    .map(([id, l, n]) => `<button class="tab ${tab === id ? 'on' : ''}" data-act="fb-tab" data-f="${id}">${l}${n ? `<em>${n}</em>` : ''}</button>`).join('');
+  const head = `<div class="fin-head">
+      ${t ? `<div class="fb-me">${fbLogo(t, 40)}<div><b>${esc(t.name)}</b><button class="link" data-act="fb-team">Trocar time</button></div></div>` : '<button class="btn primary" data-act="fb-team">⚽ Escolher meu time</button>'}
+      <span class="grow"></span>
+      ${t && tab !== 'diary' ? '<button class="btn" data-act="fb-reload">↻ Atualizar</button>' : ''}
+      <button class="btn${tab === 'diary' ? ' primary' : ''}" data-act="new-game">🏟️ + Jogo no estádio</button>
+    </div>`;
+  let body;
+  if (tab === 'diary') body = fbDiary();
+  else if (!t) body = `<div class="card pad empty">Escolha o seu time para ver aqui os próximos jogos, os últimos resultados e as tabelas de todas as competições que ele está jogando. <button data-act="fb-team">Escolher meu time</button><br><br>O <b>Diário de estádio</b> funciona mesmo sem escolher um time: anote ali os jogos a que você foi.</div>`;
+  else body = ({ team: fbTeamTab, tables: fbTablesTab, games: fbGamesTab })[tab]() + fbStatus(tab === 'tables' && ui.fbComp ? [...paths, fbTablePath(ui.fbComp)] : paths);
+  return head + `<div class="tabs">${tabs}</div>` + body;
+}
+function fbTeamTab() {
+  const t = db.football.team, all = fbGames();
+  if (!all.length) return fbEmpty([fbPastPath(t.id), fbNextPath(t.id)]);
+  const now = Date.now(), y = todayKey().slice(0, 4);
+  const past = all.filter(g => g.state === 'post' && g.hs != null).reverse(), live = all.filter(g => g.state === 'in');
+  const next = all.filter(g => g.state === 'pre' && Date.parse(g.at) > now - 3 * 3600e3);
+  const year = past.filter(g => gDate(g).slice(0, 4) === y), cnt = { v: 0, e: 0, d: 0 };
+  let gp = 0, gc = 0;
+  year.forEach(g => { const r = gameResult(g); if (r) cnt[r]++; const h = fbMine(g) === 'home'; gp += h ? g.hs : g.as; gc += h ? g.as : g.hs; });
+  const n = cnt.v + cnt.e + cnt.d, aprov = n ? Math.round((cnt.v * 3 + cnt.e) / (n * 3) * 100) : 0;
+  // posição nas competições com tabela (as que ele está jogando agora)
+  const pos = fbComps(all).filter(c => c.recent).map(c => {
+    const tb = fbData(fbTablePath(c.lg), fbParseTable, 60 * 60e3), grp = tb?.groups.find(gr => gr.rows.some(r => r.id === t.id));
+    const row = grp?.rows.find(r => r.id === t.id);
+    return grp ? { c, grp, row, zone: fbZoneOf(c.lg, tb).of(row) } : null;
+  }).filter(Boolean);
+  const g0 = live[0] || next[0];
+  let big = '<section class="card pad empty">Nenhum jogo marcado por enquanto.</section>';
+  if (g0) {
+    const k = gDate(g0), stage = stagePt(g0.stage), ag = fbInAgenda(g0), isLive = g0.state === 'in';
+    big = `<section class="card pad fb-next"><div class="card-h"><h3>${isLive ? '🔴 Jogando agora' : 'Próximo jogo'}</h3>${isLive ? `<span class="tag warn">${esc(g0.detail)}</span>` : `<span class="tag acc">${countdown(k)}</span>`}</div>
+      <div class="fb-big"><div class="fb-bt">${fbLogo(g0.home, 56)}<b>${esc(g0.home.name)}</b></div>
+        <div class="fb-vs">${isLive && g0.hs != null ? `<b>${g0.hs} x ${g0.as}</b>` : `<b>${gTime(g0)}</b>`}<small>${cap(relDate(k))}</small></div>
+        <div class="fb-bt">${fbLogo(g0.away, 56)}<b>${esc(g0.away.name)}</b></div></div>
+      <p class="fb-meta">${cap(fmt(k, { weekday: 'long', day: 'numeric', month: 'long' }))} · ${esc(compName(g0.lg, g0.lgName))}${stage ? ' · ' + stage : ''}${g0.venue ? `<br>📍 ${esc(g0.venue)}${g0.city ? ', ' + esc(g0.city) : ''}` : ''}</p>
+      ${isLive ? '' : `<div class="goal-actions fb-center">${ag ? `<button class="btn sm" data-act="go-day" data-date="${k}">📅 Já está na agenda · ver</button>` : `<button class="btn sm primary" data-act="fb-agenda" data-id="${esc(g0.id)}">📅 Colocar na agenda</button>`}</div>`}
+    </section>`;
+  }
+  const form = past.slice(0, 5).map(g => { const r = gameResult(g); return r ? `<span class="fb-res ${r}" title="${RES_LABEL[r]}">${r.toUpperCase()}</span>` : ''; }).join('');
+  return `<div class="kpis four">
+      <section class="card kpi"><span>Jogos em ${y}</span><b>${n}</b><small>${gp} gols marcados · ${gc} sofridos</small></section>
+      <section class="card kpi"><span>Vitórias</span><b class="pos">${cnt.v}</b><small>${n ? aprov + '% de aproveitamento' : 'nenhum jogo ainda'}</small></section>
+      <section class="card kpi"><span>Empates</span><b>${cnt.e}</b><small>&nbsp;</small></section>
+      <section class="card kpi"><span>Derrotas</span><b class="neg">${cnt.d}</b><small>&nbsp;</small></section>
+    </div>
+    <div class="fin-grid fb-grid">
+      <div class="fin-side">
+        ${big}
+        ${pos.length ? `<section class="card pad"><div class="card-h"><h3>📊 Nas tabelas</h3><button class="link" data-act="fb-tab" data-f="tables">Ver tabelas</button></div>
+          ${pos.map(({ c, grp, row, zone }) => `<div class="frow" data-act="fb-comp" data-lg="${esc(c.lg)}"><span class="fb-pos ${zone ? zone.cls : ''}">${row.rank}º</span><div class="grow"><b>${esc(c.name)}${grp.name ? ' · ' + esc(grp.name) : ''}</b><small>${row.pts} pontos em ${plural(row.j, 'jogo', 'jogos')} · ${row.v}V ${row.e}E ${row.d}D · saldo ${row.gp - row.gc > 0 ? '+' : ''}${row.gp - row.gc}${zone ? `<br>Hoje: ${esc(zone.text)}` : ''}</small></div></div>`).join('')}</section>` : ''}
+        ${next.length > 1 ? `<section class="card pad"><div class="card-h"><h3>Próximos jogos</h3><button class="link" data-act="fb-tab" data-f="games">Ver todos</button></div>${next.slice(1, 4).map(fbRow).join('')}</section>` : ''}
+      </div>
+      <div class="fin-side">
+        <section class="card pad"><div class="card-h"><h3>Últimos jogos</h3>${form ? `<div class="fb-form" title="Do mais recente para o mais antigo">${form}</div>` : ''}</div>
+          ${past.length ? past.slice(0, 6).map(fbRow).join('') + '<button class="link fb-more" data-act="fb-tab" data-f="games">Ver todos os resultados</button>' : '<div class="empty">Nenhum jogo nesta temporada ainda.</div>'}</section>
+      </div>
+    </div>`;
+}
+/* Zonas da tabela (Libertadores, Sul-Americana, acesso, rebaixamento…).
+   Séries A e B: vêm da tabela da Wikipédia em português, que é atualizada quando as vagas mudam
+   (ex.: campeão da Copa do Brasil já classificado abre vaga mais abaixo). Outras ligas: a ESPN já manda. */
+const FB_WIKI = { 'bra.1': 'A', 'bra.2': 'B' };
+const fbWikiUrl = (lg, y) => 'https://pt.wikipedia.org/w/api.php?action=parse&format=json&origin=*&redirects=1&prop=wikitext&page='
+  + encodeURIComponent(`Predefinição:Tabela do Campeonato Brasileiro da Série ${FB_WIKI[lg]} - ${y}`);
+const ZONE_CLS = { green1: 'z-g1', green2: 'z-g2', green3: 'z-g2', blue1: 'z-b1', blue2: 'z-b2', blue3: 'z-b2', yellow1: 'z-y', yellow2: 'z-y', orange1: 'z-y', red1: 'z-r', red2: 'z-r', red3: 'z-r' };
+const wikiText = s => s.replace(/\{\{\s*(?:nowrap|small)\s*\|([^{}]*)\}\}/gi, '$1').replace(/\[\[(?:[^\]|]*\|)?([^\]]*)\]\]/g, '$1')
+  .replace(/\{\{[^{}]*\}\}/g, '').replace(/<[^>]*>/g, '').replace(/'{2,}/g, '').replace(/\s+/g, ' ').trim();
+// valor de um parâmetro "|nome=valor" (o valor pode ter [[link|texto]] e {{nowrap|…}})
+function wikiVal(w, i) {
+  let depth = 0, out = '';
+  for (; i < w.length; i++) {
+    const two = w.substr(i, 2);
+    if (two === '[[' || two === '{{') { depth++; out += two; i++; continue; }
+    if (two === ']]' || two === '}}') { if (!depth) break; depth--; out += two; i++; continue; }
+    if (!depth && (w[i] === '|' || w[i] === '\n')) break;
+    out += w[i];
+  }
+  return out;
+}
+function fbParseWiki(j) {
+  const w = j?.parse?.wikitext?.['*'] || '', zones = {}, info = {};
+  for (const m of w.matchAll(/\|\s*result(\d+)\s*=\s*([\w-]*)/g)) if (m[2]) zones[+m[1]] = m[2];
+  for (const m of w.matchAll(/\|\s*col_([\w-]+)\s*=\s*(\w+)/g)) (info[m[1]] ??= {}).color = m[2];
+  for (const m of w.matchAll(/\|\s*text_([\w-]+)\s*=/g)) (info[m[1]] ??= {}).text = wikiText(wikiVal(w, m.index + m[0].length)).slice(0, 120);
+  const up = w.match(/\|\s*update\s*=/);
+  return { zones, info, update: up ? wikiText(wikiVal(w, up.index + up[0].length)).slice(0, 40) : '' };
+}
+const FB_NOTES = [[/relegation playoff|play-?out/i, 'Repescagem contra o rebaixamento', 'z-y'], [/relegat/i, 'Rebaixamento', 'z-r'],
+  [/champions league qualif/i, 'Classificatória da Champions League', 'z-g2'], [/champions league/i, 'Champions League', 'z-g1'],
+  [/europa league qualif/i, 'Classificatória da Liga Europa', 'z-b1'], [/europa league/i, 'Liga Europa', 'z-b1'],
+  [/conference league qualif/i, 'Classificatória da Conference League', 'z-b2'], [/conference league/i, 'Conference League', 'z-b2'],
+  [/sudamericana/i, 'Playoffs da Sul-Americana', 'z-b2'], [/libertadores/i, 'Libertadores', 'z-g1'], [/round of 16/i, 'Classificado às oitavas', 'z-g1'],
+  [/wild card/i, 'Playoffs (repescagem)', 'z-g2'], [/playoff/i, 'Playoffs', 'z-g1'], [/promot/i, 'Acesso', 'z-g1']];
+// devolve a zona de cada linha e de onde ela veio
+function fbZoneOf(lg, tb) {
+  if (FB_WIKI[lg]) {
+    const url = fbWikiUrl(lg, tb.season || +todayKey().slice(0, 4)), wk = fbData(url, fbParseWiki, 6 * 3600e3);
+    if (wk && Object.keys(wk.zones).length) return {
+      src: `Zonas da tabela: Wikipédia${wk.update ? `, atualizada em ${wk.update}` : ''}`,
+      of: r => { const code = wk.zones[r.rank], inf = code && wk.info[code]; return code ? { cls: ZONE_CLS[inf?.color] || 'z-n', text: inf?.text || code } : null; }
+    };
+    if (!fbFail.has(url) && !wk) return { src: '', of: () => null };   // ainda carregando
+    // sem Wikipédia: pelo menos o rebaixamento (4 últimos nas Séries A e B)
+    const total = tb.groups[0]?.rows.length || 0;
+    return { src: '', of: r => r.rank > total - 4 ? { cls: 'z-r', text: 'Rebaixamento' } : null };
+  }
+  return { src: '', of: r => { const n = r.note && FB_NOTES.find(([re]) => re.test(r.note)); return n ? { cls: n[2], text: n[1] } : r.note ? { cls: 'z-n', text: r.note } : null; } };
+}
+function fbTable(lg, grp, title, zone) {
+  const id = db.football.team?.id, legend = new Map();
+  const rows = grp.rows.map(r => {
+    const z = zone.of(r);
+    if (z && !legend.has(z.text)) legend.set(z.text, z.cls);
+    return `<tr class="${r.id === id ? 'me' : ''}"${z ? ` title="${esc(z.text)}"` : ''}><td><span class="fb-rank ${z ? z.cls : ''}">${r.rank}</span></td><td class="l"><span class="fb-tn">${fbLogo(r, 20)}<span>${esc(r.name)}</span></span></td><td><b>${r.pts}</b></td><td>${r.j}</td><td>${r.v}</td><td>${r.e}</td><td>${r.d}</td><td>${r.gp - r.gc > 0 ? '+' : ''}${r.gp - r.gc}</td></tr>`;
+  }).join('');
+  return `<section class="card pad"><div class="card-h"><h3>${esc(title)}</h3></div><div class="fb-tw"><table class="fb-table">
+    <thead><tr><th>#</th><th class="l">Time</th><th>P</th><th>J</th><th>V</th><th>E</th><th>D</th><th>SG</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>${legend.size ? `<div class="fb-legend">${[...legend].map(([t, c]) => `<span><i class="${c}"></i>${esc(t)}</span>`).join('')}</div>` : ''}</section>`;
+}
+function fbTablesTab() {
+  const t = db.football.team, all = fbGames(), comps = fbComps(all);
+  if (!comps.length) return fbEmpty([fbPastPath(t.id), fbNextPath(t.id)], 'as competições');
+  if (!comps.some(c => c.lg === ui.fbComp)) ui.fbComp = comps[0].lg;
+  const lg = ui.fbComp, c = comps.find(x => x.lg === lg), path = fbTablePath(lg), tb = fbData(path, fbParseTable, 30 * 60e3);
+  const chips = `<div class="tabs fb-comps">${comps.map(x => `<button class="tab ${x.lg === lg ? 'on' : ''}" data-act="fb-comp" data-lg="${esc(x.lg)}">${esc(x.name)}</button>`).join('')}</div>`;
+  const games = all.filter(g => g.lg === lg);
+  if (!tb) return chips + fbEmpty([path], 'a tabela');
+  if (!tb.groups.length) {   // mata-mata (ex.: Copa do Brasil): mostra os confrontos do time, fase por fase
+    const stages = new Map();
+    [...games].reverse().forEach(g => { const s = stagePt(g.stage) || 'Jogos'; if (!stages.has(s)) stages.set(s, []); stages.get(s).push(g); });
+    return chips + `<p class="muted small fb-intro">${esc(c.name)} é disputada em mata-mata, sem tabela de pontos. Aqui estão os confrontos do ${esc(t.name)}, da fase mais recente para a primeira.</p>`
+      + [...stages].map(([s, l]) => `<section class="card pad"><div class="card-h"><h3>${esc(s)}</h3></div>${[...l].reverse().map(fbRow).join('')}</section>`).join('');
+  }
+  const groups = [...tb.groups].sort((a, b) => b.rows.some(r => r.id === t.id) - a.rows.some(r => r.id === t.id));
+  const knock = games.filter(g => /final|round of|semi|quarter|playoff|knockout/i.test(g.stage) && !/group/i.test(g.stage));
+  const zone = fbZoneOf(lg, tb);
+  return chips + `<div class="fb-tables">${groups.map(g => fbTable(lg, g, g.name ? `${c.name} · ${g.name}` : c.name, zone)).join('')}</div>`
+    + (zone.src ? `<p class="fb-note">${esc(zone.src)}</p>` : '')
+    + (knock.length ? `<section class="card pad"><div class="card-h"><h3>Mata-mata</h3></div>${knock.map(fbRow).join('')}</section>` : '')
+    + (games.length ? `<section class="card pad"><details style="margin:0"><summary>Jogos do ${esc(t.name)} em ${esc(c.name)} (${games.length})</summary>${[...games].reverse().map(fbRow).join('')}</details></section>` : '');
+}
+function fbGamesTab() {
+  const t = db.football.team, all = fbGames(), comps = fbComps(all);
+  if (!all.length) return fbEmpty([fbPastPath(t.id), fbNextPath(t.id)]);
+  if (ui.fbFilter && !comps.some(c => c.lg === ui.fbFilter)) ui.fbFilter = '';
+  const list = all.filter(g => !ui.fbFilter || g.lg === ui.fbFilter), now = Date.now();
+  const live = list.filter(g => g.state === 'in'), next = list.filter(g => g.state === 'pre' && Date.parse(g.at) > now - 3 * 3600e3), past = list.filter(g => g.state === 'post').reverse();
+  const chips = `<div class="tabs fb-comps"><button class="tab ${!ui.fbFilter ? 'on' : ''}" data-act="fb-filter" data-lg="">Todas<em>${all.length}</em></button>${comps.map(c => `<button class="tab ${c.lg === ui.fbFilter ? 'on' : ''}" data-act="fb-filter" data-lg="${esc(c.lg)}">${esc(c.name)}<em>${c.n}</em></button>`).join('')}</div>`;
+  return chips
+    + (live.length ? `<section class="card pad"><div class="card-h"><h3>🔴 Ao vivo</h3></div>${live.map(fbRow).join('')}</section>` : '')
+    + `<section class="card pad"><div class="card-h"><h3>Próximos jogos</h3></div>${next.length ? next.map(fbRow).join('') : '<div class="empty">Nenhum jogo marcado por enquanto.</div>'}</section>`
+    + `<section class="card pad"><div class="card-h"><h3>Resultados</h3></div>${past.length ? past.map(fbRow).join('') : '<div class="empty">Nenhum jogo ainda nesta temporada.</div>'}</section>`;
+}
+
+/* ----- diário de estádio ----- */
+const gameTitle = g => `${g.home}${g.hs >= 0 ? ` ${g.hs} x ${g.as} ` : ' x '}${g.away}`;
+const gmEntry = g => g.entry ? db.finance.entries.find(e => e.id === g.entry) || null : null;
+const gmSpent = g => { const en = gmEntry(g); return en ? en.amount * en.n : g.cost; };
+function gmResult(g) {
+  if (!g.side || g.hs < 0 || g.as < 0) return '';
+  return g.side === 'home' ? fbRes(g.hs, g.as) : fbRes(g.as, g.hs);
+}
+const stars = n => n ? '★'.repeat(n) + '☆'.repeat(5 - n) : '';
+function gameCard(g) {
+  const r = gmResult(g), en = gmEntry(g), color = r === 'v' ? 'var(--ok)' : r === 'd' ? 'var(--danger)' : r === 'e' ? 'var(--muted)' : 'var(--accent)';
+  const team = s => g.side === s ? `<b>${esc(g[s])}</b>` : esc(g[s]);
+  return `<article class="card wish gm" style="--c:${color}">
+    ${g.photos.length ? `<button class="wish-photo" data-act="game-photo" data-id="${g.id}" aria-label="Ver fotos"><img src="${g.photos[0]}" alt="">${g.photos.length > 1 ? `<span>📷 ${g.photos.length}</span>` : ''}</button>` : ''}
+    <div class="wish-top"><div class="grow"><h3 class="gm-title">${team('home')} <span>${g.hs >= 0 ? `${g.hs} x ${g.as}` : 'x'}</span> ${team('away')}</h3>
+      <small>${cap(fmt(g.date, { day: 'numeric', month: 'long', year: 'numeric' }))}${g.comp ? ' · ' + esc(g.comp) : ''}</small></div>
+      ${r ? `<span class="fb-res ${r}" title="${RES_LABEL[r]}">${r.toUpperCase()}</span>` : ''}</div>
+    <div class="gm-info">${g.stadium ? `<span>🏟️ ${esc(g.stadium)}</span>` : ''}${g.with ? `<span>👥 ${esc(g.with)}</span>` : ''}${g.rating ? `<span class="gm-stars" title="Nota ${g.rating} de 5">${stars(g.rating)}</span>` : ''}${gmSpent(g) ? `<span>💸 ${money(gmSpent(g))}${en ? ' <em class="tag ok">nas Finanças</em>' : ''}</span>` : ''}</div>
+    ${g.notes ? `<p>${esc(g.notes)}</p>` : ''}
+    <div class="goal-actions"><button class="btn sm ghost" data-act="open-game" data-id="${g.id}">Editar</button>
+      ${g.cost && !en ? `<button class="btn sm" data-act="game-fin" data-id="${g.id}">💰 Lançar nas Finanças</button>` : ''}
+      ${en ? `<button class="btn sm ghost" data-act="open-entry" data-id="${en.id}">Ver gasto</button>` : ''}</div>
+  </article>`;
+}
+function fbDiary() {
+  const list = [...db.football.games].sort((a, b) => b.date.localeCompare(a.date));
+  if (!list.length) return `<div class="card pad empty">Anote cada jogo a que você for no estádio: placar, estádio, com quem foi, quanto gastou e fotos. ${db.football.team ? 'Na aba <b>Jogos</b>, toque em <b>🏟️ Fui</b> num jogo que já aconteceu: o placar, a data e o estádio já vêm preenchidos.' : ''} <button data-act="new-game">Registrar um jogo</button></div>`;
+  const cnt = { v: 0, e: 0, d: 0 };
+  list.forEach(g => { const r = gmResult(g); if (r) cnt[r]++; });
+  const n = cnt.v + cnt.e + cnt.d, aprov = n ? Math.round((cnt.v * 3 + cnt.e) / (n * 3) * 100) : 0;
+  const paid = list.filter(gmSpent), spent = paid.reduce((s, g) => s + gmSpent(g), 0);
+  const st = new Map(); list.forEach(g => g.stadium && st.set(g.stadium, (st.get(g.stadium) || 0) + 1));
+  const fav = [...st].sort((a, b) => b[1] - a[1])[0];
+  const years = new Map(); list.forEach(g => { const y = g.date.slice(0, 4); if (!years.has(y)) years.set(y, []); years.get(y).push(g); });
+  return `<div class="kpis four">
+      <section class="card kpi"><span>Jogos no estádio</span><b>${list.length}</b><small>${fav && fav[1] > 1 ? `mais vezes: ${esc(fav[0])} (${fav[1]})` : `desde ${list.at(-1).date.slice(0, 4)}`}</small></section>
+      <section class="card kpi"><span>V · E · D</span><b><em class="pos">${cnt.v}</em> · ${cnt.e} · <em class="neg">${cnt.d}</em></b><small>${n ? 'do time para o qual você torcia' : 'anote o placar e para quem torcia'}</small></section>
+      <section class="card kpi"><span>Aproveitamento</span><b class="${n ? aprov >= 50 ? 'pos' : 'neg' : ''}">${n ? aprov + '%' : '—'}</b><small>${n ? (cnt.d === 0 ? 'nunca perdeu com você lá! 🍀' : `em ${plural(n, 'jogo', 'jogos')}`) : '&nbsp;'}</small></section>
+      <section class="card kpi"><span>Gastos com jogos</span><b>${money(spent)}</b><small>${paid.length ? `média de ${money(Math.round(spent / paid.length))} por jogo` : 'anote quanto gastou'}</small></section>
+    </div>
+    ${[...years].map(([y, l]) => `<section class="wish-group"><div class="wish-month"><h3>${y}</h3><span class="grow"></span><span class="muted">${plural(l.length, 'jogo', 'jogos')}</span></div><div class="wishes">${l.map(gameCard).join('')}</div></section>`).join('')}`;
+}
+let gmId = null, gmCtx = { rating: 0, espn: '' }, gmPhotos = [];
+function renderGmPhotos() {
+  $('#gmPhotos').innerHTML = gmPhotos.map((p, i) => `<div class="ws-thumb"><img src="${p}" alt="Foto ${i + 1}"><button type="button" data-act="gm-photo-del" data-i="${i}" aria-label="Remover foto ${i + 1}">✕</button></div>`).join('')
+    + (gmPhotos.length < WISH_MAX_PHOTOS ? '<label class="ws-add"><b>+</b>Adicionar foto<input type="file" id="gmFile" accept="image/*" multiple hidden></label>' : '');
+}
+function renderGmStars() {
+  $('#gmStars').innerHTML = [1, 2, 3, 4, 5].map(i => `<button type="button" data-act="gm-star" data-n="${i}" class="${i <= gmCtx.rating ? 'on' : ''}" aria-label="Nota ${i}">★</button>`).join('');
+}
+function openGame(id, preset = {}) {
+  const g = db.football.games.find(x => x.id === id); gmId = g ? g.id : null;
+  const v = (k, def = '') => g ? g[k] : (preset[k] ?? def);
+  $('#gmTitle').textContent = g ? 'Editar jogo no estádio' : 'Jogo no estádio';
+  $('#gmDate').value = v('date', todayKey());
+  $('#gmComp').value = v('comp');
+  $('#gmHome').value = v('home');
+  $('#gmAway').value = v('away');
+  $('#gmHs').value = v('hs', -1) >= 0 ? v('hs') : '';
+  $('#gmAs').value = v('as', -1) >= 0 ? v('as') : '';
+  $('#gmSide').value = v('side');
+  $('#gmStadium').value = v('stadium');
+  $('#gmWith').value = v('with');
+  $('#gmCost').value = moneyInput(v('cost', 0));
+  $('#gmNotes').value = v('notes');
+  $('#gmFin').checked = false;
+  gmCtx = { rating: v('rating', 0), espn: v('espn') };
+  gmPhotos = g ? [...g.photos] : [];
+  // sugestões: times, estádios e competições já usados
+  const uniq = l => [...new Set(l.filter(Boolean))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  const opts = l => uniq(l).map(x => `<option value="${esc(x)}">`).join('');
+  $('#gmTeams').innerHTML = opts([db.football.team?.name, ...db.football.games.flatMap(x => [x.home, x.away])]);
+  $('#gmStadiums').innerHTML = opts(db.football.games.map(x => x.stadium));
+  $('#gmComps').innerHTML = opts([...Object.values(FB_COMP), ...db.football.games.map(x => x.comp)]);
+  $('#gmHint').textContent = !g && preset.espn ? 'Placar, data e estádio vieram da ESPN. Complete com o que quiser.' : '';
+  $('#gmHint').hidden = !$('#gmHint').textContent;
+  const en = g ? gmEntry(g) : null;
+  $('#gmFinBox').hidden = !!en;
+  $('#gmFinInfo').textContent = en ? `💰 O gasto deste jogo já está nas Finanças (${moneyAlways(en.amount * en.n)}, em ${fmtShort(en.date)}). Para mudar o valor lá, abra o lançamento em Gastos e ganhos.` : '';
+  $('#gmFinInfo').hidden = !en;
+  $('#gmDelete').hidden = !g;
+  renderGmPhotos(); renderGmStars();
+  $('#gmDlg').showModal();
+  if (!g && !preset.home) $('#gmHome').focus();
+}
+// jogo da ESPN → campos do diário
+function gamePreset(g) {
+  const stage = stagePt(g.stage);
+  return { date: gDate(g), comp: compName(g.lg, g.lgName) + (stage ? ' · ' + stage : ''), home: g.home.name, away: g.away.name,
+    hs: g.hs ?? -1, as: g.as ?? -1, side: fbMine(g), stadium: g.venue, espn: g.id };
+}
+const gmGoals = s => { s = String(s).trim(); return /^\d{1,2}$/.test(s) ? +s : -1; };
+$('#gmForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const home = $('#gmHome').value.trim(), away = $('#gmAway').value.trim(), date = $('#gmDate').value;
+  if (!home || !away) return notify('Diga quais times jogaram.');
+  if (!validDate(date)) return notify('Escolha a data do jogo.');
+  const hs = gmGoals($('#gmHs').value), as = gmGoals($('#gmAs').value);
+  if ((hs < 0) !== (as < 0)) return notify('Preencha os gols dos dois times (ou deixe os dois em branco).');
+  const data = { date, home, away, hs, as, side: $('#gmSide').value, comp: $('#gmComp').value.trim(), stadium: $('#gmStadium').value.trim(), with: $('#gmWith').value.trim(),
+    cost: parseMoney($('#gmCost').value), notes: $('#gmNotes').value.trim(), rating: gmCtx.rating, photos: [...gmPhotos] };
+  let g = db.football.games.find(x => x.id === gmId);
+  const isNew = !g;
+  if (g) Object.assign(g, data); else { g = { id: newId(), entry: '', espn: gmCtx.espn, ...data }; db.football.games.push(g); }
+  const launch = $('#gmFin').checked && data.cost && !gmEntry(g);
+  $('#gmDlg').close();
+  if (ui.view === 'foot') ui.fbTab = 'diary';
+  save();
+  if (launch) openEntry(null, null, { type: 'expense', amount: data.cost, desc: `Jogo: ${home} x ${away}`, cat: 'f-lazer', date, link: { kind: 'game', id: g.id } });
+  else notify(isNew ? 'Jogo anotado no diário de estádio. 🏟️' : 'Jogo atualizado.');
+});
+$('#gmDelete').addEventListener('click', async () => {
+  const i = db.football.games.findIndex(x => x.id === gmId); if (i < 0) return;
+  const g = db.football.games[i], en = gmEntry(g);
+  if (!await ask('Excluir jogo do diário?', `"${gameTitle(g)}" sai do diário de estádio.${en ? ' O gasto continua nas Finanças.' : ''}`, [{ label: 'Excluir', value: true, danger: true }])) return;
+  db.football.games.splice(i, 1);
+  $('#gmDlg').close();
+  save();
+  notify('Jogo excluído do diário.', () => { db.football.games.splice(i, 0, g); save(); });
+});
+$('#gmPhotos').addEventListener('change', e => { if (e.target.id === 'gmFile') addPhotos(gmPhotos, e.target.files, renderGmPhotos, 'jogo'); });
+$('#gmDlg').addEventListener('paste', e => {
+  const files = [...(e.clipboardData?.files || [])].filter(f => f.type.startsWith('image/'));
+  if (files.length) { e.preventDefault(); addPhotos(gmPhotos, files, renderGmPhotos, 'jogo'); }
+});
+
+/* ----- escolher o time ----- */
+function openPicker() {
+  $('#ftLeague').innerHTML = FB_LEAGUES.map(([id, l]) => `<option value="${id}">${l}</option>`).join('');
+  $('#ftLeague').value = FB_LEAGUES.some(([id]) => id === db.football.team?.league) ? db.football.team.league : 'bra.1';
+  $('#ftSearch').value = '';
+  $('#ftNone').hidden = !db.football.team;
+  renderPicker();
+  $('#ftDlg').showModal();
+}
+function renderPicker() {
+  const lg = $('#ftLeague').value, path = fbTablePath(lg), tb = fbData(path, fbParseTable, 24 * 3600e3);
+  const q = noAccent($('#ftSearch').value.trim().toLowerCase()), cur = db.football.team?.id;
+  if (!tb) {
+    $('#ftList').innerHTML = !fbFail.has(path) ? '<div class="empty">⏳ Carregando os times…</div>'
+      : '<div class="empty">Não consegui carregar a lista de times. Confira a internet e <button type="button" data-act="ft-retry">tente de novo</button>.</div>';
+    return;
+  }
+  const seen = new Set(), teams = tb.groups.flatMap(g => g.rows).filter(r => !seen.has(r.id) && seen.add(r.id)).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+  const list = teams.filter(r => !q || noAccent(r.name.toLowerCase()).includes(q));
+  $('#ftList').innerHTML = list.length ? list.map(r => `<button type="button" class="ft-team${r.id === cur ? ' on' : ''}" data-act="fb-pick" data-id="${esc(r.id)}">${fbLogo(r, 40)}<span>${esc(r.name)}</span></button>`).join('')
+    : '<div class="empty">Nenhum time com esse nome nesta liga.</div>';
+}
+$('#ftDlg form').addEventListener('submit', e => e.preventDefault());
+$('#ftNone').addEventListener('click', () => {
+  db.football.team = null; ui.fbTab = 'team';
+  $('#ftDlg').close();
+  save();
+  notify('Você não está mais acompanhando um time. O diário de estádio continua.');
+});
+function pickTeam(id) {
+  const lg = $('#ftLeague').value, tb = fbCache[fbTablePath(lg)]?.d, r = tb?.groups.flatMap(g => g.rows).find(x => x.id === id);
+  if (!r) return;
+  const changed = db.football.team?.id !== r.id;
+  db.football.team = { id: r.id, name: r.name, abbr: r.abbr, logo: r.logo, league: lg };
+  if (changed) { ui.fbTab = 'team'; ui.fbComp = ''; ui.fbFilter = ''; }
+  $('#ftDlg').close();
+  save();
+  notify(`${r.name} é o seu time agora. ⚽`);
+}
 
 /* =========================================================
    Exercícios: peso, ficha da academia, treinos e atividades
@@ -3555,7 +4180,7 @@ function shift(n) {
   render();
 }
 // Abas que, no celular, ficam atrás do botão "Mais"
-const MORE_VIEWS = [['week', '🗓️ Semana'], ['goals', '🎯 Provas e metas'], ['trips', '✈️ Viagens'], ['fit', '💪 Exercícios'], ['debts', '🤝 Dívidas'], ['wishlist', '🎁 Wishlist']];
+const MORE_VIEWS = [['week', '🗓️ Semana'], ['goals', '🎯 Provas e metas'], ['trips', '✈️ Viagens'], ['fit', '💪 Exercícios'], ['foot', '⚽ Futebol'], ['debts', '🤝 Dívidas'], ['wishlist', '🎁 Wishlist']];
 const openDrawer = () => $('#sidebar').classList.add('open');
 const closeDrawer = () => $('#sidebar').classList.remove('open');
 
@@ -3609,19 +4234,19 @@ function openEvent(id, date, preset = {}) {
   evCtx = { id: ev ? ev.id : null, date: date || d };
   $('#evTitle').textContent = ev ? 'Editar compromisso' : (preset.allDay ? 'Novo evento de dia inteiro' : 'Novo compromisso');
   $('#evCat').innerHTML = catOptions(ev ? ev.cat : (db.categories[0]?.id || ''));
-  $('#evName').value = ev ? ev.title : '';
+  $('#evName').value = ev ? ev.title : (preset.title || '');
   $('#evDate').value = d;
   $('#evAllDay').checked = ev ? ev.allDay : !!preset.allDay;
   const start = ev && !ev.allDay ? ev.start : (preset.start || defaultStart(d));
   $('#evStart').value = start;
-  $('#evEnd').value = ev && !ev.allDay ? endOf(ev) : fromMin(toMin(start) + 60);
+  $('#evEnd').value = ev && !ev.allDay ? endOf(ev) : (preset.end || fromMin(toMin(start) + 60));
   $('#evRepeat').innerHTML = Object.entries(REPEAT).map(([k, v]) => `<option value="${k}">${v}</option>`).join('');
   $('#evRepeat').value = ev ? ev.repeat : 'none';
   $('#evUntil').value = ev ? ev.until : '';
   const days = ev && ev.days.length ? ev.days : [dow(d)];
   $('#evDays').innerHTML = weekOrder().map(i => `<label><input type="checkbox" value="${i}" ${days.includes(i) ? 'checked' : ''}><span>${WD[i]}</span></label>`).join('');
-  $('#evLoc').value = ev ? ev.location : '';
-  $('#evNotes').value = ev ? ev.notes : '';
+  $('#evLoc').value = ev ? ev.location : (preset.location || '');
+  $('#evNotes').value = ev ? ev.notes : (preset.notes || '');
   $('#evDelete').hidden = !ev;
   $('#evHint').textContent = [ev && ev.repeat !== 'none' ? '↻ Este compromisso se repete. As alterações valem para todas as repetições.' : '',
     ev?.gcal ? '📥 Veio do Google Agenda: se você importar de novo, título, data, horário, local e observações voltam a ser os do Google.' : ''].filter(Boolean).join(' ');
@@ -3824,6 +4449,7 @@ function renderResults() {
   db.finance.entries.forEach(e => { if ((e.desc + ' ' + e.notes).toLowerCase().includes(q)) r.push({ icon: e.type === 'income' ? '💰' : '🧾', title: e.desc, meta: `${e.type === 'income' ? 'Ganho' : 'Gasto'} · ${money(e.amount)}${e.recur ? ' · todo mês' : e.n > 1 ? ` · ${e.n}x` : ' · ' + relDate(e.date)}`, act: 'open-entry', id: e.id }); });
   db.debts.forEach(d => { if ((d.person + ' ' + d.desc).toLowerCase().includes(q)) r.push({ icon: '🤝', title: d.person, meta: `${d.done ? 'Quitada' : d.dir === 'owe' ? 'Você deve' : 'Te deve'} · ${money(d.done ? d.amount : debtLeft(d))}${d.desc ? ' · ' + esc(d.desc) : ''}`, act: 'open-debt', id: d.id }); });
   db.wishes.forEach(w => { if ((w.name + ' ' + w.notes).toLowerCase().includes(q)) r.push({ icon: '🎁', title: w.name, meta: `Wishlist${w.bought ? ' · comprado' : w.price ? ' · ' + money(w.price) : ''}`, act: 'open-wish', id: w.id }); });
+  db.football.games.forEach(g => { if ([g.home, g.away, g.stadium, g.with, g.notes, g.comp].join(' ').toLowerCase().includes(q)) r.push({ icon: '🏟️', title: gameTitle(g), meta: `Diário de estádio · ${relDate(g.date)}${g.stadium ? ' · ' + esc(g.stadium) : ''}`, act: 'open-game', id: g.id }); });
   box.innerHTML = r.length ? r.slice(0, 12).map(x => `<button class="res" data-act="${x.act}" data-date="${x.date || ''}" data-id="${x.id || ''}"><span>${x.icon}</span><span><b>${esc(x.title)}</b><small>${x.meta}</small></span></button>`).join('') : '<div class="res-empty">Nada encontrado.</div>';
   box.hidden = false;
 }
@@ -3843,7 +4469,7 @@ function exportBackup() {
 async function importBackup(file) {
   try {
     const clean = sanitize(JSON.parse(await file.text()));
-    const has = db.events.length || db.tasks.length || db.goals.length || db.trips.length || db.finance.entries.length || db.debts.length || db.wishes.length || hasFit(db);
+    const has = db.events.length || db.tasks.length || db.goals.length || db.trips.length || db.finance.entries.length || db.debts.length || db.wishes.length || hasFit(db) || db.football.games.length;
     if (has && !await ask('Restaurar backup?', 'Os dados atuais deste navegador serão substituídos pelos do arquivo.', [{ label: 'Substituir', value: true, danger: true }])) return;
     clean.settings.onboarded = true;
     db = clean; ui.planning = null;
@@ -4045,9 +4671,16 @@ function loadDemo() {
     { id: newId(), date: d(-6), type: 'run', min: 32, km: 5, notes: 'No parque' },
     { id: newId(), date: d(-2), type: 'walk', min: 45, km: 3.6, notes: '' }
   );
+  // futebol: um time para a central e dois jogos no diário de estádio
+  if (!db.football.team) db.football.team = { id: '2022', name: 'Cruzeiro', abbr: 'CRU', logo: 'https://a.espncdn.com/i/teamlogos/soccer/500/2022.png', league: 'bra.1' };
+  const gm = (date, home, hs, as, away, extra) => ({ id: newId(), date, home, away, hs, as, side: 'home', comp: 'Brasileirão', stadium: 'Mineirão', with: '', notes: '', rating: 0, cost: 0, entry: '', espn: '', photos: [], ...extra });
+  db.football.games.push(
+    gm(d(-40), 'Cruzeiro', 2, 1, 'Palmeiras', { with: 'Pai e o Lucas', rating: 5, cost: 12000, notes: 'Virada no segundo tempo, estádio lotado!' }),
+    gm(d(-12), 'Cruzeiro', 0, 0, 'Grêmio', { with: 'Amigos do trabalho', rating: 3, cost: 9000 })
+  );
 }
 function showWelcome() {
-  const has = db.events.length || db.tasks.length || db.goals.length || db.trips.length || db.finance.entries.length || db.debts.length || db.wishes.length || hasFit(db);
+  const has = db.events.length || db.tasks.length || db.goals.length || db.trips.length || db.finance.entries.length || db.debts.length || db.wishes.length || hasFit(db) || db.football.games.length;
   $('#wName').value = db.settings.name;
   $('#wDemo').hidden = !!has;
   $('#wGo').textContent = has ? 'Continuar' : 'Começar do zero';
@@ -4244,6 +4877,32 @@ document.addEventListener('click', async e => {
       if (sib && sib.className === r.className) { act === 'fp-up' ? sib.before(r) : sib.after(r); fpRelabel(); el.focus(); }
       break;
     }
+    /* futebol */
+    case 'fb-tab': ui.fbTab = el.dataset.f; render(); break;
+    case 'fb-comp': ui.fbComp = el.dataset.lg; ui.fbTab = 'tables'; render(); break;
+    case 'fb-filter': ui.fbFilter = el.dataset.lg; render(); break;
+    case 'fb-team': openPicker(); break;
+    case 'fb-pick': pickTeam(id); break;
+    case 'ft-retry': fbFail.clear(); renderPicker(); break;
+    case 'fb-reload': Object.values(fbCache).forEach(c => c.t = 0); fbFail.clear(); render(); break;
+    case 'fb-agenda': {
+      const g = fbGames().find(x => x.id === id); if (!g) break;
+      const ev = fbInAgenda(g); if (ev) { setCursor(gDate(g)); setView('day'); break; }
+      const st = gTime(g), stage = stagePt(g.stage);
+      openEvent(null, gDate(g), { title: fbEventTitle(g), start: st, end: fromMin(toMin(st) + 120), location: [g.venue, g.city].filter(Boolean).join(', '), notes: compName(g.lg, g.lgName) + (stage ? ' · ' + stage : '') });
+      break;
+    }
+    case 'fb-went': { const g = fbGames().find(x => x.id === id); if (g) openGame(null, gamePreset(g)); break; }
+    case 'new-game': closeDrawer(); openGame(null); break;
+    case 'open-game': hideResults(); openGame(id); break;
+    case 'gm-star': { const n = +el.dataset.n; gmCtx.rating = gmCtx.rating === n ? 0 : n; renderGmStars(); break; }
+    case 'gm-photo-del': gmPhotos.splice(+el.dataset.i, 1); renderGmPhotos(); break;
+    case 'game-photo': { const g = db.football.games.find(x => x.id === id); if (g && g.photos.length) openPhotos({ photos: g.photos, name: gameTitle(g) }); break; }
+    case 'game-fin': {
+      const g = db.football.games.find(x => x.id === id);
+      if (g && g.cost) openEntry(null, null, { type: 'expense', amount: g.cost, desc: `Jogo: ${g.home} x ${g.away}`, cat: 'f-lazer', date: g.date, link: { kind: 'game', id: g.id } });
+      break;
+    }
     /* wishlist */
     case 'new-wish': openWish(null); break;
     case 'open-wish': hideResults(); openWish(id); break;
@@ -4258,7 +4917,7 @@ document.addEventListener('click', async e => {
     case 'drawer': openDrawer(); break;
     case 'drawer-close': closeDrawer(); break;
     case 'fab': {
-      const v = await ask('Adicionar', 'O que você quer criar?', [{ label: '✅ Tarefa', value: 'task', secondary: true }, { label: '🎯 Prova / meta', value: 'goal', secondary: true }, { label: '− Gasto', value: 'expense', secondary: true }, { label: '+ Ganho', value: 'income', secondary: true }, { label: '🤝 Dívida', value: 'debt', secondary: true }, { label: '🎁 Desejo', value: 'wish', secondary: true }, { label: '✈️ Viagem', value: 'trip', secondary: true }, { label: '⚖️ Peso', value: 'weight', secondary: true }, { label: '🏃 Atividade física', value: 'act', secondary: true }, { label: '🕒 Compromisso', value: 'event', secondary: true }], true);
+      const v = await ask('Adicionar', 'O que você quer criar?', [{ label: '✅ Tarefa', value: 'task', secondary: true }, { label: '🎯 Prova / meta', value: 'goal', secondary: true }, { label: '− Gasto', value: 'expense', secondary: true }, { label: '+ Ganho', value: 'income', secondary: true }, { label: '🤝 Dívida', value: 'debt', secondary: true }, { label: '🎁 Desejo', value: 'wish', secondary: true }, { label: '✈️ Viagem', value: 'trip', secondary: true }, { label: '⚖️ Peso', value: 'weight', secondary: true }, { label: '🏃 Atividade física', value: 'act', secondary: true }, { label: '🏟️ Jogo no estádio', value: 'game', secondary: true }, { label: '🕒 Compromisso', value: 'event', secondary: true }], true);
       if (v === 'event') openEvent(null, ui.cursor);
       else if (v === 'trip') openTrip(null, { date: ui.cursor >= todayKey() ? ui.cursor : todayKey() });
       else if (v === 'expense' || v === 'income') openEntry(null, null, { type: v });
@@ -4268,6 +4927,7 @@ document.addEventListener('click', async e => {
       else if (v === 'goal') openGoal('exam');
       else if (v === 'weight') openWeight(null, ui.cursor <= todayKey() ? ui.cursor : todayKey());
       else if (v === 'act') openAct(null, ui.cursor);
+      else if (v === 'game') openGame(null);
       break;
     }
   }
@@ -4304,6 +4964,7 @@ document.addEventListener('input', e => {
   else if (t.name === 'enType' || ['enMode', 'enN', 'enBasis', 'enAmount', 'enDate', 'enRule', 'enRuleN', 'enAuto'].includes(t.id)) syncEnForm();
   else if (t.id === 'wishSort') { ui.wishSort = t.value; render(); }
   else if (t.id === 'fitEx') { ui.fitEx = t.value; render(); }
+  else if (t.id === 'ftLeague' || t.id === 'ftSearch') renderPicker();
   else if (t.closest('#fpDays')) fpRenderTimes();
   else if (t.name === 'billCycle') $('#billAmount').value = moneyInput(billCtx.opts[+t.value].amount);
   else if (t.classList.contains('fs-type')) {
@@ -4532,7 +5193,7 @@ function mergeList(b, l, r, preferLocal) {
   return out;
 }
 const MERGE_LISTS = [['categories'], ['events'], ['tasks'], ['goals'], ['trips'], ['debts'], ['wishes'],['finance', 'banks'], ['finance', 'accounts'], ['finance', 'cats'], ['finance', 'entries'],
-  ['fitness', 'weights'], ['fitness', 'plans'], ['fitness', 'logs'], ['fitness', 'acts']];
+  ['fitness', 'weights'], ['fitness', 'plans'], ['fitness', 'logs'], ['fitness', 'acts'], ['football', 'games']];
 function mergeDb(base, local, remote) {
   const preferLocal = (local.updatedAt || 0) >= (remote.updatedAt || 0);
   const at = (o, p) => p.reduce((x, k) => x?.[k], o) || [];
@@ -4547,7 +5208,7 @@ function sameData(a, b) {
   const canon = d => { try { const c = sanitize(JSON.parse(JSON.stringify(d))); c.updatedAt = 0; c.settings.onboarded = true; return JSON.stringify(c); } catch (e) { return Math.random(); } };
   return canon(a) === canon(b);
 }
-const hasData = d => d.events.length || d.tasks.length || d.goals.length || d.trips.length ||d.finance.entries.length || d.debts.length || d.wishes.length || hasFit(d) || Object.keys(d.notes).length;
+const hasData = d => d.events.length || d.tasks.length || d.goals.length || d.trips.length ||d.finance.entries.length || d.debts.length || d.wishes.length || hasFit(d) || d.football.games.length || Object.keys(d.notes).length;
 const fmtWhen = t => t ? new Date(t).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'sem data';
 
 // Compara este aparelho com a nuvem: envia, baixa ou pergunta qual versão manter.
